@@ -1,0 +1,158 @@
+﻿@model IEnumerable<SwiftHR.Models.FeedsGroup>
+
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Posts";
+}
+
+<style>
+    .nav > li > a:hover {
+        color: #333;
+        background: #3c8dbc5c;
+        font-weight: 600;
+    }
+
+    .nav > li > a:focus {
+        color: #333;
+        background: #3c8dbc5c;
+        font-weight: 600;
+    }
+
+    .liactive {
+        color: #333;
+        background: #3c8dbc5c;
+        font-weight: 600;
+    }
+
+
+</style>
+
+<section class="content-header">
+    <h1>
+        Posts
+    </h1>
+
+</section>
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="box box-primary">
+                <div class="box-body box-profile">
+                    <p class="text-muted text-center">Posts Filters </p>
+
+                    <ul id="ulGroupList" class="nav nav-stacked">
+                        <li>
+                            <a id="li_AllPosts" class="liactive" href="javascript:void(0)" style="text-transform:uppercase;" onclick="OnPostsFilterClick('-1', @Model.Count(), '-1')">ALL POSTS <span class="pull-right badge bg-blue"></span></a>
+                            <input id="hndfAllPost" type="hidden" value="-1" />
+                        </li>
+
+                        @if (Model != null && Model.Count() > 0)
+                        {
+                            @for (int j = 0; j <= Model.Count() - 1; j++)
+                            {
+                                int empj = j + 1;
+
+                                <li>
+                                    <a id="li_@empj" href="javascript:void(0)" name="FeedsGroup_@Model.ElementAt(j).FeedsGroupId" style="text-transform:uppercase;" onclick="OnPostsFilterClick(this.id, @Model.Count(), @Model.ElementAt(j).FeedsGroupId)"> @Model.ElementAt(j).FeedsGroupName <span class="pull-right badge bg-aqua"></span></a>
+                                    <input id="hndf_@empj" type="hidden" value="@Model.ElementAt(j).FeedsGroupId" />
+                                </li>
+                            }
+                        }
+
+                    <li>
+                        <a id="li_MyPosts" href="javascript:void(0)" style="text-transform:uppercase;" onclick="OnPostsFilterClick('0', @Model.Count(), '0')">My Posts <span class="pull-right badge bg-aqua"></span></a>
+                        <input id="hndfMyPosts" type="hidden" value="0" />
+                    </li>
+
+
+                    </ul>
+
+                    <hr style="border-top: 1px solid #33333326 !important;" />
+
+                    <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#modal-default"><b>Add New Post</b></a>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div id="divShowPosts">
+            </div>
+        </div>
+        <div class="col-md-3">
+
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+                <ol class="carousel-indicators">
+                    <li data-target="#carousel-example-generic" data-slide-to="1" class="active"></li>
+                </ol>
+                <div class="carousel-inner">
+                    <div class="item active">
+                        <img src="../dist/img/Bootstrap.png" alt="Second slide">
+                        <div class="carousel-caption">
+                            <a href="#carousel-example-generic" style="color:#f9fafc;">
+                                For, Your Convenience
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+                @*<a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+                        <span class="fa fa-angle-left"></span>
+                    </a>
+                    <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+                        <span class="fa fa-angle-right"></span>
+                    </a>*@
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-default">
+        <div class="modal-dialog">
+            <div id="divAddPosts"></div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#liPosts").addClass("active"); //This is for sidebar menu
+            $("#divShowPosts").load("/Home/ShowPostsData");
+            $("#divAddPosts").load("/Home/AddPostsData");
+        });
+
+
+        function OnPostsFilterClick(selectedMenu, listCount, grpId) {
+            var liAllPosts = document.getElementById("li_AllPosts");
+            var liMyPosts = document.getElementById("li_MyPosts");
+            liAllPosts.classList.remove("liactive");
+            liMyPosts.classList.remove("liactive");
+
+            for (var i = 0; i <= listCount - 1; i++) {
+                document.getElementById("li_" + (i + 1).toString()).classList.remove("liactive")
+            }
+
+            if (selectedMenu == '-1') {
+                liAllPosts.classList.add("liactive");
+                $("#divShowPosts").load("/Home/ShowPostsData");
+            }
+            else if (selectedMenu == '0') {
+                liMyPosts.classList.add("liactive");
+                $("#divShowPosts").load("/Home/ShowGroupPostsData?FeedsGroupId=" + '0');
+            }
+            else if (grpId == '0') {
+                document.getElementById(selectedMenu.id).classList.add("liactive");
+            }
+            else {
+                document.getElementById(selectedMenu).classList.add("liactive");
+                $("#divShowPosts").load("/Home/ShowGroupPostsData?FeedsGroupId=" + grpId);
+            }
+        }
+
+    </script>
+}

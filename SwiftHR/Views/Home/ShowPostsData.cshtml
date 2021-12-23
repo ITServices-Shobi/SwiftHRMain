@@ -1,0 +1,122 @@
+﻿@model IEnumerable<SwiftHR.Utility.EmployeeFeedsAllData>
+@using System.Data;
+<!-- Box Comment -->
+
+@if (Model != null && Model.Count() > 0)
+{
+    int indx = 0;
+
+    @foreach (var empFeed in Model)
+    {
+        <div class="box box-widget">
+            <div class="box-header with-border">
+                <div class="user-block">
+                    <img class="img-circle" src="../UploadImages/@empFeed.EmployeeProfilePhoto" alt="User Image">
+                    <span class="username"><a href="#">@empFeed.EmployeeName</a></span>
+                    <span class="description">Shared publicly - @empFeed.employeeFeed.CreatedDate  @empFeed.employeeFeed.CreatedTime</span>
+                </div>
+                <!-- /.user-block -->
+                <div class="box-tools">
+                    @*<button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>*@
+                </div>
+                <!-- /.box-tools -->
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+
+                @if (empFeed.employeeFeed.FeedsFileName != "")
+                {
+                    <img class="img-responsive pad" src="../FeedsImages/@empFeed.employeeFeed.FeedsFileName" alt="Photo">
+                }
+
+
+                @Html.Raw(@empFeed.employeeFeed.FeedsDescription)
+
+
+
+                <button type="button" class="btn btn-default btn-xs" onclick="OnAddLikeClick(@empFeed.employeeFeed.FeedsId)"><i class="fa fa-thumbs-o-up"></i> Like</button>
+                <span class="pull-right text-muted">@empFeed.LikesCount likes - <a href="#" class="link-black text-sm"> @empFeed.CommentsCount comments </a> </span>
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer box-comments">
+
+                @foreach (var empFeedsComments in @empFeed.feedsComments)
+                {
+                    <div class="box-comment">
+                        <!-- User image -->
+                        <img class="img-circle img-sm" src="../UploadImages/@empFeedsComments.CommentEmployeeProfilePhoto" alt="User Image">
+
+                        <div class="comment-text">
+                            <span class="username">
+                                @empFeedsComments.CommentEmployeeName
+                                <span class="text-muted pull-right">@empFeedsComments.feedComments.CreatedDate @empFeedsComments.feedComments.CreatedTime</span>
+                            </span><!-- /.username -->
+                            @empFeedsComments.feedComments.Comments
+                        </div>
+                        <!-- /.comment-text -->
+                    </div>
+                }
+
+
+            </div>
+            <!-- /.box-footer -->
+            <div class="box-footer">
+                <form action="#" method="post">
+                    @*<img class="img-responsive img-circle img-sm" src="../dist/img/user4-128x128.jpg" alt="Alt Text">*@
+                    <!-- .img-push is used to add margin to elements next to floating images -->
+                    <div class="img-push">
+                        <input type="text" class="form-control input-sm" id="feedsComment" name="feedsComment" placeholder="Enter text to post comment">
+                        <button type="button" class="btn btn-default btn-xs" style="float: right; margin-top: 1%;" onclick="OnAddCommentsClick(@empFeed.employeeFeed.FeedsId, @indx)"><i class="fa fa-share"></i> Send </button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.box-footer -->
+        </div>
+
+        indx++;
+    }
+}
+else
+{
+
+    <div> No Records Found! </div>
+}
+
+
+<script>
+
+    function OnAddLikeClick(feedsId) {
+        $("#divShowPosts").load("/Home/AddLikesToFeed?FeedsId=" + feedsId);
+    }
+
+    function OnAddCommentsClick(feedsId, btnindex) {
+
+        var ulGroupList = document.getElementById("ulGroupList").getElementsByTagName("li");
+        var group_id = 0;
+        for (var a = 0; a <= ulGroupList.length - 1; a++) {
+            if (ulGroupList[a].firstElementChild.classList.contains("liactive")) {
+                group_id = ulGroupList[a].lastElementChild.value;
+            }
+        }
+
+        var txtComments = document.getElementsByName("feedsComment");
+        var FeedComment = txtComments[btnindex].value;
+       // $("#divShowPosts").load("/Home/AddCommentsToFeed?FeedsId=" + feedsId + "&groupId=" + group_id + "&feedsComment=" + FeedComment);
+
+         $.ajax({
+                type: "POST",
+                url: "@Url.Action("AddCommentsToFeed", "Home")",
+                data: { FeedsId: feedsId, groupId: group_id, feedsComment: FeedComment},
+                dataType: "JSON",
+                success: function (response) {
+                    $("#divShowPosts").load("/Home/GetCommentsToFeed?groupId=" + group_id);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+</script>

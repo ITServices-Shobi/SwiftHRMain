@@ -1,0 +1,1608 @@
+﻿@model SwiftHR.Utility.EmployeeOnboardingDetails
+
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+@{
+    switch (@ViewBag.CallingView)
+    {
+        case "EditEmployeeDetails":
+            Layout = "_MainLayout";
+            break;
+        default:
+            Layout = "_MainLayout";
+            break;
+    }
+    ViewData["Title"] = "Edit Employee Details";
+}
+
+<form id="frmEditEmployee" asp-controller="Employee" asp-action="UpdateEmployeeDetails" method="post" enctype="multipart/form-data">
+    <section class="content-header">
+        <h1>
+            Employee Profile
+        </h1>
+
+    </section>
+    <section class="content">
+        <div class="row" style="margin-top: 0%;">
+            <div class="alertS alert-success" id="modal-success" style="display:none;">
+                <button type="button" class="close" aria-hidden="true" onclick="successAlertClose(event)">&times;</button>
+                <h4><i class="icon fa fa-check"></i> Success </h4>
+                <p id="successBody"></p>
+            </div>
+            <div class="col-md-3">
+
+                <!-- Profile Image -->
+                <div class="box box-primary">
+                    <div class="box-body box-profile">
+                        @*<img class="profile-user-img img-responsive img-circle" src="../../dist/img/user4-128x128.jpg" alt="User profile picture">*@
+                        @*<img class='profile-user-img img-responsive img-circle' onclick='return OpenFileBrowser(event)' src="../../dist/img/user4-128x128.jpg" alt="" style="cursor:pointer;" />
+                            <input type="file" opacity="0" name="PicturePath" id="fileUpload" accept=".png,.jpg,.jpeg,.gif,.tif" />*@
+
+                        <div class="profile-username text-center">
+                            <label for="empfileUpload">
+                                <input type="file" id="empfileUpload" name="PicturePath" onchange="ChangeEmployeeLogo(event);" style="display:none" accept=".png,.jpg,.jpeg,.gif,.tif" />
+                                <img id="imgEmpProfile" class="profile-user-img img-responsive img-circle" onclick="return OpenFileBrowser(event)" src="../UploadImages/@Model.empDetails.EmployeeProfilePhoto" alt="User profile picture" style="cursor:pointer;" />
+                                @*<img class="profile-user-img img-responsive img-circle" src="../UploadImages/@Model.empDetails.EmployeeProfilePhoto" alt="User profile picture" style="cursor:pointer;">*@
+                            </label>
+                        </div>
+                        <h3 class="profile-username text-center">@Model.empDetails.FirstName @Model.empDetails.MiddleName @Model.empDetails.LastName</h3>
+
+                        <p class="text-muted text-center">@Model.empDetails.Designation</p>
+
+                        <ul class="list-group list-group-unbordered">
+                            <li class="list-group-item">
+                                <b>Followers</b> <a class="pull-right">1,322</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Following</b> <a class="pull-right">543</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Friends</b> <a class="pull-right">13,287</a>
+                            </li>
+                        </ul>
+
+                        <a href="#" class="btn btn-primary btn-block"><b>Follow</b></a>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+                <!-- About Me Box -->
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">About Me</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <strong><i class="fa fa-book margin-r-5"></i> Education</strong>
+
+                        <p class="text-muted">
+                            B.S. in Computer Science from the University of Tennessee at Knoxville
+                        </p>
+
+                        <hr>
+
+                        <strong><i class="fa fa-map-marker margin-r-5"></i> Location</strong>
+
+                        <p class="text-muted">Malibu, California</p>
+
+                        <hr>
+
+                        <strong><i class="fa fa-pencil margin-r-5"></i> Skills</strong>
+
+                        <p>
+                            <span class="label label-danger">UI Design</span>
+                            <span class="label label-success">Coding</span>
+                            <span class="label label-info">Javascript</span>
+                            <span class="label label-warning">PHP</span>
+                            <span class="label label-primary">Node.js</span>
+                        </p>
+
+                        <hr>
+
+                        <strong><i class="fa fa-file-text-o margin-r-5"></i> Notes</strong>
+
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam fermentum enim neque.</p>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+
+            <!-- /.col -->
+
+            <div class="col-md-9">
+                <div class="box box-default">
+                    <div class="box-body">
+                        @if (@ViewBag.CallingView == "EmployeeOnboarding")
+                        {
+                            <button type="submit" class="close" data-dismiss="modal" asp-controller="Employee" asp-action="EmployeeOnbList" onclick="closeEditEmployeeWindow(event)" style="margin-right: 2%; margin-top: 1%;" title="Close Window">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        }
+                        @if (@ViewBag.CallingView == "EmployeeDirectory")
+                        {
+                            <button type="submit" class="close" data-dismiss="modal" asp-controller="Employee" asp-action="EmployeeList" onclick="closeEditEmployeeWindow(event)" style="margin-right: 2%; margin-top: 1%;" title="Close Window">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        }
+                        <div class="nav-tabs-custom">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#activity" data-toggle="tab">My Activity</a></li>
+                                <li><a href="#basicinfo" data-toggle="tab">Basic Info</a></li>
+                                <li><a href="#employmentHistory" data-toggle="tab">Employement History</a></li>
+                                <li><a href="#settings" data-toggle="tab">Settings</a></li>
+                            </ul>
+                            <div class="box-footer">
+                                <button type="submit" id="btnSaveAll" class="btn btn-primary active" style="float: right; margin-right: 3%;" onclick="validateData(event);"><i id="iSave" class="fa fa-save"></i> Save All </button>
+                                @if (Model.empDetails.IsSelfOnboarding == true && Model.empOnboardingDetails.OnboardingStatus <= 1)
+                                {
+                                    <button id="btnOnbd" type="button" class="btn btn-danger active" style="float: right; margin-right: 3%;" onclick="sendOnbDataForApproval(@Model.empDetails.EmployeeId);"><i id="iOnbd" class="fa fa-spinner"></i> Send For Onboarding </button>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="tab-content">
+
+                            <div class="active tab-pane" id="activity">
+                                <!-- Post -->
+                                <div class="post">
+                                    <div class="user-block">
+                                        <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
+                                        <span class="username">
+                                            <a href="#">Jonathan Burke Jr.</a>
+                                            <a href="#" class="pull-right btn-box-tool"><i class="fa fa-times"></i></a>
+                                        </span>
+                                        <span class="description">Shared publicly - 7:30 PM today</span>
+                                    </div>
+                                    <!-- /.user-block -->
+                                    <p>
+                                        Lorem ipsum represents a long-held tradition for designers,
+                                        typographers and the like. Some people hate it and argue for
+                                        its demise, but others ignore the hate as they create awesome
+                                        tools to help create filler text for everyone from bacon lovers
+                                        to Charlie Sheen fans.
+                                    </p>
+                                    <ul class="list-inline">
+                                        <li><a href="#" class="link-black text-sm"><i class="fa fa-share margin-r-5"></i> Share</a></li>
+                                        <li>
+                                            <a href="#" class="link-black text-sm"><i class="fa fa-thumbs-o-up margin-r-5"></i> Like</a>
+                                        </li>
+                                        <li class="pull-right">
+                                            <a href="#" class="link-black text-sm">
+                                                <i class="fa fa-comments-o margin-r-5"></i> Comments
+                                                (5)
+                                            </a>
+                                        </li>
+                                    </ul>
+
+                                    <input class="form-control input-sm" type="text" placeholder="Type a comment">
+                                </div>
+                                <!-- /.post -->
+                                <!-- Post -->
+                                <div class="post clearfix">
+                                    <div class="user-block">
+                                        <img class="img-circle img-bordered-sm" src="../../dist/img/user7-128x128.jpg" alt="User Image">
+                                        <span class="username">
+                                            <a href="#">Sarah Ross</a>
+                                            <a href="#" class="pull-right btn-box-tool"><i class="fa fa-times"></i></a>
+                                        </span>
+                                        <span class="description">Sent you a message - 3 days ago</span>
+                                    </div>
+                                    <!-- /.user-block -->
+                                    <p>
+                                        Lorem ipsum represents a long-held tradition for designers,
+                                        typographers and the like. Some people hate it and argue for
+                                        its demise, but others ignore the hate as they create awesome
+                                        tools to help create filler text for everyone from bacon lovers
+                                        to Charlie Sheen fans.
+                                    </p>
+
+
+                                    <div class="form-group margin-bottom-none">
+                                        <div class="col-sm-9">
+                                            <input class="form-control input-sm" placeholder="Response">
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <button type="submit" class="btn btn-danger pull-right btn-block btn-sm">Send</button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!-- /.post -->
+                                <!-- Post -->
+                                <div class="post">
+                                    <div class="user-block">
+                                        <img class="img-circle img-bordered-sm" src="../../dist/img/user6-128x128.jpg" alt="User Image">
+                                        <span class="username">
+                                            <a href="#">Adam Jones</a>
+                                            <a href="#" class="pull-right btn-box-tool"><i class="fa fa-times"></i></a>
+                                        </span>
+                                        <span class="description">Posted 5 photos - 5 days ago</span>
+                                    </div>
+                                    <!-- /.user-block -->
+                                    <div class="row margin-bottom">
+                                        <div class="col-sm-6">
+                                            <img class="img-responsive" src="../../dist/img/photo1.png" alt="Photo">
+                                        </div>
+                                        <!-- /.col -->
+                                        <div class="col-sm-6">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <img class="img-responsive" src="../../dist/img/photo2.png" alt="Photo">
+                                                    <br>
+                                                    <img class="img-responsive" src="../../dist/img/photo3.jpg" alt="Photo">
+                                                </div>
+                                                <!-- /.col -->
+                                                <div class="col-sm-6">
+                                                    <img class="img-responsive" src="../../dist/img/photo4.jpg" alt="Photo">
+                                                    <br>
+                                                    <img class="img-responsive" src="../../dist/img/photo1.png" alt="Photo">
+                                                </div>
+                                                <!-- /.col -->
+                                            </div>
+                                            <!-- /.row -->
+                                        </div>
+                                        <!-- /.col -->
+                                    </div>
+                                    <!-- /.row -->
+
+                                    <ul class="list-inline">
+                                        <li><a href="#" class="link-black text-sm"><i class="fa fa-share margin-r-5"></i> Share</a></li>
+                                        <li>
+                                            <a href="#" class="link-black text-sm"><i class="fa fa-thumbs-o-up margin-r-5"></i> Like</a>
+                                        </li>
+                                        <li class="pull-right">
+                                            <a href="#" class="link-black text-sm">
+                                                <i class="fa fa-comments-o margin-r-5"></i> Comments
+                                                (5)
+                                            </a>
+                                        </li>
+                                    </ul>
+
+                                    <input class="form-control input-sm" type="text" placeholder="Type a comment">
+                                </div>
+                                <!-- /.post -->
+                            </div>
+
+                            <!--Tab basic info start-->
+                            <div class="tab-pane" id="basicinfo" style="border: 1px solid #0000001c;">
+                                <div class="box box-solid" style="box-shadow: none !important;">
+                                    <div class="box-body">
+                                        <div class="box-group" id="accordion">
+                                            <!-- we are adding the .panel class so bootstrap.js collapse plugin detects it -->
+
+                                            <div id="divPanelBox1" class="panel box" style="border-top: none !important; background-color:#ddd6;">
+                                                <div class="box-header">
+                                                    <h4 class="box-title">
+                                                        Basic Details
+                                                    </h4>
+                                                    <div class="box-tools pull-right">
+                                                        <button id="btnPToggle1" type="button" class="btn btn-box-tool" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" title="Collapse" onclick="onToggle(this)">
+                                                            <i id="iconPToggle1" class="fa fa-minus"></i>
+                                                        </button>
+                                                    </div>
+
+                                                </div>
+                                                <div id="collapseOne" class="panel-collapse collapse in">
+                                                    <hr style="border-top: 1px solid #d2d6de;" />
+                                                    <div class="box-body">
+                                                        <div class="row">
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label for="txtFName">First Name</label>
+                                                                    <input type="text" id="txtFName" name="FirstName" asp-for="@Model.empDetails.FirstName" class="form-control" placeholder="First Name" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label for="txtMName">Middle Name</label>
+                                                                    <input type="text" id="txtMName" name="MiddleName" asp-for="@Model.empDetails.MiddleName" class="form-control" placeholder="Middle Name" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label for="txtLName">Last Name</label>
+                                                                    <input type="text" id="txtLName" name="LastName" asp-for="@Model.empDetails.LastName" class="form-control" placeholder="Last Name" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <div class="col-md-4">
+                                                                <div class="form-group has-success has-feedback">
+                                                                    <label class="control-label" for="ddlGender">Gender</label>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon"><i class="fa fa-exclamation-circle"></i></span>
+                                                                        <select class="form-control " id="ddlGender" name="Gender" aria-describedby="inputGroupSuccess2Status">
+                                                                            <option value="0">Choose..</option>
+                                                                            @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:Gender"])).ToList().Count() > 0)
+                                                                            {
+                                                                                @foreach (var mGen in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:Gender"])).ToList())
+                                                                                {
+                                                                                    @if (Model.empDetails.Gender == mGen.MasterDataItemId.ToString())
+                                                                                    {
+                                                                                        <option value="@mGen.MasterDataItemId" selected>@mGen.MasterDataItemValue</option>
+                                                                                    }
+                                                                                    @if (Model.empDetails.Gender != mGen.MasterDataItemId.ToString())
+                                                                                    {
+                                                                                        <option value="@mGen.MasterDataItemId">@mGen.MasterDataItemValue</option>
+                                                                                    }
+                                                                                }
+                                                                            }
+
+                                                                        </select>
+                                                                    </div>
+                                                                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                                                                    <span id="inputGroupSuccess2Status" class="sr-only">(success)</span>
+                                                                </div>
+
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group has-success has-feedback">
+                                                                    <label for="dtDateOfBirth">Date of Birth </label>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon"><i class="fa fa-exclamation-circle"></i></span>
+                                                                        <input class="form-control" name="DateOfBirth" asp-for="@Model.empDetails.DateOfBirth" type="date" id="dtDateOfBirth" aria-describedby="inputSuccess3Status">
+                                                                    </div>
+                                                                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                                                                    <span id="inputSuccess3Status" class="sr-only">(success)</span>
+                                                                </div>
+
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group has-success has-feedback">
+                                                                    <label for="txtPlaceOfBirth">Place Of Birth</label>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon"><i class="fa fa-exclamation-circle"></i></span>
+                                                                        <input type="text" id="txtPlaceOfBirth" name="PlaceOfBirth" asp-for="@Model.empDetails.PlaceOfBirth" class="form-control" placeholder="Place Of Birth" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)" aria-describedby="inputSuccess4Status">
+                                                                    </div>
+                                                                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                                                                    <span id="inputSuccess4Status" class="sr-only">(success)</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="ddlReligion">Religion</label>
+                                                                    <select class="form-control select2" id="ddlReligion" name="Religion">
+                                                                        <option value="0">Choose..</option>
+                                                                        @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:Religion"])).ToList().Count() > 0)
+                                                                        {
+                                                                            @foreach (var mRel in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:Religion"])).ToList())
+                                                                            {
+                                                                                @if (Model.empDetails.Religion == mRel.MasterDataItemId.ToString())
+                                                                                {
+                                                                                    <option value="@mRel.MasterDataItemId" selected>@mRel.MasterDataItemValue</option>
+                                                                                }
+                                                                                @if (Model.empDetails.Religion != mRel.MasterDataItemId.ToString())
+                                                                                {
+                                                                                    <option value="@mRel.MasterDataItemId">@mRel.MasterDataItemValue</option>
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="ddlBloodGroup">Blood Group</label>
+                                                                    <select class="form-control select2" id="ddlBloodGroup" name="BloodGroup">
+                                                                        <option value="0">Choose..</option>
+                                                                        @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:BloodGroup"])).ToList().Count() > 0)
+                                                                        {
+                                                                            @foreach (var bGroup in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:BloodGroup"])).ToList())
+                                                                            {
+                                                                                @if (Model.empDetails.BloodGroup == bGroup.MasterDataItemId.ToString())
+                                                                                {
+                                                                                    <option value="@bGroup.MasterDataItemId" selected>@bGroup.MasterDataItemValue</option>
+                                                                                }
+                                                                                @if (Model.empDetails.BloodGroup != bGroup.MasterDataItemId.ToString())
+                                                                                {
+                                                                                    <option value="@bGroup.MasterDataItemId">@bGroup.MasterDataItemValue</option>
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="ddlMaritalStatus">Marital Status</label>
+                                                                    <select class="form-control select2" id="ddlMaritalStatus" name="MaritalStatus">
+                                                                        <option value="0">Choose..</option>
+
+                                                                        @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:MaritalStatus"])).ToList().Count() > 0)
+                                                                        {
+                                                                            @foreach (var marStat in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:MaritalStatus"])).ToList())
+                                                                            {
+                                                                                @if (Model.empDetails.MaritalStatus == marStat.MasterDataItemId.ToString())
+                                                                                {
+                                                                                    <option value="@marStat.MasterDataItemId" selected>@marStat.MasterDataItemValue</option>
+                                                                                }
+                                                                                @if (Model.empDetails.MaritalStatus != marStat.MasterDataItemId.ToString())
+                                                                                {
+                                                                                    <option value="@marStat.MasterDataItemId">@marStat.MasterDataItemValue</option>
+                                                                                }
+                                                                            }
+                                                                        }
+
+                                                                        @*@if (Model.empDetails.MaritalStatus == "Married")
+                                                        {
+                                                            <option value="Married" selected>Married</option>
+                                                        }
+                                                        @if (Model.empDetails.MaritalStatus != "Married")
+                                                        {
+                                                            <option value="Married">Married</option>
+                                                        }
+                                                        @if (Model.empDetails.MaritalStatus == "Unmarried")
+                                                        {
+                                                            <option value="Unmarried" selected>Unmarried</option>
+                                                        }
+                                                        @if (Model.empDetails.MaritalStatus != "Unmarried")
+                                                        {
+                                                            <option value="Unmarried">Unmarried</option>
+                                                        }
+                                                        @if (Model.empDetails.MaritalStatus == "Divorced")
+                                                        {
+                                                            <option value="Divorced" selected>Divorced</option>
+                                                        }
+                                                        @if (Model.empDetails.MaritalStatus != "Divorced")
+                                                        {
+                                                            <option value="Divorced">Divorced</option>
+                                                        }*@
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="dtDateOfMarriage">Marriage Date</label>
+                                                                    <input class="form-control" name="DateOfMarriage" asp-for="@Model.empDetails.MarriageDate" type="date" id="dtDateOfMarriage">
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div id="divPanelBox2" class="panel box" style="border-top: none !important;">
+                                                <div class="box-header">
+                                                    <h4 class="box-title">
+                                                        Contact Details
+                                                    </h4>
+                                                    <input type="hidden" id="hndEmployeeId" name="loggedEmployeeId" asp-for="@Model.empDetails.EmployeeId" class="form-control">
+                                                    <input type="hidden" id="hndCallingView" name="CallingView" asp-for="@Model.CallingView" class="form-control">
+                                                    <input type="hidden" id="hndCallingView1" name="CallingView1" class="form-control">
+                                                    <div class="box-tools pull-right">
+                                                        <button id="btnPToggle2" type="button" class="btn btn-box-tool" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" title="Expand" onclick="onToggle(this)">
+                                                            <i id="iconPToggle2" class="fa fa-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div id="collapseTwo" class="panel-collapse collapse">
+                                                    <hr style="border-top: 1px solid #d2d6de;" />
+                                                    <div class="box-body" style="margin-top: -3%;">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <select class="form-control select2" id="ddlAddressSelection" name="AddessType" style="background: none; width: 35%;" onchange="ddlAddressSelectionChange(this.value)">
+                                                                        <option value="PresentAddress">Present Address</option>
+                                                                        <option value="PermanentAddress">Permanent Address</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="divPresentAddress">
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label for="txtAddress">Address</label>
+                                                                        <textarea class="form-control" id="txtAddress" rows="2" name="PresentAddress" asp-for="@Model.empDetails.FirstName" placeholder="Address"></textarea>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label for="ddlCountry">Country</label>
+                                                                        <select class="form-control select2" id="ddlCountry" name="Country">
+                                                                            <option value="India">India</option>
+                                                                            <option value="USA">USA</option>
+                                                                            <option value="Austrelia">Austrelia</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label for="ddlState">State</label>
+                                                                        <select class="form-control select2" id="ddlState" name="State">
+                                                                            <option value="Maharashtra">Maharashtra</option>
+                                                                            <option value="Punjab">Punjab</option>
+                                                                            <option value="Calcutta">Calcutta</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label for="ddlCity">City</label>
+                                                                        <select class="form-control select2" id="ddlCity" name="City">
+                                                                            <option value="Pune">Pune</option>
+                                                                            <option value="Mumbai">Mumbai</option>
+                                                                            <option value="Delhi">Delhi</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label for="txtPinCode">Pin Code</label>
+                                                                        <input type="text" id="txtPinCode" name="PinCode" class="form-control" maxlength="6" min="6" placeholder="Pin Code" onkeypress='return restrictAlphabets(event)'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="divPermanentAddress" style="display:none;">
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label for="txtPermanentAddress">Address</label>
+                                                                        <textarea class="form-control" id="txtPermanentAddress" rows="2" name="PermanentAddress" placeholder="Address"></textarea>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label for="ddlPermanentCountry">Country</label>
+                                                                        <select class="form-control select2" id="ddlPermanentCountry" name="Country">
+                                                                            <option value="India">India</option>
+                                                                            <option value="USA">USA</option>
+                                                                            <option value="Austrelia">Austrelia</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label for="ddlPermanentState">State</label>
+                                                                        <select class="form-control select2" id="ddlPermanentState" name="State">
+                                                                            <option value="Maharashtra">Maharashtra</option>
+                                                                            <option value="Punjab">Punjab</option>
+                                                                            <option value="Calcutta">Calcutta</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label for="ddlPermanentCity">City</label>
+                                                                        <select class="form-control select2" id="ddlPermanentCity" name="City">
+                                                                            <option value="Pune">Pune</option>
+                                                                            <option value="Mumbai">Mumbai</option>
+                                                                            <option value="Delhi">Delhi</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label for="txtPermanentPinCode">Pin Code</label>
+                                                                        <input type="text" id="txtPermanentPinCode" name="PinCode" class="form-control" maxlength="6" min="6" placeholder="Pin Code" onkeypress='return restrictAlphabets(event)'>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="box-body" style="margin-top: -3%;">
+                                                        <hr style="border-top: 1px solid #d2d6de;" />
+
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtMobileNo">Mobile Number</label>
+                                                                    <input type="text" id="txtMobileNo" name="ContactNumber" asp-for="@Model.empDetails.ContactNumber" class="form-control" maxlength="10" min="10" placeholder="Mobile Number" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtEmail">Email </label>
+                                                                    <input type="email" id="txtEmail" name="Email" asp-for="@Model.empDetails.Email" class="form-control" placeholder="Email" onchange="ValidateEmail(this)">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtEmerMobileNo">Emergency Contact Number</label>
+                                                                    <input type="text" id="txtEmerMobileNo" name="EmergencyContactNumber" asp-for="@Model.empDetails.EmergencyNumber" class="form-control" maxlength="10" min="10" placeholder="Emergency Contact Number" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtEmerContactName">Emergency Contact Name </label>
+                                                                    <input type="text" id="txtEmerContactName" name="EmergencyContactName" asp-for="@Model.empDetails.EmergencyContactName" class="form-control" placeholder="Emergency Contact Name">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="panel box" id="divPanelBox3" style="border-top: none !important;">
+                                                <div class="box-header">
+                                                    <h4 class="box-title">
+                                                        Family Details
+                                                    </h4>
+                                                    <div class="box-tools pull-right">
+                                                        <button id="btnPToggle3" type="button" class="btn btn-box-tool" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" title="Expand" onclick="onToggle(this)">
+                                                            <i id="iconPToggle3" class="fa fa-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div id="collapseThree" class="panel-collapse collapse">
+                                                    <hr style="border-top: 1px solid #d2d6de;" />
+                                                    <div class="box-body">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtFathersName">Father's Name</label>
+                                                                    <input type="text" id="txtFathersName" name="FathersName" asp-for="@Model.empDetails.FathersName" class="form-control" placeholder="Father's Name" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtEmail">Mother's Name </label>
+                                                                    <input type="text" id="txtMothersName" name="MothersName" asp-for="@Model.empOnboardingDetails.MothersName" class="form-control" placeholder="Mother's Name" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtMobileNo">Spouse Name</label>
+                                                                    <input type="text" id="txtSpouseName" name="SpouseName" asp-for="@Model.empDetails.SpouseName" class="form-control" placeholder="Spouse Name" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtNomineeName">Nominee Name</label>
+                                                                    <input type="text" id="txtNomineeName" name="NomineeName" asp-for="@Model.empDetails.NomineeName" class="form-control" placeholder="Nominee Name" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtEmail"> Nominee Contact No </label>
+                                                                    <input type="text" id="txtNomineeContactNo" name="NomineeContactNo" asp-for="@Model.empDetails.NomineeContactNumber" class="form-control" maxlength="10" min="10" placeholder="Nominee Contact No" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtMobileNo">Nominee DOB</label>
+                                                                    <input class="form-control" name="NomineeDateOfBirth" asp-for="@Model.empDetails.NomineeDob" type="date" id="dtNomineeDateOfBirth">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtMobileNo">Relation With Nominee </label>
+                                                                    <input type="text" id="txtNomineeRelation" name="NomineeRelation" asp-for="@Model.empDetails.NomineeRelation" class="form-control" placeholder="Relation With Nominee" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="panel box" id="divPanelBox4" style="border-top: none !important;">
+                                                <div class="box-header">
+                                                    <h4 class="box-title">
+                                                        Educational Details
+                                                    </h4>
+                                                    <div class="box-tools pull-right">
+                                                        <button id="btnPToggle4" type="button" class="btn btn-box-tool" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" title="Expand" onclick="onToggle(this)">
+                                                            <i id="iconPToggle4" class="fa fa-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div id="collapseFour" class="panel-collapse collapse">
+                                                    <hr style="border-top: 1px solid #d2d6de;" />
+                                                    <div class="box-body">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtCourseName">Course/Degree</label>
+                                                                    <input type="text" id="txtCourseName" name="CourseName" class="form-control" placeholder="Course/Degree Name" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtUniversityName">Board/University </label>
+                                                                    <input type="text" id="txtUniversityName" name="UniversityName" class="form-control" placeholder="University Name" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtMobileNo">Year of Passing </label>
+                                                                    <input type="text" id="txtPassingYear" name="PassingYear" class="form-control" placeholder="Year of Passing" maxlength="4" onkeypress='return restrictAlphabets(event)'>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="txtMarks">Marks(%) </label>
+                                                                    <input type="text" id="txtMarks" name="Marks" class="form-control" placeholder="Marks" onkeypress='return restrictAlphabets(event)'>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            @*<div class="box-footer">
+                                <button type="submit" id="btnSaveAll" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="validateData(event);"> Save All </button>
+                            </div>*@
+
+                                        </div>
+                                    </div>
+                                    <!-- /.box-body -->
+                                </div>
+                            </div>
+                            <!--Tab basic info end-->
+                            <!-- /.tab-pane -->
+                            <div class="tab-pane" id="employmentHistory" style="border: 1px solid #0000001c;">
+                                <!-- The timeline -->
+                                <ul class="timeline timeline-inverse">
+                                    <!-- timeline time label -->
+                                    <li class="time-label">
+                                        <span class="bg-red">
+                                            @if (!string.IsNullOrEmpty(Model.prevEmploymentDetail1.JoinedDate) && !string.IsNullOrEmpty(Model.prevEmploymentDetail1.LeavingDate))
+                                            {
+                                                <span><i class="fa fa-clock-o"> </i> @System.Convert.ToDateTime(Model.prevEmploymentDetail1.JoinedDate).ToString("dd-MMM-yyyy") to @System.Convert.ToDateTime(Model.prevEmploymentDetail1.LeavingDate).ToString("dd-MMM-yyyy")</span>
+                                            }
+                                            else
+                                            {
+                                                <span><i class="fa fa-clock-o"> </i> [Joining Date] to[Leaving Date]</span>
+                                            }
+                                        </span>
+                                    </li>
+                                    <!-- /.timeline-label -->
+                                    <!-- timeline item -->
+                                    <li>
+                                        <i class="fa fa-user bg-blue"></i>
+                                        <div class="timeline-item">
+                                            @if (!string.IsNullOrEmpty(Model.prevEmploymentDetail1.CreatedDate))
+                                            {
+                                                <span class="time"><i class="fa fa-clock-o"></i> Last updated on : @Model.prevEmploymentDetail1.CreatedDate</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(Model.prevEmploymentDetail1.PrevEmploymentName))
+                                            {
+                                                <h3 class="timeline-header"><a href="https://www.google.com/search?q=@Model.prevEmploymentDetail1.PrevEmploymentName" target="_blank">@Model.prevEmploymentDetail1.PrevEmploymentName</a> As @Model.prevEmploymentDetail1.Designation</h3>
+                                            }
+                                            else
+                                            {
+                                                <h3 class="timeline-header"><a href="#">[Company Name]</a> As [Designation]</h3>
+                                            }
+                                            <h3 class="timeline-header pull-right">[*Last Company]</h3>
+                                            <div class="timeline-body">
+                                                <div class="box box-solid" style="box-shadow:  inset !important;">
+
+                                                    <div class="box-body" id="divComp1">
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <div class="form-group">
+                                                                    <label for="inputName1" class="control-label">Company Name :</label>
+                                                                    <input class="form-control" id="inputCompanyName1" name="inputCompanyName1" asp-for="@Model.prevEmploymentDetail1.PrevEmploymentName" placeholder="Name">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <div class="form-group">
+                                                                    <label for="inputCompanyAddress1" class="control-label">Company Address</label>
+                                                                    <textarea class="form-control" id="inputCompanyAddress1" name="inputCompanyAddress1" asp-for="@Model.prevEmploymentDetail1.PrevCompanyAddress" placeholder="Company Address"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-8">
+                                                                <div class="form-group">
+                                                                    <label for="inputDesignation1" class="control-label">Designation</label>
+                                                                    <input type="text" class="form-control" id="inputDesignation1" name="inputDesignation1" asp-for="@Model.prevEmploymentDetail1.Designation" placeholder="Designation">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-6">
+                                                                    <label for="dtDateOfJoining1" class="control-label">Joining Date</label>
+                                                                    <input class="form-control" name="DateOfJoining1" asp-for="@Model.prevEmploymentDetail1.JoinedDate" type="date" id="dtDateOfJoining1" placeholder="Leaving Date">
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    <label for="dtDateOfLeaving1" class="control-label">Leaving Date</label>
+                                                                    <input class="form-control" name="DateOfLeaving1" asp-for="@Model.prevEmploymentDetail1.LeavingDate" type="date" id="dtDateOfLeaving1" placeholder="Leaving Date">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <div class="form-group">
+                                                                    <label for="inputLeavingReason1" class="control-label">Leaving Reason</label>
+                                                                    <textarea class="form-control" name="inputLeavingReason1" id="inputLeavingReason1" asp-for="@Model.prevEmploymentDetail1.LeavingReason" placeholder="Company Leaving Reason"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-4">
+                                                                <div class="form-group">
+                                                                    <label for="contact1Name1" class="control-label">Contact 1</label>
+                                                                    <input type="text" class="form-control" name="contact1Name1" id="contact1Name1" asp-for="@Model.prevEmploymentDetail1.ContactPerson1" placeholder="Contact Name">
+                                                                    <input type="text" maxlength="10" min="10" class="form-control" name="contact1Phone1" id="contact1Phone1" asp-for="@Model.prevEmploymentDetail1.ContactPerson1No" placeholder="Contact Number" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-4">
+                                                                <div class="form-group">
+                                                                    <label for="contact2Name1" class="control-label">Contact 2</label>
+                                                                    <input type="text" class="form-control" name="contact2Name1" id="contact2Name1" asp-for="@Model.prevEmploymentDetail1.ContactPerson2" placeholder="Contact Name">
+                                                                    <input type="text" maxlength="10" min="10" class="form-control" name="contact2Phone1" id="contact2Phone1" asp-for="@Model.prevEmploymentDetail1.ContactPerson2No" placeholder="Contact Number" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-4">
+                                                                <div class="form-group">
+                                                                    <label for="contact3Name1" class="control-label">Contact 3</label>
+                                                                    <input type="text" class="form-control" name="contact3Name1" id="contact3Name1" asp-for="@Model.prevEmploymentDetail1.ContactPerson3" placeholder="Contact Name">
+                                                                    <input type="text" maxlength="10" min="10" class="form-control" name="contact3Phone1" id="contact3Phone1" asp-for="@Model.prevEmploymentDetail1.ContactPerson3No" placeholder="Contact Number" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button id="btnEmpl1" type="button" class="btn btn-bitbucket btn-xs" onclick="resetEditingPannel(1);"><i id="iOnbd" class="fa fa-info-circle"></i> Details... </button>
+                                            </div>
+                                            @*<div class="timeline-footer">
+                                <button id="btnEmpl1" type="button" class="btn btn-danger btn-xs" onclick="resetEditingPannel(1);"><i id="iOnbd" class="fa fa-spinner"></i> Modify Details </button>
+                            </div>*@
+                                        </div>
+                                    </li>
+                                    <!-- END timeline item -->
+                                    <!-- timeline time label -->
+                                    <li class="time-label">
+                                        <span class="bg-yellow">
+                                            @if (!string.IsNullOrEmpty(Model.prevEmploymentDetail2.JoinedDate) && !string.IsNullOrEmpty(Model.prevEmploymentDetail2.LeavingDate))
+                                            {
+                                                <span><i class="fa fa-clock-o"> </i> @System.Convert.ToDateTime(Model.prevEmploymentDetail2.JoinedDate).ToString("dd-MMM-yyyy") to @System.Convert.ToDateTime(Model.prevEmploymentDetail2.LeavingDate).ToString("dd-MMM-yyyy")</span>
+                                            }
+                                            else
+                                            {
+                                                <span><i class="fa fa-clock-o"> </i> [Joining Date] to[Leaving Date]</span>
+                                            }
+                                        </span>
+                                    </li>
+                                    <!-- /.timeline-label -->
+                                    <!-- timeline item -->
+                                    <li>
+                                        <i class="fa fa-user bg-blue"></i>
+                                        <div class="timeline-item">
+                                            @if (!string.IsNullOrEmpty(Model.prevEmploymentDetail2.CreatedDate))
+                                            {
+                                                <span class="time"><i class="fa fa-clock-o"></i> Last updated on : @Model.prevEmploymentDetail2.CreatedDate</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(Model.prevEmploymentDetail2.PrevEmploymentName))
+                                            {
+                                                <h3 class="timeline-header"><a href="https://www.google.com/search?q=@Model.prevEmploymentDetail2.PrevEmploymentName" target="_blank">@Model.prevEmploymentDetail2.PrevEmploymentName</a> As @Model.prevEmploymentDetail2.Designation</h3>
+                                            }
+                                            else
+                                            {
+                                                <h3 class="timeline-header"><a href="#">[Company Name]</a> As [Designation]</h3>
+                                            }
+                                            <h3 class="timeline-header pull-right">[*Previous Company 1]</h3>
+                                            <div class="timeline-body">
+                                                <div class="box box-solid" style="box-shadow:  inset !important;">
+                                                    <div class="box-body" id="divComp2">
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <div class="form-group">
+                                                                    <label for="inputName2" class="control-label">Company Name :</label>
+                                                                    <input class="form-control" name="inputCompanyName2" id="inputCompanyName2" asp-for="@Model.prevEmploymentDetail2.PrevEmploymentName" placeholder="Name">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <div class="form-group">
+                                                                    <label for="inputCompanyAddress2" class="control-label">Company Address</label>
+                                                                    <textarea class="form-control" name="inputCompanyAddress2" id="inputCompanyAddress2" asp-for="@Model.prevEmploymentDetail2.PrevCompanyAddress" placeholder="Company Address"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-8">
+                                                                <div class="form-group">
+                                                                    <label for="inputDesignation" class="control-label">Designation</label>
+                                                                    <input type="text" class="form-control" id="inputDesignation2" name="inputDesignation2" asp-for="@Model.prevEmploymentDetail2.Designation" placeholder="Designation">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-6">
+                                                                    <label for="dtDateOfJoining2" class="control-label">Joining Date</label>
+                                                                    <input class="form-control" name="DateOfJoining2" asp-for="@Model.prevEmploymentDetail2.JoinedDate" type="date" id="dtDateOfJoining2" placeholder="Leaving Date">
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    <label for="dtDateOfLeaving2" class="control-label">Leaving Date</label>
+                                                                    <input class="form-control" name="DateOfLeaving2" asp-for="@Model.prevEmploymentDetail2.LeavingDate" type="date" id="dtDateOfLeaving2" placeholder="Leaving Date">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <div class="form-group">
+                                                                    <label for="inputLeavingReason2" class="control-label">Leaving Reason</label>
+                                                                    <textarea class="form-control" name="inputLeavingReason2" id="inputLeavingReason2" asp-for="@Model.prevEmploymentDetail2.LeavingReason" placeholder="Company Leaving Reason"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-4">
+                                                                <div class="form-group">
+                                                                    <label for="contact1Name2" class="control-label">Contact 1</label>
+                                                                    <input type="text" class="form-control" name="contact1Name2" asp-for="@Model.prevEmploymentDetail2.ContactPerson1" id="contact1Name2" placeholder="Contact Name">
+                                                                    <input type="text" maxlength="10" min="10" class="form-control" name="contact1Phone2" id="contact1Phone2" asp-for="@Model.prevEmploymentDetail2.ContactPerson1No" placeholder="Contact Number" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-4">
+                                                                <div class="form-group">
+                                                                    <label for="contact2Name2" class="control-label">Contact 2</label>
+                                                                    <input type="text" class="form-control" name="contact2Name2" id="contact2Name2" asp-for="@Model.prevEmploymentDetail2.ContactPerson2" placeholder="Contact Name">
+                                                                    <input type="text" maxlength="10" min="10" class="form-control" name="contact2Phone2" id="contact2Phone2" asp-for="@Model.prevEmploymentDetail2.ContactPerson2No" placeholder="Contact Number" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-4">
+                                                                <div class="form-group">
+                                                                    <label for="contact3Name2" class="control-label">Contact 3</label>
+                                                                    <input type="text" class="form-control" name="contact3Name2" id="contact3Name2" asp-for="@Model.prevEmploymentDetail2.ContactPerson3" placeholder="Contact Name">
+                                                                    <input type="text" maxlength="10" min="10" class="form-control" name="contact3Phone2" id="contact3Phone2" asp-for="@Model.prevEmploymentDetail2.ContactPerson3No" placeholder="Contact Number" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button id="btnEmpl2" type="button" class="btn btn-bitbucket btn-xs" onclick="resetEditingPannel(2);"><i id="iOnbd" class="fa fa-info-circle"></i> Details... </button>
+                                            </div>
+                                            @*<div class="timeline-footer">
+                                <button id="btnEmpl1" type="button" class="btn btn-danger btn-xs" onclick="resetEditingPannel(1);"><i id="iOnbd" class="fa fa-spinner"></i> Modify Details </button>
+                            </div>*@
+                                        </div>
+                                    </li>
+                                    <!-- END timeline item -->
+                                    <!-- timeline time label -->
+                                    <li class="time-label">
+                                        <span class="bg-green">
+                                            @if (!string.IsNullOrEmpty(Model.prevEmploymentDetail3.JoinedDate) && !string.IsNullOrEmpty(Model.prevEmploymentDetail3.LeavingDate))
+                                            {
+                                                <span><i class="fa fa-clock-o"> </i> @System.Convert.ToDateTime(Model.prevEmploymentDetail3.JoinedDate).ToString("dd-MMM-yyyy") to @System.Convert.ToDateTime(Model.prevEmploymentDetail3.LeavingDate).ToString("dd-MMM-yyyy")</span>
+                                            }
+                                            else
+                                            {
+                                                <span><i class="fa fa-clock-o"> </i> [Joining Date] to[Leaving Date]</span>
+                                            }
+                                        </span>
+                                    </li>
+                                    <!-- /.timeline-label -->
+                                    <!-- timeline item -->
+                                    <li>
+                                        <i class="fa fa-user bg-blue"></i>
+                                        <div class="timeline-item">
+                                            @if (!string.IsNullOrEmpty(Model.prevEmploymentDetail3.CreatedDate))
+                                            {
+                                                <span class="time"><i class="fa fa-clock-o"></i> Last updated on : @Model.prevEmploymentDetail3.CreatedDate</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(Model.prevEmploymentDetail3.PrevEmploymentName))
+                                            {
+                                                <h3 class="timeline-header"><a href="https://www.google.com/search?q=@Model.prevEmploymentDetail3.PrevEmploymentName" target="_blank">@Model.prevEmploymentDetail3.PrevEmploymentName</a> As @Model.prevEmploymentDetail3.Designation</h3>
+                                            }
+                                            else
+                                            {
+                                                <h3 class="timeline-header"><a href="#">[Company Name]</a> As [Designation]</h3>
+                                            }
+                                            <h3 class="timeline-header pull-right">[*Previous Company 2]</h3>
+                                            <div class="timeline-body">
+                                                <div class="box box-solid" style="box-shadow:  inset !important;">
+                                                    <div class="box-body" id="divComp3">
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <div class="form-group">
+                                                                    <label for="inputName3" class="control-label">Company Name :</label>
+                                                                    <input class="form-control" name="inputCompanyName3" id="inputCompanyName3" asp-for="@Model.prevEmploymentDetail3.PrevEmploymentName" placeholder="Name">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <div class="form-group">
+                                                                    <label for="inputCompanyAddress3" class="control-label">Company Address</label>
+                                                                    <textarea class="form-control" name="inputCompanyAddress3" id="inputCompanyAddress3" asp-for="@Model.prevEmploymentDetail3.PrevCompanyAddress" placeholder="Company Address"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-8">
+                                                                <div class="form-group">
+                                                                    <label for="inputDesignation3" class="control-label">Designation</label>
+                                                                    <input type="text" class="form-control" name="inputDesignation3" id="inputDesignation3" asp-for="@Model.prevEmploymentDetail3.Designation" placeholder="Designation">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-6">
+                                                                    <label for="dtDateOfJoining3" class="control-label">Joining Date</label>
+                                                                    <input class="form-control" name="DateOfJoining3" asp-for="@Model.prevEmploymentDetail3.JoinedDate" type="date" id="dtDateOfJoining3" placeholder="Leaving Date">
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    <label for="dtDateOfLeaving3" class="control-label">Leaving Date</label>
+                                                                    <input class="form-control" name="DateOfLeaving3" asp-for="@Model.prevEmploymentDetail3.LeavingDate" type="date" id="dtDateOfLeaving3" placeholder="Leaving Date">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <div class="form-group">
+                                                                    <label for="inputLeavingReason3" class="control-label">Leaving Reason</label>
+                                                                    <textarea class="form-control" name="inputLeavingReason3" id="inputLeavingReason3" asp-for="@Model.prevEmploymentDetail3.LeavingReason" placeholder="Company Leaving Reason"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-4">
+                                                                <div class="form-group">
+                                                                    <label for="contact1Name3" class="control-label">Contact 1</label>
+                                                                    <input type="text" class="form-control" name="contact1Name3" id="contact1Name3" asp-for="@Model.prevEmploymentDetail3.ContactPerson1" placeholder="Contact Name">
+                                                                    <input type="text" maxlength="10" min="10" class="form-control" name="contact1Phone3" id="contact1Phone3" asp-for="@Model.prevEmploymentDetail3.ContactPerson1No" placeholder="Contact Number" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-4">
+                                                                <div class="form-group">
+                                                                    <label for="contact2Name3" class="control-label">Contact 2</label>
+                                                                    <input type="text" class="form-control" name="contact2Name3" id="contact2Name3" asp-for="@Model.prevEmploymentDetail3.ContactPerson2" placeholder="Contact Name">
+                                                                    <input type="text" maxlength="10" min="10" class="form-control" name="contact2Phone3" id="contact2Phone3" asp-for="@Model.prevEmploymentDetail3.ContactPerson2No" placeholder="Contact Number" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-4">
+                                                                <div class="form-group">
+                                                                    <label for="contact3Name3" class="control-label">Contact 3</label>
+                                                                    <input type="text" class="form-control" name="contact3Name3" id="contact3Name3" asp-for="@Model.prevEmploymentDetail3.ContactPerson3" placeholder="Contact Name">
+                                                                    <input type="text" maxlength="10" min="10" class="form-control" name="contact3Phone3" id="contact3Phone3" asp-for="@Model.prevEmploymentDetail3.ContactPerson3No" placeholder="Contact Number" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button id="btnEmpl3" type="button" class="btn btn-bitbucket btn-xs" onclick="resetEditingPannel(3);"><i id="iOnbd" class="fa fa-info-circle"></i> Details... </button>
+                                            </div>
+                                            @*<div class="timeline-footer">
+                                <button id="btnEmpl1" type="button" class="btn btn-danger btn-xs" onclick="resetEditingPannel(1);"><i id="iOnbd" class="fa fa-spinner"></i> Modify Details </button>
+                            </div>*@
+                                        </div>
+                                    </li>
+                                    <!-- END timeline item -->
+
+                                    <li>
+                                        <i class="fa fa-clock-o bg-gray"></i>
+                                    </li>
+                                </ul>
+                                <!-- The timeline -->
+                                <ul class="timeline timeline-inverse">
+                                    <!-- timeline time label -->
+                                    <li class="time-label">
+                                        <span class="bg-gray">
+                                            <i class="fa fa-file-upload "></i>  Documents Upload
+                                        </span>
+                                    </li>
+                                    <!-- /.timeline-label -->
+                                    <!-- timeline item -->
+                                    <li>
+                                        <i class="fa fa-file-photo-o bg-purple"></i>
+
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fa fa-clock-o"></i> 2 days ago</span>
+                                            <h3 class="timeline-header">Supporting documents</h3>
+                                            <div class="timeline-body">
+                                                <label for="empfileUpload1">
+                                                    <input type="file" id="empfileUpload1" name="pdfPath1" onchange="PDF1(1);" style="display:none" accept="application/pdf" />
+                                                    <img id="pdfExp1" src="http://placehold.it/150x100?text=.pdf+Ony" alt="pdf Document[1]" class="margin" onclick="return OpenFileBrowser(event)" style="cursor: pointer; ">
+                                                    <i class="fa fa-file-photo-o" id="ipdfPath1" style="display:none">
+                                                        @if (Model.empDocument.Count >= 1 && !String.IsNullOrEmpty(Model.empDocument[0].EmpDoumentName))
+                                                        {
+                                                            <a id="aPdfPath1" href="../UploadFiles/@Model.empDocument[0].EmpDoumentName" target="_blank">@Model.empDocument[0].EmpDoumentName</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a id="aPdfPath1" href="" target="_blank"></a>
+                                                        }
+                                                    </i>
+                                                </label>
+                                                <label for="empfileUpload2">
+                                                    <input type="file" id="empfileUpload2" name="pdfPath2" onchange="PDF1(2);" style="display:none" accept="application/pdf" />
+                                                    <img id="pdfExp2" src="http://placehold.it/150x100?text=.pdf+Ony" alt="pdf Document[2]" class="margin" onclick="return OpenFileBrowser(event)" style="cursor: pointer; ">
+                                                    <i class="fa fa-file-photo-o" id="ipdfPath2" style="display:none">
+                                                        @if (Model.empDocument.Count >= 2 && !String.IsNullOrEmpty(Model.empDocument[1].EmpDoumentName))
+                                                        {
+                                                            <a id="aPdfPath2" href="../UploadFiles/@Model.empDocument[1].EmpDoumentName" target="_blank">@Model.empDocument[1].EmpDoumentName</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a id="aPdfPath2" href="" target="_blank"></a>
+                                                        }
+                                                    </i>
+                                                </label>
+                                                <label for="empfileUpload3">
+                                                    <input type="file" id="empfileUpload3" name="pdfPath3" onchange="PDF1(3);" style="display:none" accept="application/pdf" />
+                                                    <img id="pdfExp3" src="http://placehold.it/150x100?text=.pdf+Ony" alt="pdf Document[3]" class="margin" onclick="return OpenFileBrowser(event)" style="cursor: pointer; ">
+                                                    <i class="fa fa-file-photo-o" id="ipdfPath3" style="display:none">
+                                                        @if (Model.empDocument.Count >= 3 && !String.IsNullOrEmpty(Model.empDocument[2].EmpDoumentName))
+                                                        {
+                                                            <a id="aPdfPath3" href="../UploadFiles/@Model.empDocument[2].EmpDoumentName" target="_blank">@Model.empDocument[2].EmpDoumentName</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a id="aPdfPath3" href="" target="_blank"></a>
+                                                        }
+                                                    </i>
+                                                </label>
+                                                <label for="empfileUpload4">
+                                                    <input type="file" id="empfileUpload4" name="pdfPath4" onchange="PDF1(4);" style="display:none" accept="application/pdf" />
+                                                    <img id="pdfExp4" src="http://placehold.it/150x100?text=.pdf+Ony" alt="pdf Document[4]" class="margin" onclick="return OpenFileBrowser(event)" style="cursor: pointer; ">
+                                                    <i class="fa fa-file-photo-o" id="ipdfPath4" style="display:none">
+                                                        @if (Model.empDocument.Count >= 4 && !String.IsNullOrEmpty(Model.empDocument[3].EmpDoumentName))
+                                                        {
+                                                            <a id="aPdfPath4" href="../UploadFiles/@Model.empDocument[3].EmpDoumentName" target="_blank">@Model.empDocument[3].EmpDoumentName</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a id="aPdfPath4" href="" target="_blank"></a>
+                                                        }
+                                                    </i>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!-- END timeline item -->
+                                </ul>
+                            </div>
+                            <!-- /.tab-pane -->
+
+                            <div class="tab-pane" id="settings" style="border: 1px solid #0000001c;">
+                                <div class="box box-solid" style="box-shadow: none !important;">
+                                    <div class="box-body">
+                                        <div class="box-group" id="accordion1">
+                                            <div class="form-group">
+                                                <label for="inputName" class="col-sm-2 control-label">Name</label>
+
+                                                <div class="col-sm-10">
+                                                    <input type="email" class="form-control" id="inputName" placeholder="Name">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="inputEmail" class="col-sm-2 control-label">Email</label>
+
+                                                <div class="col-sm-10">
+                                                    <input type="email" class="form-control" id="inputEmail" placeholder="Email">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="inputName" class="col-sm-2 control-label">Name</label>
+
+                                                <div class="col-sm-10">
+                                                    <input type="text" class="form-control" id="inputName" placeholder="Name">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="inputExperience" class="col-sm-2 control-label">Experience</label>
+
+                                                <div class="col-sm-10">
+                                                    <textarea class="form-control" id="inputExperience" placeholder="Experience"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="inputSkills" class="col-sm-2 control-label">Skills</label>
+
+                                                <div class="col-sm-10">
+                                                    <input type="text" class="form-control" id="inputSkills" placeholder="Skills">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-sm-offset-2 col-sm-10">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                            <input type="checkbox"> I agree to the <a href="#">terms and conditions</a>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @*<div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <button type="submit" class="btn btn-danger">Submit</button>
+                                </div>
+                            </div>*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- /.tab-pane -->
+                        </div>
+                    </div>
+                </div>
+                <!-- /.tab-content -->
+            </div>
+            <!-- /.nav-tabs-custom -->
+
+        </div>
+
+    </section>
+
+</form>
+
+
+
+@section Scripts {
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+            window.onload = function () {
+
+                document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                document.getElementById("modal-success").style.display = "block";
+
+               
+            };
+
+        </script>
+    }
+
+
+    <script type="text/javascript">
+
+        function validateData(event) {
+            //document.getElementById("iSave").className = "fa fa-save fa-pulse fa-spin";
+            $("#iSave").addClass("fa-pulse fa-spin");
+
+            var IsAnyEmpty = false;
+            var alertMsg = "";
+
+            if (document.getElementById("txtEmpNo").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = "Employee Number <br />";
+            }
+            if (document.getElementById("txtFName").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "First Name <br />";
+            }
+            if (document.getElementById("txtLName").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Last Name <br />";
+            }
+            if (document.getElementById("txtMobileNo").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Mobile Number <br />";
+            }
+            if (document.getElementById("txtEmail").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Email <br />";
+            }
+            if (document.getElementById("dtDateOfJoining").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Date of Joining <br />";
+            }
+
+            if (IsAnyEmpty) {
+
+                event.preventDefault();
+
+                document.getElementById("btnAlert").click();
+
+                $('#alertBody').html(
+
+                    '<p>' + alertMsg + '<br /> can not be empty </p>'
+
+                );
+
+                IsAnyEmpty = true;
+            }
+
+
+            return IsAnyEmpty;
+        }
+
+        function onToggle(btnToggle) {
+
+            document.getElementById("divPanelBox1").style.backgroundColor = "#ffffff";
+            document.getElementById("divPanelBox2").style.backgroundColor = "#ffffff";
+            document.getElementById("divPanelBox3").style.backgroundColor = "#ffffff";
+            document.getElementById("divPanelBox4").style.backgroundColor = "#ffffff";
+
+            switch (btnToggle.id) {
+                case 'btnPToggle1':
+                    if (btnToggle.title == "Collapse") {
+                        $(btnToggle).prop('title', 'Expand');
+                        $("#iconPToggle1").removeClass("fa-minus").addClass("fa-plus");
+                    }
+                    else {
+                        $(btnToggle).prop('title', 'Collapse');
+                        $("#iconPToggle1").removeClass("fa-plus").addClass("fa-minus");
+                        document.getElementById("divPanelBox1").style.backgroundColor = "#ddd6";
+
+                        $("#btnPToggle2").prop('title', 'Expand');
+                        $("#iconPToggle2").removeClass("fa-minus").addClass("fa-plus");
+                        $("#btnPToggle3").prop('title', 'Expand');
+                        $("#iconPToggle3").removeClass("fa-minus").addClass("fa-plus");
+                        $("#btnPToggle4").prop('title', 'Expand');
+                        $("#iconPToggle4").removeClass("fa-minus").addClass("fa-plus");
+                    }
+                    break;
+                case 'btnPToggle2':
+                    if (btnToggle.title == "Collapse") {
+                        $(btnToggle).prop('title', 'Expand');
+                        $("#iconPToggle2").removeClass("fa-minus").addClass("fa-plus");
+                    }
+                    else {
+                        $(btnToggle).prop('title', 'Collapse');
+                        $("#iconPToggle2").removeClass("fa-plus").addClass("fa-minus");
+                        document.getElementById("divPanelBox2").style.backgroundColor = "#ddd6";
+                        $("#btnPToggle1").prop('title', 'Expand');
+                        $("#iconPToggle1").removeClass("fa-minus").addClass("fa-plus");
+                        $("#btnPToggle3").prop('title', 'Expand');
+                        $("#iconPToggle3").removeClass("fa-minus").addClass("fa-plus");
+                        $("#btnPToggle4").prop('title', 'Expand');
+                        $("#iconPToggle4").removeClass("fa-minus").addClass("fa-plus");
+                    }
+                    break;
+                case 'btnPToggle3':
+                    if (btnToggle.title == "Collapse") {
+                        $(btnToggle).prop('title', 'Expand');
+                        $("#iconPToggle3").removeClass("fa-minus").addClass("fa-plus");
+                    }
+                    else {
+                        $(btnToggle).prop('title', 'Collapse');
+                        $("#iconPToggle3").removeClass("fa-plus").addClass("fa-minus");
+                        document.getElementById("divPanelBox3").style.backgroundColor = "#ddd6";
+                        $("#btnPToggle1").prop('title', 'Expand');
+                        $("#iconPToggle1").removeClass("fa-minus").addClass("fa-plus");
+                        $("#btnPToggle2").prop('title', 'Expand');
+                        $("#iconPToggle2").removeClass("fa-minus").addClass("fa-plus");
+                        $("#btnPToggle4").prop('title', 'Expand');
+                        $("#iconPToggle4").removeClass("fa-minus").addClass("fa-plus");
+                    }
+                    break;
+                case 'btnPToggle4':
+                    if (btnToggle.title == "Collapse") {
+                        $(btnToggle).prop('title', 'Expand');
+                        $("#iconPToggle4").removeClass("fa-minus").addClass("fa-plus");
+                    }
+                    else {
+                        $(btnToggle).prop('title', 'Collapse');
+                        $("#iconPToggle4").removeClass("fa-plus").addClass("fa-minus");
+                        document.getElementById("divPanelBox4").style.backgroundColor = "#ddd6";
+                        $("#btnPToggle1").prop('title', 'Expand');
+                        $("#iconPToggle1").removeClass("fa-minus").addClass("fa-plus");
+                        $("#btnPToggle2").prop('title', 'Expand');
+                        $("#iconPToggle2").removeClass("fa-minus").addClass("fa-plus");
+                        $("#btnPToggle3").prop('title', 'Expand');
+                        $("#iconPToggle3").removeClass("fa-minus").addClass("fa-plus");
+                    }
+                    break;
+
+            }
+
+
+        }
+
+        function ValidateMobileNo(txtMobileNo) {
+            var mobileNo = txtMobileNo.value;
+
+            if (mobileNo.length < 10) {
+                txtMobileNo.value = "";
+                alert("Please enter valid mobile number.");
+            }
+        }
+
+        function preventNumberInput(e) {
+            var keyCode = (e.keyCode ? e.keyCode : e.which);
+            if (keyCode > 47 && keyCode < 58 || keyCode > 95 && keyCode < 107) {
+                e.preventDefault();
+            }
+        }
+
+        function restrictAlphabets(e) {
+            var x = e.which || e.keycode;
+            if ((x >= 48 && x <= 57))
+                return true;
+            else
+                return false;
+        }
+
+        function ValidateEmail(txtEmail) {
+            var emailId = txtEmail.value;
+            var expr = /^([\w-\.]+)@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+            if (!expr.test(emailId)) {
+                txtEmail.value = "";
+                alert("Please enter valid email.");
+            }
+        }
+
+        function ddlAddressSelectionChange(selValue) {
+            if (selValue == "PermanentAddress") {
+                document.getElementById("divPresentAddress").style.display = "none";
+                document.getElementById("divPermanentAddress").style.display = "block";
+            }
+            else {
+                document.getElementById("divPermanentAddress").style.display = "none";
+                document.getElementById("divPresentAddress").style.display = "block";
+            }
+        }
+
+        function closeEditEmployeeWindow(event) {
+            //alert("here...kjhkjhkh");
+            //event.preventDefault();
+            //alert("inside edit employee");
+            //history.go(-1);
+            //document.getElementById("liEmpSelfOnboard").click();
+        }
+        function successAlertClose(event) {
+            document.getElementById("modal-success").style.display = "none";
+        }
+
+        function ChangeEmployeeLogo(event) {
+            @*var localEmpFileUpload = document.getElementById("empfileUpload");
+            var localEmpImage = document.getElementById("imgEmpProfile");
+            //alert(localEmpFileUpload.files.item(0).name);
+            alert("1");
+           // alert(localEmpFileUpload.src);
+            var file = localEmpFileUpload.files.item(0);
+            if (file) {
+                alert("2");
+                alert(file.name);
+            }
+
+            //imageProfile.src = "../UploadImages/" + usrImgData.ProfilePicturePath;
+            //alert(URL.createObjectURL(event.target.files[0]));
+            //imageProfile.src = URL.createObjectURL(event.target.files[0]);
+
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#imgEmpProfile').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(this.files[0]);
+
+            alert(URL.createObjectURL(event.target.files[0]));
+            ///////*@
+            //debugger;
+            //console.log("Function Called");
+            var localEmpFileUpload = document.getElementById("empfileUpload").files;
+            if (localEmpFileUpload.length > 0) {
+                var filereader = new FileReader();
+                filereader.onload = function (e) {
+                    document.getElementById("imgEmpProfile").setAttribute("src", e.target.result);
+                };
+                filereader.readAsDataURL(localEmpFileUpload[0]);
+            }
+
+        }
+
+        function PDF1(Id) {
+            var localEmpFileUpload = document.getElementById("empfileUpload" + Id).files;
+            if (localEmpFileUpload.length > 0) {
+                var filereader = new FileReader();
+                filereader.onload = function (e) {
+                    //document.getElementById("aPdfPath" + Id).setAttribute("href", e.target.result);
+                    var tmppath = URL.createObjectURL(document.getElementById("empfileUpload" + Id).files[0]);
+                    document.getElementById("aPdfPath" + Id).innerHTML = document.getElementById("empfileUpload" + Id).files[0].name;
+                    document.getElementById("aPdfPath" + Id).setAttribute("href", tmppath);
+                    document.getElementById("pdfExp" + Id).style.display = "none";
+                    document.getElementById("ipdfPath" + Id).style.display = "block";
+                };
+                filereader.readAsDataURL(localEmpFileUpload[0]);
+            }
+
+        }
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#liEmployee").addClass("active");
+            $("#liUpdateEmployee").addClass("active");
+            document.getElementById("liUpdateEmployee").style.backgroundColor = "#3c8dbc45";
+            document.getElementById("empfileUpload").hidden = true;
+
+            setTimeout(successAlertClose, 5000);
+            document.getElementById("divComp1").style.display = "none"
+            document.getElementById("divComp2").style.display = "none"
+            document.getElementById("divComp3").style.display = "none"
+
+            var noOfDocuments = 4;
+            for (let Id = 1; Id < noOfDocuments; Id++) {
+                if (document.getElementById("aPdfPath" + Id).innerHTML != null && document.getElementById("aPdfPath" + Id).innerHTML.length > 0) {
+                    document.getElementById("ipdfPath" + Id).style.display = "block";
+                    document.getElementById("pdfExp" + Id).style.display = "none";
+                }
+            }
+            
+        });
+
+    </script>
+    <script>
+            function OpenFileBrowser(elem) {
+                @*$('#fileUpload').attr("type", "file");
+                $('#fileUpload').click();
+                @Model.empDetails.EmployeeProfilePhoto= $('#fileUpload').value;
+                $('#fileUpload').attr("type", "hidden");*@
+
+            }
+
+    </script>
+    <script>
+        function sendOnbDataForApproval(empId) {
+            //alert(empId);
+            event.preventDefault();
+            $("#iOnbd").addClass("fa-pulse fa-spin");
+            var form_data = new FormData();
+            form_data.append('empId', empId);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SendOnboardingForApproval", "Employee")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    var usrMsgData = JSON.parse(response);
+                    //alert("here...after submit for approval" + usrMsgData);
+                    if (usrMsgData != null && usrMsgData != undefined) {
+                        document.getElementById("btnOnbd").innerText = "Boarding in progress...";
+                        document.getElementById("btnOnbd").disabled = true;
+                        //alert("alert1");
+                        document.getElementById("successBody").innerHTML = usrMsgData[0];
+                        //alert("alert2");
+                        document.getElementById("modal-success").style.display = "block";
+                        //alert("alert3");
+                        setTimeout(successAlertClose, 5000);
+                        //alert("alert4");
+                        //event.preventDefault();
+                    }
+                },
+                error: function (req, status, error) {
+                    console.log(msg);
+                }
+            });
+        }
+
+        function resetEditingPannel(Id) {
+            //id = parseInt(Id);
+            //alert("reset pannel");
+            if (document.getElementById("divComp"+Id).style.display === "block") {
+                document.getElementById("divComp" + Id).style.display = "none";
+            }
+            else if (document.getElementById("divComp" + Id).style.display === "none") {
+                document.getElementById("divComp" + Id).style.display = "block";
+            }
+            
+        }
+        
+    </script>
+}
+

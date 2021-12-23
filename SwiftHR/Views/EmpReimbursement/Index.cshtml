@@ -1,0 +1,573 @@
+﻿@model SwiftHR.Utility.EmpReimbursementU
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Add Employee Reimbursement";
+}
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+<link rel="stylesheet" href="~/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="~/css/site.css" />
+
+<section class="content-header">
+    <h1>
+        Add Employee Reimbursement
+    </h1>
+</section>
+
+<section class="content">
+    <div class="alertS alert-success" id="modal-success" style="display:none;">
+        <button type="button" class="close" aria-hidden="true" onclick="successAlertClose(event)">&times;</button>
+        <h4><i class="icon fa fa-check"></i> Success </h4>
+        <p id="successBody"></p>
+    </div>
+    <div class="box box-default">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="LookUpId" style="border: 1px solid #0000001c;">
+                            <form asp-controller="EmpReimbursement" asp-action="AddEmpReimbursementDetails" method="POST">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtEmployeeNumber">Employee Code<span style="color:#FF0000;">*</span></label>
+                                                <input type="hidden" id="ReimbursementId" name="ReimbursementId">
+                                                <input type="hidden" id="txtEmployeeId" name="EmployeeID">
+                                                <input type="text" id="txtEmployeeNumber" name="EmployeeNumber" class="form-control" placeholder="Employee Code" onchange="GetEmpDetails()">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtEmployeeName">Employee Name<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtEmployeeName" name="EmployeeName" class="form-control" readonly="" placeholder="Employee Name">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="dtDate">Date<span style="color:#FF0000;">*</span></label>
+                                                <input class="form-control" name="Date" type="date" id="dtDate">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtAmount">Amount<span style="color:#FF0000;">*</span> </label>
+                                                <input type="text" id="txtAmount" class="form-control" name="Amount" placeholder="Amount">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtRemarks">Remarks</label>
+                                                <input type="text" id="txtRemarks" class="form-control" name="Remarks" placeholder="Remarks">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+                                <div class="box-footer">
+                                    <div class="col-md-12">
+                                        <button type="button" id="btnNext1" class="btn btn-warning" style="float: right; margin-right: 8%" onclick="Clear(event)">Clear </button>
+                                        <button type="submit" id="btnSave" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="ReimbursementvalidateData(event);">Save</button>
+                                    </div>
+                                </div>
+                                @if (ViewBag.ReimbursementList != null)
+                                {
+                                    if (ViewBag.ReimbursementList.Count > 0)
+                                    {
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divReimbursementlist">
+
+                                                <table id="tblReimbursementList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    @if (ViewBag.ReimbursementList != null)
+                                                    {
+                                                        IEnumerable<SwiftHR.Models.EmpReimbursement> d = new List<SwiftHR.Models.EmpReimbursement>();
+                                                        d = ViewBag.ReimbursementList;
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="bg-primary"> Employee No</th>
+                                                                <th class="bg-primary"> Employee</th>
+                                                                <th class="bg-primary">Date</th>
+                                                                <th class="bg-primary"> Amount</th>
+                                                                <th class="bg-primary"> Remark</th>
+                                                                <th class="bg-primary"> Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var data in d)
+                                                            {
+                                                                <tr id="@data.Id">
+                                                                    <td>
+                                                                        @Html.DisplayFor(modelItem => data.EmployeeNumber)
+                                                                    </td>
+                                                                    <td>@Html.DisplayFor(modelItem => data.EmployeeName) </td>
+                                                                    <td>@Html.DisplayFor(modelItem => data.Date) </td>
+                                                                    <td>@Html.DisplayFor(modelItem => data.Amount) </td>
+                                                                    <td>@Html.DisplayFor(modelItem => data.Remarks) </td>
+                                                                    <td>
+                                                                        <a type="submit" href="" class="btn btn-primary pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="SearchRecord(@data.Id);"><i id="" class="fa fa-edit"></i> Edit</a>
+                                                                        <button type="submit" class="btn btn-danger pull-left btn-xs" style="float: right; margin-right: 4%;" onclick="LOPDataDelete(@data.Id);"><i id="" class="fa fa-remove"></i> Disccable</button>
+                                                                    </td>
+
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                        <tfoot class="hidden-print">
+                                                            <tr>
+                                                                <th>Employee No</th>
+                                                                <th>Employee</th>
+                                                                <th>Date</th>
+                                                                <th>Amount</th>
+                                                                <th>Remark</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </tfoot>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div style="display:none;">
+        <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+        </button>
+        <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+        </button>
+    </div>
+
+    <div class="alert alert-warning fade" id="modal-warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4>
+            <i class="icon fa fa-warning"></i> Alert!
+        </h4>
+
+        <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+        </div>
+
+        <div class="alert-footer">
+            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+        </div>
+    </div>
+
+    <div class="modal modal-warning fade" id="modal-warning2">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Alert!</h4>
+                </div>
+                <div class="modal-body">
+                    <p>One fine body&hellip;</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+            @*/.modal-content*@
+        </div>
+        @*/.modal-dialog*@
+    </div>
+</section>
+<script>
+    function GetEmpDetails() {
+        event.preventDefault();
+        var EmployeeNo = $("#txtEmployeeNumber").val();
+        var form_data = new FormData();
+        form_data.append('EmpNo', EmployeeNo);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetEmpName", "EmpLOPDetails")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+                    debugger;
+                    $("#txtEmployeeName").val(response[0].firstName + ' ' + response[0].middleName + ' ' + response[0].lastName);
+                    $("#txtEmployeeId").val(response[0].employeeId);
+                    //alert(response);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function SearchRecord(Id) {
+        event.preventDefault();
+        var form_data = new FormData();
+        form_data.append('EMPReimbID', Id);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SearchReimbursementRecord", "EmpReimbursement")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+                    debugger;
+
+                    $("#ReimbursementId").val(response[0].id);
+                    $("#txtEmployeeId").val(response[0].employeeId);
+                    $("#txtEmployeeNumber").val(response[0].employeeNumber);
+                    $("#txtEmployeeName").val(response[0].employeeName);
+                   
+                    $("#dtDate").val(response[0].date);
+                    //$("#dtDate").format('dd-MM-yyyy').val('2021-12-21');
+                    $("#txtAmount").val(response[0].amount);
+                    $("#txtRemarks").val(response[0].remarks);
+
+
+                    document.getElementById("successBody").innerHTML = "Record Search Success";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+                    //alert(response);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+
+    function LOPDataDelete(ID) {
+        var form_data = new FormData();
+        form_data.append('EMPReimbID', ID);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("ReimbursementDelete", "EmpReimbursement")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function successAlertClose(event) {
+        document.getElementById("modal-success").style.display = "none";
+    }
+
+</script>
+
+@section Scripts {
+
+    <!-- DataTables -->
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/dataTables.buttons.min.js"></script>
+    @*<script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"></script>*@
+
+    <script src="~/bower_components/datatables.net-export/jszip.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/pdfmake.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/vfs_fonts.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.html5.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.print.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.colVis.min.js"></script>
+    <!-- Export plugin -->
+    <script type="text/javascript" src="~/lib/hhurz/libs/FileSaver/FileSaver.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/js-xlsx/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.min.js"></script>
+    @*<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.15.4/extensions/print/bootstrap-table-print.js"></script>*@
+
+
+
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+        window.onload = function () {
+             document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+              };
+        </script>
+    }
+
+    
+    <script>
+
+        $(document).ready(function () {
+            $("#liAttendance").addClass("active");
+            $("#liAttandancePolicy").addClass("active");
+            document.getElementById("liAttandancePolicy").style.backgroundColor = "#3c8dbc45";
+        });
+        function ReimbursementvalidateData(event) {
+            var IsAnyEmpty = false;
+            var alertMsg = "";
+
+            if (document.getElementById("txtEmployeeNumber").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = "Employee Number <br />";
+            }
+
+
+            if (document.getElementById("dtDate").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Date <br />";
+            }
+
+            if (document.getElementById("txtAmount").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Amount <br />";
+            }
+
+            if (IsAnyEmpty) {
+
+                event.preventDefault();
+
+                document.getElementById("btnAlert").click();
+
+                $('#alertBody').html('<p>' + alertMsg + '<br /> can not be empty </p>');
+                debugger;
+
+                IsAnyEmpty = true;
+            }
+
+            return IsAnyEmpty;
+
+            function successAlertClose(event) {
+                document.getElementById("modal-success").style.display = "none";
+            }
+        }
+        function Clear() {
+
+            document.getElementById("txtEmployeeNumber").value = null;
+            document.getElementById("txtEmployeeName").value = null;
+
+            document.getElementById("txtLOPMonth").value = null;
+            document.getElementById("txtTotalLOPDays").value = null;
+
+            document.getElementById("txtRemarks").value = null;
+
+        }
+
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#liEmployee").addClass("active");
+            $("#liEmployeeList").addClass("active");
+            document.getElementById("liEmployeeList").style.backgroundColor = "#3c8dbc45";
+
+            //// Setup - add a text input to each footer cell
+            //$('#tblPolicyList tfoot th').each(function (i) {
+            //    var title = $('#tblPolicyList thead th').eq($(this).index()).text();
+            //    $(this).html('<input type="text" placeholder="Search ' + title + '" data-index="' + i + '" />');
+            //});
+
+
+            // DataTable
+            @* scrollY: "300px",*@
+            var table = $('#tblLOPList').DataTable({
+                "scrollX": true,
+                "scrollY": true,
+                "scrollCollapse": true,
+                "paging": true,
+                "fixedColumns": true,
+                "fixedHeader": true,
+                "bLengthChange": true,
+                "Filter": true,
+                "Info": true,
+                "pagingType": "full_numbers",
+                "pageLength": 10,
+                "pageList": "[10, 25, 50, 100, 200, All]",
+                "dom": 'Bfrtip',
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-copy"></i>'
+                    },
+                    {
+                        extend: 'excel',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-excel-o"></i>'
+                    },
+                    {
+                        extend: 'pdf',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-pdf-o"></i>'
+                    },
+                    {
+                        extend: 'csv',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-csv-o"></i>'
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-print"></i>'
+                    }
+                ],
+            });
+
+
+            // Filter event handler
+            $(table.table().container()).on('keyup', 'tfoot input', function () {
+                table
+                    .column($(this).data('index'))
+                    .search(this.value)
+                    .draw();
+            });
+        });
+
+        @*$(function () {
+            $('#tblEmpList').DataTable();
+        })*@
+
+
+        $("#btnExport").click(function (e) {
+            //alert("excel");
+            //window.open('data:application/vnd.ms-excel,' + $('#divJoinerslist').dataTable.html());
+            $('#tblLOPList').tableExport({ type: 'excel'});
+            @*$('#tblEmpList').tableExport({ type: 'csv' });*@
+            @*$('tblEmpList').tableExport({
+                type: 'excel',
+                mso: {
+                    fileFormat: 'excel',
+                    worksheetName: ['Table 1', 'Table 2', 'Table 3']
+                }
+            });*@
+
+            @*$('tblEmpList').tableExport({
+                type: 'excel',
+                mso: {
+                    fileFormat: 'xmlss',
+                    worksheetName: ['Table 1', 'Table 2', 'Table 3']
+                }
+            });*@
+            e.preventDefault();
+        });
+
+        $("#btnpDF").click(function (e) {
+            //PDF
+            $('#tblLOPList').tableExport({
+                type: 'pdf',
+                jspdf: {
+                    orientation: 'l',
+                    format: 'a4',
+                    margins: { left: 10, right: 10, top: 20, bottom: 20 },
+                    autotable: {
+                        styles: {
+                            fillColor: 'inherit',
+                            textColor: 'inherit'
+                        },
+                        tableWidth: 'auto'
+                    }
+                }
+            });
+            e.preventDefault();
+        });
+
+        $("#btnPrint").click(function (e) {
+            //Print
+            var table = document.getElementById('tblLOPList');
+            table.button('.buttons-print').trigger();
+            //var win = window.open('', '', 'height=700,width=700');
+            //window.document.write(tab.outerHTML);
+            //window.document.print();
+            //window.print();
+            //window.document.close();
+
+            //window.print();
+
+            //e.preventDefault();
+        });
+
+    </script>
+}

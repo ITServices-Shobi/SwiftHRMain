@@ -1,0 +1,89 @@
+﻿@model IEnumerable<SwiftHR.Models.FeedsGroup>
+    <!-- bootstrap wysihtml5 - text editor -->
+<link rel="stylesheet" href="~/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
+
+<style>
+    a[data-wysihtml5-command="Outdent"],
+    a[data-wysihtml5-command="Indent"] {
+        display: none !important;
+    }
+</style>
+
+<div class="modal-content">
+    <form method="post" enctype="multipart/form-data" asp-controller="Home" asp-action="InsertPostsData">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title"> Add New Post </h4>
+        </div>
+        <div class="modal-body">
+
+            <div class="box">
+                <!-- /.box-header -->
+                <div class="box-body pad">
+
+                    <div class="form-group">
+                        <label>Select Group:</label>
+                        <select id="ddlEmpNoSeriesType" class="form-control" name="FeedsGroupId">
+
+                            @if (Model != null && Model.Count() > 0)
+                            {
+                                @foreach (var empFeedGroup in Model)
+                                {
+                                    <option value="@empFeedGroup.FeedsGroupId">@empFeedGroup.FeedsGroupName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Message:</label>
+                        <textarea id="editor" class="textarea" placeholder="Write here..." rows="2" name="PostTextData" 
+                                  style="width: 100%; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+
+                        
+                    </div>
+
+                    <div class="form-group">
+                        <label for="exampleInputFile">Post a file:</label>
+                        <input type="file" name="file" id="fileUploadImage">
+                        <p class="help-block">jpg | jpeg | png</p>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" onclick="GetEditorData()"> Submit </button>
+        </div>
+    </form>
+</div>
+
+
+
+<!-- Bootstrap WYSIHTML5 -->
+<script src="~/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
+
+
+
+<script>
+    $(function () {
+        //bootstrap WYSIHTML5 - text editor
+        $('.textarea').wysihtml5({
+            toolbar: {
+                "html": false, //Button which allows you to edit the generated HTML.
+                "link": false,
+                "image": false //Button to insert an image.
+            }
+        })
+    })
+
+    function GetEditorData() {
+        debugger;
+        var editr = $('iframe').contents().find('.wysihtml5-editor').html();
+        //document.getElementById("divPostTextData").innerHTML = editr;
+    }
+</script>

@@ -1,0 +1,702 @@
+﻿@model SwiftHR.Utility.EmpMasters
+
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Add Employee";
+}
+
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+
+<section class="content-header">
+    <h1>
+        Add Employee
+    </h1>
+
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="box box-default">
+        <div class="box-body">
+            <form asp-controller="Employee" asp-action="AddEmployeeDetails" method="POST">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="nav-tabs-custom">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a id="anchr1" href="#BasicInfo" data-toggle="tab">Basic Info</a></li>
+                                <li><a id="anchr2" href="#EmploymentSelections" data-toggle="tab">Employment Selections </a></li>
+                                <li><a id="anchr3" href="#PF_ESI_LWF" data-toggle="tab">PF, ESI, LWF</a></li>
+                                <li><a id="anchr4" href="#PaymentMode" data-toggle="tab">Payment Mode</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="tab-content">
+
+                            <div class="active tab-pane" id="BasicInfo" style="border: 1px solid #0000001c;">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="ddlEmployeeNoSelection">Employee No Selection</label>
+                                                <select class="form-control select2" id="ddlEmployeeNoSelection" name="EmployeeNoSelection">
+                                                    <option value="Manual Entry">Manual Entry</option>
+                                                    <option value="Permanant Employee">Permanant Employee</option>
+                                                    <option value="Temporary Employee">Temporary Employee</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtFName">First Name<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtFName" name="FirstName" class="form-control" placeholder="First Name" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtMobileNo">Mobile Number<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="Mobile Number" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="ddlDepartment">Department</label>
+                                                <select class="form-control select2" id="ddlDepartment" name="Department">
+                                                    <option value="0">Choose..</option>
+
+
+                                                    @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:DepartmentCode"])).ToList().Count() > 0)
+                                                    {
+                                                        @foreach (var dept in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:DepartmentCode"])).ToList())
+                                                        {
+                                                            <option value="@dept.MasterDataItemId">@dept.MasterDataItemValue</option>
+                                                        }
+                                                    }
+
+
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtEmpNo">Employee No <span style="color:#FF0000;">*</span> </label>
+                                                <input type="text" id="txtEmpNo" class="form-control" name="EmployeeNumber" placeholder="Enter Employee No" onkeypress='return restrictAlphabets(event)' onchange="EmployeeNumberCheck(this)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtMName">Middle Name</label>
+                                                <input type="text" id="txtMName" name="MiddleName" class="form-control" placeholder="Middle Name" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtEmail">Email <span style="color:#FF0000;">*</span></label>
+                                                <input type="email" id="txtEmail" name="Email" class="form-control" placeholder="Email" onchange="ValidateEmail(this)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="ddlDesignation">Designation</label>
+                                                <select class="form-control select2" id="ddlDesignation" name="Designation">
+                                                    <option value="0">Choose..</option>
+                                                        @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:DesignationCode"])).ToList().Count() > 0)
+                                                        {
+                                                            @foreach (var desig in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:DesignationCode"])).ToList())
+                                                            {
+                                                                <option value="@desig.MasterDataItemId">@desig.MasterDataItemValue</option>
+                                                            }
+                                                        }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="dtDateOfJoining">Date of Joining <span style="color:#FF0000;">*</span></label>
+                                                <input class="form-control" name="DateOfJoining" type="date" id="dtDateOfJoining">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtLName">Last Name<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtLName" name="LastName" class="form-control" placeholder="Last Name" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="dtConfirmationDate">Confirmation Date</label>
+                                                <input class="form-control" name="ConfirmationDate" type="date" id="dtConfirmationDate">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="ddlReportingManager">Reporting Manager</label>
+                                                <select class="form-control select2" id="ddlReportingManager" name="ReportingManager">
+                                                    <option value="0">Choose..</option>
+                                                    @if (Model != null && Model.reportingMgrList.Count() > 0)
+                                                    {
+                                                        @foreach (var user in Model.reportingMgrList)
+                                                        {
+                                                            <option value="@user.UserId">@user.FirstName @user.LastName</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input name="IsSelfOnboarding" type="checkbox" id="chkIsSelfOnboarding">  Allow Employee Self Onboarding
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button type="button" id="btnNext1" class="btn btn-warning" style="float: right; margin-right: 8%" onclick="NextClick(event, '2')">Next </button>
+                                        <button type="submit" id="btnSave" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="validateData(event);">Save</button>
+                                        <div style="display:none;">
+                                            <button id="btnSaveOnly" type="submit" class="btn btn-primary" style="float: right; margin-right: 4%;">Save</button>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="tab-pane" id="EmploymentSelections" style="border: 1px solid #0000001c;">
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="ddlEmployeeStatus">Employee Status</label>
+                                                <select class="form-control select2" id="ddlEmployeeStatus" name="EmployeeStatus">
+                                                    <option value="0">Choose..</option>
+                                                    <option value="Confirmed">Confirmed</option>
+                                                    <option value="Probation">Probation</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="ddlDivision">Division</label>
+                                                <select class="form-control select2" id="ddlDivision" name="Division">
+                                                    <option value="0">Choose..</option>
+
+                                                    @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:DevisionCode"])).ToList().Count() > 0)
+                                                    {
+                                                        @foreach (var div in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:DevisionCode"])).ToList())
+                                                        {
+                                                            <option value="@div.MasterDataItemId">@div.MasterDataItemValue</option>
+                                                        }
+                                                    }
+
+
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="ddlGrade">Grade</label>
+                                                <select class="form-control select2" id="ddlGrade" name="Grade">
+                                                    <option value="0">Choose..</option>
+
+                                                    @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:GradeCode"])).ToList().Count() > 0)
+                                                    {
+                                                        @foreach (var grade in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:GradeCode"])).ToList())
+                                                        {
+                                                            <option value="@grade.MasterDataItemId">@grade.MasterDataItemValue</option>
+                                                        }
+                                                    }
+
+
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="ddlLevel">Level</label>
+                                                <select class="form-control select2" id="ddlLevel" name="Level">
+                                                    <option value="0">Choose..</option>
+
+                                                    @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:LevelCode"])).ToList().Count() > 0)
+                                                    {
+                                                        @foreach (var level in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:LevelCode"])).ToList())
+                                                        {
+                                                            <option value="@level.MasterDataItemId">@level.MasterDataItemValue</option>
+                                                        }
+                                                    }
+
+
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="ddlLocation">Location</label>
+                                                <select class="form-control select2" id="ddlLocation" name="Location">
+                                                    <option value="0">Choose..</option>
+
+                                                    @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:LocationCode"])).ToList().Count() > 0)
+                                                    {
+                                                        @foreach (var location in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:LocationCode"])).ToList())
+                                                        {
+                                                            <option value="@location.MasterDataItemId">@location.MasterDataItemValue</option>
+                                                        }
+                                                    }
+
+
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtProbationPeriod">Probation Period (In Days)</label>
+                                                <input type="text" id="txtProbationPeriod" name="ProbationPeriod" class="form-control" placeholder="Probation Period" onkeypress='return restrictAlphabets(event)' maxlength="3">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="ddlCostCenter">Cost Center</label>
+                                                <select class="form-control select2" id="ddlCostCenter" name="CostCenter">
+                                                    <option value="0">Choose..</option>
+
+                                                    @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:CostCenterCode"])).ToList().Count() > 0)
+                                                    {
+                                                        @foreach (var costCeter in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:CostCenterCode"])).ToList())
+                                                        {
+                                                            <option value="@costCeter.MasterDataItemId">@costCeter.MasterDataItemValue</option>
+                                                        }
+                                                    }
+
+
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="ddlFunctionalGrade">Functional Grade</label>
+                                                <select class="form-control select2" id="ddlFunctionalGrade" name="FunctionalGrade">
+                                                    <option value="0">Choose..</option>
+
+                                                    @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:FunctionalGradeCode"])).ToList().Count() > 0)
+                                                    {
+                                                        @foreach (var funGrade in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:FunctionalGradeCode"])).ToList())
+                                                        {
+                                                            <option value="@funGrade.MasterDataItemId">@funGrade.MasterDataItemValue</option>
+                                                        }
+                                                    }
+
+
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="ddlSubLevel">Sub Level</label>
+                                                <select class="form-control select2" id="ddlSubLevel" name="SubLevel">
+                                                    <option value="0">Choose..</option>
+
+                                                    @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:SubLevelCode"])).ToList().Count() > 0)
+                                                    {
+                                                        @foreach (var subLevel in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:SubLevelCode"])).ToList())
+                                                        {
+                                                            <option value="@subLevel.MasterDataItemId">@subLevel.MasterDataItemValue</option>
+                                                        }
+                                                    }
+
+
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="ddlHouseName">House Name</label>
+                                                <select class="form-control select2" id="ddlHouseName" name="HouseName">
+                                                    <option value="0">Choose..</option>
+
+                                                    @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:HouseNameCode"])).ToList().Count() > 0)
+                                                    {
+                                                        @foreach (var houseName in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:HouseNameCode"])).ToList())
+                                                        {
+                                                            <option value="@houseName.MasterDataItemId">@houseName.MasterDataItemValue</option>
+                                                        }
+                                                    }
+
+
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <button type="button" id="btnNext2" class="btn btn-warning" style="float: right; margin-right: 4%" onclick="NextClick(event, '3')">Next </button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="PF_ESI_LWF" style="border: 1px solid #0000001c;">
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <div class="checkbox" style="text-align:center;">
+                                                    <label>
+                                                        <input name="EnablePF" type="checkbox" id="chkEnablePF" onchange="chkEnablePFChange(this)"> Enable PF
+                                                    </label>
+                                                </div>
+                                                <div id="divPF">
+
+                                                    <label for="txtPfnumber"> PF Number </label>
+                                                    <input type="text" class="form-control" id="txtPfnumber" name="Pfnumber" placeholder="PF Number" onkeypress='return restrictAlphabets(event)' disabled>
+
+                                                    <label for="txtUANNumber"> UAN Number </label>
+                                                    <input type="text" class="form-control" id="txtUANNumber" name="Uannumber" placeholder="UAN Number" onkeypress='return restrictAlphabets(event)' disabled>
+
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="checkbox" style="text-align: center; margin-left: 1.5%;">
+                                                    <label>
+                                                        <input name="IncludeLwf" type="checkbox" id="chkEnableLWF"> Enable LWF
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <div class="checkbox" style="text-align:center;">
+                                                    <label>
+                                                        <input type="checkbox" id="chkEnableESI" name="IncludeEsi" onchange="chkEnableESIChange(this)"> Enable ESI
+                                                    </label>
+                                                </div>
+
+                                                <div id="divESI">
+                                                    <label for="txtESINumber">  ESI Number </label>
+                                                    <input type="text" id="txtESINumber" name="Esinumber" class="form-control" placeholder="ESI Number" onkeypress='return restrictAlphabets(event)' disabled>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <button type="button" id="btnNext3" class="btn btn-warning" style="float: right; margin-right: 4%" onclick="NextClick(event, '4')">Next </button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="PaymentMode" style="border: 1px solid #0000001c;">
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="ddlPaymentMode"> Payment Mode</label>
+                                                <select class="form-control select2" id="ddlPaymentMode" name="PaymentMethod">
+                                                    <option value="0">Choose..</option>
+
+                                                    @if (Model != null && Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:PaymentModeCode"])).ToList().Count() > 0)
+                                                    {
+                                                        @foreach (var payMode in Model.empMasterDataItems.Where(x => x.ItemTypeId == Convert.ToInt32(Configuration["AppData:PaymentModeCode"])).ToList())
+                                                        {
+                                                            <option value="@payMode.MasterDataItemId">@payMode.MasterDataItemValue</option>
+                                                        }
+                                                    }
+
+
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+
+
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <button type="submit" id="btnSaveAll" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="validateData(event);"> Save All </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div style="display:none;">
+                <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+                </button>
+                <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+                </button>
+            </div>
+
+
+            <div class="alert alert-warning fade" id="modal-warning">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4>
+                    <i class="icon fa fa-warning"></i> Alert!
+                </h4>
+
+                <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+                </div>
+
+                <div class="alert-footer">
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+
+
+            <div class="modal modal-warning fade" id="modal-warning2">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">Alert!</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>One fine body&hellip;</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                        </div>
+                    </div>
+                    @*/.modal-content*@
+                </div>
+                @*/.modal-dialog*@
+            </div>
+            <!-- /.modal -->
+
+            <div class="alertS alert-success" id="modal-success" style="display:none;">
+                <button type="button" class="close" aria-hidden="true" onclick="successAlertClose()">&times;</button>
+                <h4><i class="icon fa fa-check"></i> Success </h4>
+
+                <p id="successBody"></p>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+        window.onload = function () {
+                document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                document.getElementById("modal-success").style.display = "block";
+              };
+    </script>
+}
+
+
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+            $("#liEmployee").addClass("active");
+            $("#liAddEmployee").addClass("active");
+            document.getElementById("liAddEmployee").style.backgroundColor = "#3c8dbc45";
+        });
+
+        function chkEnablePFChange(chkEnablePFChange) {
+            if (chkEnablePFChange.checked) {
+                document.getElementById("txtPfnumber").disabled = false;
+                document.getElementById("txtUANNumber").disabled = false;
+            }
+            else {
+                document.getElementById("txtPfnumber").disabled = true;
+                document.getElementById("txtUANNumber").disabled = true;
+            }
+
+        }
+
+        function chkEnableESIChange(chkEnableESIChange) {
+            if (chkEnableESIChange.checked)
+                document.getElementById("txtESINumber").disabled = false;
+            else
+                document.getElementById("txtESINumber").disabled = true;
+        }
+
+        function EmployeeNumberCheck(txtemployeeNumber) {
+
+            var employeeNumber = txtemployeeNumber.value;
+
+             $.ajax({
+                type: "GET",
+                url: "@Url.Action("EmployeeNumberExists", "Employee")",
+                data: { empNumber: employeeNumber},
+                dataType: "JSON",
+                 success: function (response) {
+                     if (response == "True") {
+                         txtemployeeNumber.value = "";
+                         alert("Employee number already exists.")
+                     }
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+        }
+
+        $('#chkEnableLWF').click(function () {
+            $('#chkEnableLWF').val($(this).is(':checked'));
+        });
+
+        $('#chkEnableESI').click(function () {
+            $('#chkEnableESI').val($(this).is(':checked'));
+        });
+
+        $('#chkIsSelfOnboarding').click(function () {
+            $('#chkIsSelfOnboarding').val($(this).is(':checked'));
+        });
+
+        function NextClick(event, nextSection) {
+            switch (nextSection) {
+                case "1": document.getElementById("anchr1").click(); break;
+                case "2": if (validateData(event)) { return false; } else { document.getElementById("anchr2").click(); } break;
+                case "3": document.getElementById("anchr3").click(); break;
+                case "4": document.getElementById("anchr4").click(); break;
+                case "5": document.getElementById("anchr5").click(); break;
+            }
+        }
+
+        function validateData(event) {
+            var IsAnyEmpty = false;
+
+
+            var alertMsg = "";
+
+            if (document.getElementById("txtEmpNo").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = "Employee Number <br />";
+            }
+            if (document.getElementById("txtFName").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "First Name <br />";
+            }
+            if (document.getElementById("txtLName").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Last Name <br />";
+            }
+            if (document.getElementById("txtMobileNo").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Mobile Number <br />";
+            }
+            if (document.getElementById("txtEmail").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Email <br />";
+            }
+            if (document.getElementById("dtDateOfJoining").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Date of Joining <br />";
+            }
+
+            if (IsAnyEmpty) {
+
+                event.preventDefault();
+
+                document.getElementById("btnAlert").click();
+
+                $('#alertBody').html(
+
+                    '<p>' + alertMsg +  '<br /> can not be empty </p>'
+
+                );
+
+                IsAnyEmpty = true;
+            }
+
+
+            return IsAnyEmpty;
+        }
+
+        function ValidateMobileNo(txtMobileNo) {
+            var mobileNo = txtMobileNo.value;
+
+            if (mobileNo.length < 10) {
+                txtMobileNo.value = "";
+                alert("Please enter valid mobile number.");
+            }
+        }
+
+        function preventNumberInput(e) {
+            var keyCode = (e.keyCode ? e.keyCode : e.which);
+            if (keyCode > 47 && keyCode < 58 || keyCode > 95 && keyCode < 107) {
+                e.preventDefault();
+            }
+        }
+
+        function restrictAlphabets(e) {
+            var x = e.which || e.keycode;
+            if ((x >= 48 && x <= 57))
+                return true;
+            else
+                return false;
+        }
+
+        function ValidateEmail(txtEmail) {
+            var emailId = txtEmail.value;
+            var expr = /^([\w-\.]+)@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+            if (!expr.test(emailId)) {
+                txtEmail.value = "";
+                alert("Please enter valid email.");
+            }
+        }
+
+        function successAlertClose() {
+            document.getElementById("modal-success").style.display = "none";
+        }
+
+    </script>
+}

@@ -1,0 +1,1070 @@
+﻿
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Add Employee";
+    int i;
+    IEnumerable<SwiftHR.Models.TimeRecordingSheetDetails> A = new List<SwiftHR.Models.TimeRecordingSheetDetails>();
+
+}
+
+
+<!-- bootstrap datepicker -->
+<script src="../../plugins/datepicker/bootstrap-datepicker.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+
+
+<style>
+    .Holidaybg {
+        background-color: #c1c1c1;
+    }
+
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+@section Scripts {
+    <script>
+        var dayName = [];
+        $(document).ready(function () {
+
+
+            var dt = new Date();
+            var year = dt.getFullYear();
+            var month = ("0" + (dt.getMonth() + 1)).slice(-2);
+            $("#bdaymonth").val(year + '-' + month);
+            var CountOfMonth = new Date(year, month, 0).getDate();
+
+            date = dt.getDate();
+
+            $('#checkall').change(function () {
+                $('.cb-element').prop('checked', this.checked);
+            });
+            GetHolidays();
+            $('.cb-element').change(function () {
+                if ($('.cb-element:checked').length == $('.cb-element').length) {
+                    $('#checkall').prop('checked', true);
+                }
+                else {
+                    $('#checkall').prop('checked', false);
+                }
+            });
+        });
+
+        @if (ViewBag.TimeSheetRecordingDetails != null) {
+
+            A = ViewBag.TimeSheetRecordingDetails;
+
+        }
+
+        var EmpName = "@ViewBag.EmpName";
+        var EmpId = "@ViewBag.EmpId";
+        $("#EmpId").val(EmpId);
+        $("#txtEmpName").val(EmpName);
+
+        EnableCurrentDay(@ViewBag.CountOfDay);
+
+        //for (var i = 1; i <= CountOfMonth; i++) {
+        //    var todaysdate = $('#bdaymonth').val();
+        //    var dt = new Date(todaysdate + "-" + i);
+        //    var dayname = GetDayName(dt);
+        //    dayName.push[dayname];
+        //}
+
+    </script>
+}
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+        window.onload = function () {
+             document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+              };
+    </script>
+}
+<section class="content-header">
+    <h1>
+        Time Recording Sheet
+    </h1>
+</section>
+
+<section class="content">
+    <div class="alertS alert-success" id="modal-success" style="display:none;">
+        <button type="button" class="close" aria-hidden="true" onclick="successAlertClose(event)">&times;</button>
+        <h4><i class="icon fa fa-check"></i> Success </h4>
+        <p id="successBody"></p>
+    </div>
+    <div class="box box-default">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="PolicyMasterId" style="border: 1px solid #0000001c;">
+                            <form asp-controller="TimeRecordingSheet" asp-action="AddPolicyDetails" method="POST">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <a href="https://www.shobigroup.com" class="logo" style="border-right: 0px !important;">
+                                                    <img src="~/dist/img/shobi_logo.png" alt="homepage" class="logo-lg" style="width:75%;" />
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="bdaymonth">Month And Year: </label>
+                                                <i class="fa fa-chevron-circle-left fa-lg allowed" onclick="setpreviousDate();" title="Previous Date" style="margin-right: 10px"></i>
+                                                <input type="month" id="bdaymonth" name="bdaymonth" onchange="ChangeMonth();">
+
+
+                                                <i class="fa fa-chevron-circle-right fa-lg allowed" onclick="MonthNext();" title="Next Date" style="margin-right: 10px"></i>
+
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtFName">Employee Name<span style="color:#FF0000;">*</span></label>
+                                                @*@Html.DropDownList("EmpId", new SelectList(ViewBag.EmployeeList, "Value", "Text"), new { @class = "form-control select2", onchange = "ChangeMonth()" })*@
+                                                <input type="hidden" id="EmpId">
+                                                <input type="text" id="txtEmpName" name="EmpName" class="form-control" placeholder="" disabled>
+                                                <span id="spanNavUser" class="hidden-xs"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <button type="button" id="btnSubmitAllId" class="btn btn-primary" style="float: right; margin-right: 4%;" disabled onclick="SubmitAllData();">SubmitAll</button>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header with-border">
+                    <div class="col-md-12">
+                        <button type="button" id="btnNext1" class="btn btn-warning" style="float: left; margin-right: 4%" onclick="Clear(event)">Clear </button>
+                        <h3 class="box-title" style="margin-left:30%">
+                            Office Time
+                        </h3>
+                        <button type="submit" id="btnSave" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="ABC(event);">eMpower</button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="MonthDetailsId" class="table table-bordered etable">
+                        <thead>
+                            <tr>
+                                <th class="bg-primary">
+                                    <input type="checkbox" name="all" id="checkall" /> All
+                                </th>
+                                <th class="bg-primary">Day No</th>
+                                <th class="bg-primary">In</th>
+                                <th class="bg-primary">Out</th>
+                                <th class="bg-primary">Total</th>
+                                <th class="bg-primary">Break</th>
+                                <th class="bg-primary">Net</th>
+                                <th class="bg-primary">Day</th>
+                                <th class="bg-primary" style="width:19%; text-align:center">Presence</th>
+                                <th class="bg-primary">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if (ViewBag.NoOfDays != 0)
+                            {
+                                var d = ViewBag.TimeSheetListData;
+                                var n = ViewBag.NoOfDays;
+                                var weekName = ViewBag.weekDayName;
+                                @if (ViewBag.TimeSheetRecordingDetails != null)
+                                {
+
+                                    A = ViewBag.TimeSheetRecordingDetails;
+                                }
+
+                                @for (i = 1; i <= n; i++)
+                                {
+                                    var DbRecordId = 0;
+                                    var DbEmpIN = "";
+                                    var DbEmpOut = "";
+                                    var DbEmpTotal = "";
+                                    var DbEmpNet = "";
+                                    var DbEmpBreak = "";
+                                    var DbPresence = "";
+                                    bool DbisSubmitData = false;
+                                    bool isSaveData = false;
+                                    var DbDayName = weekName[i];
+
+
+                                    @foreach (var item in A)
+                                    {
+                                        @if (i == item.DayNo)
+                                        {
+                                            DbRecordId = @item.RecTimeSheetDetailsId;
+                                            DbEmpIN = @item.EmpIn;
+                                            DbEmpOut = @item.EmpOut;
+                                            DbEmpTotal = @item.Total;
+                                            DbEmpBreak = @item.EmpBreak;
+                                            DbEmpNet = @item.Net;
+                                            DbPresence = @item.Presence;
+                                            DbisSubmitData = @item.IsSubmitData;
+                                            DbDayName = @item.Day;
+                                            isSaveData = true;
+                                            break;
+                                        }
+
+                                    }
+
+
+                                    <tr id='trChildRow_@i'>
+                                        <td><input type="checkbox" data-id='chk_@i' class="cb-element chkchild" /></td>
+                                        <td onclick="EnableRow(this);" data-rowId=@i data-isSubmited=@DbisSubmitData>@i</td>
+                                        <td>
+                                            <input type="hidden" id="HiddenRecordId_@i" value="@DbRecordId">
+                                            <input type="time" id='txtIn_@i' style="color:orangered" name="In" class="form-control" placeholder="IN" value="@DbEmpIN" disabled>
+                                        </td>
+                                        <td>
+                                            <input type="time" id="txtOut_@i" name="In" style="color:orangered" data-rowId=@i value="@DbEmpOut" onblur="calculateTotalTime('@i');" class="form-control" placeholder="Out" disabled>
+                                        </td>
+                                        <td>
+                                            <input type="time" id="txtTotal_@i" name="In" style="color:orangered" value="@DbEmpTotal" class="form-control" placeholder="Total" disabled>
+
+                                        </td>
+                                        <td>
+                                            <input type="time" id="txtBreak_@i" name="In" style="color:orangered" data-rowId=@i class="form-control" onblur="calculateBreakTime('@i');" value="@DbEmpBreak" placeholder="Break" disabled>
+
+                                        </td>
+                                        <td>
+                                            <input type="time" id="txtNet_@i" name="In" style="color:orangered" class="form-control" value="@DbEmpNet" placeholder="Net" disabled>
+
+                                        </td>
+                                        <td>
+                                            <input type="text" id="txtDayName_@i" name="DayName" style="color:orangered" class="form-control" value="@DbDayName" placeholder="Day Name" disabled>
+
+                                        </td>
+                                        <td>
+                                            @*@Html.DropDownList("txtPrsence_@i",new SelectList(ViewBag.PresenceList, "Value", "Text"), new { @class = "form-control select2"})*@
+                                            <select class="form-control" id="txtPrsence_@i" name="txtPrsence" disabled>
+                                                @if (@DbPresence == "")
+                                                {
+                                                    <option value="" selected>Please Select</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="">Please Select</option>
+                                                }
+                                                @if (@DbPresence == "h")
+                                                {
+                                                    <option value="h" selected>H(Holiday,Weekend)</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="h">H(Holiday,Weekend)</option>
+                                                }
+                                                @if (@DbPresence == "v")
+                                                {
+                                                    <option value="v" selected>V(Leave,Vacation)</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="v">V(Leave,Vacation)</option>
+                                                }
+                                                @if (@DbPresence == "x")
+                                                {
+                                                    <option value="x" selected>X(Invalid, Not Applicable Day)</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="x">X(Invalid, Not Applicable Day)</option>
+                                                }
+                                                @if (@DbPresence == "w")
+                                                {
+                                                    <option value="w" selected>W(Irregular Working Day)</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="w">W(Irregular Working Day)</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+
+                                            @if (@DbisSubmitData == false && @isSaveData == true)
+                                            {<a type="button" href="" id="btnSave_@i" class="btn btn-primary pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="Save('@i');"><i id="" class="fa fa-edit"></i> Save</a>
+                                                <a type="button" href="" id="btnSubmit_@i" class="btn btn-default pull-left btn-xs" disabled style="float: left; margin-right: 4%; background-color: #f39c12" onclick="Submit(@i);"><i id="" class="fa fa-thumbs-up"></i> Submit</a>
+                                            }
+                                            else if (@DbisSubmitData == true && @isSaveData == true)
+                                            {<a type="button" href="" id="btnSave_@i" class="btn btn-primary pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="Save('@i');"><i id="" class="fa fa-edit"></i> Save</a>
+                                                <a type="button" href="" id="btnSubmit_@i" class="btn btn-default pull-left btn-xs" disabled style="float: left; margin-right: 4%; background-color:green" onclick="Submit(@i);"><i id="" class="fa fa-thumbs-up"></i> Submit</a>
+                                            }
+                                            else
+                                            {
+                                                <a type="button" href="" id="btnSave_@i" class="btn btn-primary pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="Save('@i');"><i id="" class="fa fa-edit"></i> Save</a>
+                                                <a type="button" href="" id="btnSubmit_@i" class="btn btn-default pull-left btn-xs" disabled style="float: left; margin-right: 4%;" onclick="Submit(@i);"><i id="" class="fa fa-thumbs-up"></i> Submit</a>
+                                            }
+                                        </td>
+                                    </tr>
+
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+        </div>
+    </div>
+    <div style="display:none;">
+        <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+        </button>
+        <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+        </button>
+    </div>
+
+    <div class="alert alert-warning fade" id="modal-warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4>
+            <i class="icon fa fa-warning"></i> Alert!
+        </h4>
+
+        <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+        </div>
+
+        <div class="alert-footer">
+            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+        </div>
+    </div>
+
+    <div class="modal modal-warning fade" id="modal-warning2">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Alert!</h4>
+                </div>
+                <div class="modal-body">
+                    <p>One fine body&hellip;</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+            @*/.modal-content*@
+        </div>
+        @*/.modal-dialog*@
+    </div>
+</section>
+
+
+<script>
+    selectedItems = [];
+
+    function GetDayName() {
+
+        year = dt.getFullYear();
+        month = dt.getMonth() + 1;
+        dd = dt.getDate();
+
+        var objToday = dt,
+            weekday = new Array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'),
+            dayOfWeek = weekday[objToday.getDay()]
+
+    }
+
+    $(document).on("change",".chkchild", function (item) {
+        var id = "";
+        id = $(this).attr("data-id");
+
+        if (this.checked) { // check select status
+
+            selectedItems.push(id);
+
+        } else {
+            selectedItems.pop(id);
+        }
+
+        if (selectedItems.length > 1) {
+            $('#btnSubmitAllId').removeAttr('disabled');
+        }
+        else {
+            $('#btnSubmitAllId').attr('disabled', 'disabled');
+        }
+    });
+
+    $(document).on("change", "#checkall", function (item) {
+
+        if (this.checked) { // check select status
+            $('#btnSubmitAllId').removeAttr('disabled');
+        } else {
+            $('#btnSubmitAllId').attr('disabled', 'disabled');
+        }
+    });
+
+    function AddTableBody(NoOfDays, TimeSheetRecordingDetails, weekName) {
+        debugger;
+
+        $('#MonthDetailsId > tbody').empty();
+                            if (NoOfDays != 0)
+                            {
+                                for (i = 1; i <= NoOfDays; i++)
+                                {
+                                    var DbRecordId = "";
+                                    var DbEmpIN = "";
+                                    var DbEmpOut = "";
+                                    var DbEmpTotal = "";
+                                    var DbEmpNet = "";
+                                    var DbEmpBreak = "";
+                                    var DbPresence = "";
+                                    var DbDayName = weekName[i];
+                                    var DbisSubmitData = "False";
+                                    var isSubmit = false;
+                                    for (var item = 0; item < TimeSheetRecordingDetails.length; item++)
+                                    {
+                                        if (i == TimeSheetRecordingDetails[item].dayNo)
+                                        {
+                                            DbRecordId = TimeSheetRecordingDetails[item].recTimeSheetDetailsId;
+                                            DbEmpIN = TimeSheetRecordingDetails[item].empIn;
+                                            DbEmpOut = TimeSheetRecordingDetails[item].empOut;
+                                            DbEmpTotal = TimeSheetRecordingDetails[item].total;
+                                            DbEmpBreak = TimeSheetRecordingDetails[item].empBreak;
+                                            DbEmpNet = TimeSheetRecordingDetails[item].net;
+                                            DbPresence = TimeSheetRecordingDetails[item].presence;
+                                           // $('select option[value="' + DbPresence + '"]').attr("selected", true);
+                                            //$('#txtPrsence_' + i).val(DbPresence);
+                                            DbisSubmitData = TimeSheetRecordingDetails[item].isSubmitData;
+                                            DbDayName = TimeSheetRecordingDetails[item].day;
+                                            isSubmit = true;
+                                            break;
+                                        }
+                                    }
+
+
+                                    var data = '<tr id="trChildRow_' + i + '">'
+
+                                     + '<td><input type="checkbox" data-id="chk_' + i +'" class="cb-element chkchild" /></td>'
+                                     + '<td onclick="EnableRow(this);" data-rowId="' + i + '" data-isSubmited="'+ DbisSubmitData + '">'+i+'</td>'
+                                     + '<td><input type="hidden" id="HiddenRecordId_' + i + '"value="' + DbRecordId + '" disabled><input type="time" id="txtIn_' + i + '" style="color:orangered" name="In" class="form-control" placeholder="IN" value="' + DbEmpIN + '" disabled></td>'
+                                     + '<td><input type="time" id="txtOut_' + i + '" name="In" style="color:orangered" value="' + DbEmpOut + '" onblur="calculateTotalTime(' + i + ');" class="form-control" placeholder="Out" disabled></td>'
+                                     + '<td><input type="time" id="txtTotal_' + i + '" name="In" style="color:orangered" value="' + DbEmpTotal + '" class="form-control" placeholder="Total" disabled></td>'
+                                     + '<td><input type="time" id="txtBreak_' + i + '" name="In" style="color:orangered" class="form-control" onblur="calculateBreakTime(' + i + ');" value="' + DbEmpBreak + '" placeholder="Break" disabled></td>'
+                                     + '<td><input type="time" id="txtNet_' + i + '" name="In" style="color:orangered" class="form-control" value="' + DbEmpNet + '" placeholder="Net" disabled></td>'
+                                     + '<td><input type="text" id="txtDayName_' + i + '" name="DayName" style="color:orangered" class="form-control" value="' + DbDayName + '" placeholder="Day Name" disabled></td>'
+                                     @*+ '<td>@Html.Raw(Ajax.javaScriptStringEncode(Html.DropDownList("txtPrsence_@i",new SelectList(ViewBag.PresenceList, "Value", "Text"), new { @class = "form-control select2"}).ToHtmlString()))</td>'*@
+                                      + '<td> <select class="form-control" id="txtPrsence_' + i + '" name="txtPrsence" disabled>'
+                                        +'<option value="">Please Select</option>'
+                                        +'<option value="h">H(Holiday,Weekend)</option>'
+                                        +'<option value="v">V(Leave,Vacation)</option>'
+                                        +'<option value="x">X(Invalid, Not Applicable Day)</option>'
+                                        +'<option value="w">W(Irregular Working Day)</option>'
+                                        +'</select></td>'
+                                        + '<td><a type="button" href="" id="btnSave_' + i + '" class="btn btn-primary pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="Save(' + i + ');"><i id="" class="fa fa-edit"></i> Save</a>'
+                                        + '<a type="button" href="" id="btnSubmit_' + i + '" class="btn btn-default pull-left btn-xs" disabled style="float: left; margin-right: 4%;" onclick="Submit(' + i + ');"><i id="" class="fa fa-thumbs-up"></i> Submit</a></td></tr>'
+
+                                    $('#MonthDetailsId').append(data);
+                                    document.getElementById('txtPrsence_' + i).value = DbPresence;
+                                    if (DbisSubmitData == "False" && isSubmit == true)
+                                    {
+                                        $('#btnSubmit_' + i).css("background-color", "#f39c12");
+                                    }else if (DbisSubmitData == "True" && isSubmit == true) {
+                                        $('#btnSubmit_' + i).css("background-color", "green");
+                                    }
+                                }
+                            }
+    }
+
+    function SubmitAllData() {
+        event.preventDefault();
+
+        debugger;
+        var form_data = new FormData();
+        var rowCount = $('#MonthDetailsId >tbody >tr').length;
+        var saveFlag = 0;
+        var workorderjson = "";
+        var obj = new Object();
+        var EmpId = $('#EmpId').val();
+        for (var i = 1; i <= rowCount; i++) {
+            for (var j = 0; j < selectedItems.length; j++) {
+                if (selectedItems[j] == 'chk_' + i) {
+
+                    var todaysdate = $('#bdaymonth').val();
+
+                    var dt = new Date(todaysdate + "-" + i);
+
+
+                    year = dt.getFullYear();
+                    month = dt.getMonth() + 1;
+                    dd = dt.getDate();
+
+                    if (dd < 10) {
+                        dd = '0' + dd;
+                    }
+                    if (month < 10) {
+                        month = '0' + month;
+                    }
+
+                    var objToday = dt,
+                   // var objToday = new Date(),
+                        weekday = new Array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'),
+                        dayOfWeek = weekday[objToday.getDay()],
+                        domEnder = function () { var a = objToday; if (/1/.test(parseInt((a + "").charAt(0)))) return "th"; a = parseInt((a + "").charAt(1)); return 1 == a ? "st" : 2 == a ? "nd" : 3 == a ? "rd" : "th" }(),
+                        dayOfMonth = today + (objToday.getDate() < 10) ? '0' + objToday.getDate() + domEnder : objToday.getDate() + domEnder,
+                        months = new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'),
+                        curMonth = months[objToday.getMonth()],
+                        curMonthNo = objToday.getMonth(),
+                        curYear = objToday.getFullYear(),
+                        curHour = objToday.getHours() > 12 ? objToday.getHours() - 12 : (objToday.getHours() < 10 ? "0" + objToday.getHours() : objToday.getHours()),
+                        curMinute = objToday.getMinutes() < 10 ? "0" + objToday.getMinutes() : objToday.getMinutes(),
+                        curSeconds = objToday.getSeconds() < 10 ? "0" + objToday.getSeconds() : objToday.getSeconds(),
+                        curMeridiem = objToday.getHours() > 12 ? "PM" : "AM";
+                    var today = curHour + ":" + curMinute + "." + curSeconds + curMeridiem + " " + dayOfWeek + " " + dayOfMonth + " of " + curMonth + ", " + curYear;
+
+
+                    var TextIn = $('#txtIn_' + i).val();
+                    var TextOut = $('#txtOut_' + i).val();
+                    var TextTotal = $('#txtTotal_' + i).val();
+                    var TextBreak = $('#txtBreak_' + i).val();
+                    var TextNet = $('#txtNet_' + i).val();
+                    var TextPresence = $('#txtPrsence_' + i).val();
+                    var DayNo = i;
+                    var Month = curMonthNo + 1;
+                    var Day = dayOfWeek;
+                    var MonthNum;
+                    debugger;
+                    if (TextIn != "null" && TextIn != "" && TextOut != "null" && TextOut != "" && TextTotal != "null" && TextTotal != "" && TextBreak != "null" && TextBreak != "" && TextNet != "null" && TextNet != "" && TextPresence != "null" && TextPresence != "") {
+                        saveFlag = 1;
+                        obj.EmpId = parseInt(EmpId);
+                        obj.Date = year + '-' + month + '-' + dd;
+                        obj.curMonthNo = MonthNum;
+                        obj.EmpIn = TextIn;
+                        obj.EmpOut = TextOut;
+                        obj.Total = TextTotal;
+                        obj.DayNo = DayNo;
+                        obj.EmpBreak = TextBreak;
+                        obj.Net = TextNet;
+                        obj.Presence = TextPresence;
+                        obj.Day = Day;
+                        obj.Month = Month;
+                        debugger;
+                        workorderjson = workorderjson + ",\n" + JSON.stringify(obj);
+                    } else {
+                        saveFlag = 0;
+                    }
+                }
+            }
+
+        }
+        workorderjson = workorderjson.replace(/^,/, '');
+        workorderjson = "[" + workorderjson + "]";
+        form_data.append('workorderjson', workorderjson);
+        if (saveFlag == 1) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("InsertAllData", "TimeRecordingSheet")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                /*data: "{TextIn:'" + TextIn + "',TextOut:'" + TextOut + "',TextTotal:'" + TextTotal + "',TextBreak:'" + TextBreak + "',TextNet:'" + TextNet + "',TextPresence:'" + TextPresence +"'}",*/
+                success: function (response) {
+                    document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+
+                    var resData = response.result;
+                    for (var i = 0; i <= resData.length; i++) {
+                        $('#txtIn_' + resData[i].dayNo).val(resData[i].empIn);
+                        $('#txtOut_' + resData[i].dayNo).val(resData[i].empOut);
+                        $('#txtTotal_' + resData[i].dayNo).val(resData[i].total);
+                        $('#txtBreak_' + resData[i].dayNo).val(resData[i].empBreak);
+                        $('#txtNet__' + resData[i].dayNo).val(resData[i].net);
+                        $('#txtPrsence_' + resData[i].dayNo).val(resData[i].presence);
+                    }
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+        }
+        else {
+            alert("Please Enter All Fields!!");
+        }
+    }
+
+    function Submit(i) {
+        event.preventDefault();
+        var HiddenRecodId = $('#HiddenRecordId_' + i).val();
+
+        var form_data = new FormData();
+        form_data.append('HiddenRecodId', HiddenRecodId);
+         $.ajax({
+                type: "POST",
+                url: "@Url.Action("SubmitRecord", "TimeRecordingSheet")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+                    window.location.reload();
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+
+    }
+    function successAlertClose(event) {
+        document.getElementById("modal-success").style.display = "none";
+    }
+
+    function Save(i) {
+
+        event.preventDefault();
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate+"-"+i);
+        var date = new Date(dt).toDateString("yyyy-MM-dd");
+
+        var objToday = dt,
+            weekday = new Array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'),
+            dayOfWeek = weekday[objToday.getDay()],
+            domEnder = function () { var a = objToday; if (/1/.test(parseInt((a + "").charAt(0)))) return "th"; a = parseInt((a + "").charAt(1)); return 1 == a ? "st" : 2 == a ? "nd" : 3 == a ? "rd" : "th" }(),
+            dayOfMonth = today + (objToday.getDate() < 10) ? '0' + objToday.getDate() + domEnder : objToday.getDate() + domEnder,
+            months = new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'),
+            curMonth = months[objToday.getMonth()],
+            curMonthNo = objToday.getMonth(),
+            curYear = objToday.getFullYear(),
+            curHour = objToday.getHours() > 12 ? objToday.getHours() - 12 : (objToday.getHours() < 10 ? "0" + objToday.getHours() : objToday.getHours()),
+            curMinute = objToday.getMinutes() < 10 ? "0" + objToday.getMinutes() : objToday.getMinutes(),
+            curSeconds = objToday.getSeconds() < 10 ? "0" + objToday.getSeconds() : objToday.getSeconds(),
+            curMeridiem = objToday.getHours() > 12 ? "PM" : "AM";
+        var today = curHour + ":" + curMinute + "." + curSeconds + curMeridiem + " " + dayOfWeek + " " + dayOfMonth + " of " + curMonth + ", " + curYear;
+
+
+        var EmpId = $('#EmpId').val();
+        var TextIn = $('#txtIn_' + i).val();
+        var TextOut = $('#txtOut_' + i).val();
+        var TextTotal = $('#txtTotal_' + i).val();
+        var TextBreak = $('#txtBreak_' + i).val();
+        var TextNet = $('#txtNet_' + i).val();
+         var TextPresence = $('#txtPrsence_'+i).val();
+        var DayNo = i;
+        var Month = curMonthNo+1;
+        var Day = dayOfWeek;
+        if (EmpId!="null" && TextIn != "null" && TextIn != "" && TextOut != "null" && TextOut != "" && TextTotal != "null" && TextTotal != "" && TextBreak != "null" && TextBreak != "" && TextNet != "null" && TextNet != "" && TextPresence != "null" && TextPresence != "") {
+            var form_data = new FormData();
+            form_data.append('EmpId', EmpId);
+            form_data.append('TextIn', TextIn);
+            form_data.append('TextOut', TextOut);
+            form_data.append('TextTotal', TextTotal);
+            form_data.append('TextBreak', TextBreak);
+            form_data.append('TextNet', TextNet);
+            form_data.append('TextPresence', TextPresence);
+            form_data.append('DayNo', DayNo);
+            form_data.append('Day', Day);
+            form_data.append('Date', date);
+            form_data.append('Month', Month);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("InsertWorkOrder", "TimeRecordingSheet")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                /*data: "{TextIn:'" + TextIn + "',TextOut:'" + TextOut + "',TextTotal:'" + TextTotal + "',TextBreak:'" + TextBreak + "',TextNet:'" + TextNet + "',TextPresence:'" + TextPresence +"'}",*/
+                success: function (response) {
+                    $('#btnSubmit_' + i).css("background-color", "#f39c12");
+                  document.getElementById("successBody").innerHTML = "@ViewBag.TimeSheetMessage";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+        }
+        else {
+            document.getElementById("successBody").innerHTML = "All Fild Mandatory";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+        }
+    }
+
+    function calculateTotalTime(index) {
+
+        var TextIn = $('#txtIn_' + index).val();
+        var TextOut = $('#txtOut_' + index).val();
+
+        let [h1, m1] = TextIn.split(':')
+        let [h2, m2] = TextOut.split(':')
+        var startTimeObject = new Date();
+        startTimeObject.setHours(h1, m1, 0);
+
+        //Create date object and set the time to that
+        var endTimeObject = new Date(startTimeObject);
+        endTimeObject.setHours(h2, m2, 0);
+
+        //Now we are ready to compare both the dates
+        if (startTimeObject > endTimeObject) {
+
+           // alert('End time should be after start time.');
+            document.getElementById("successBody").innerHTML = "End time should be after start time.";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+           $('#txtOut_' + index).focus();
+        }
+        else {
+            // alert('Entries are perfect.');
+        }
+        var decimaltime = ((+h2 + (+m2 / 60)) - (+h1 + (+m1 / 60)));
+        var hrs = parseInt(Number(decimaltime));
+        var min = Math.round((Number(decimaltime) - hrs) * 60);
+        var clocktime = hrs.toLocaleString('en-US', {minimumIntegerDigits: 2,useGrouping: false}) + ':' + min.toLocaleString('en-US', {minimumIntegerDigits: 2,useGrouping: false});
+
+        $('#txtTotal_' + index).val(clocktime);
+    }
+
+    function calculateBreakTime(index) {
+
+        var TextTotal = $('#txtTotal_' + index).val();
+        var TextBreak = $('#txtBreak_' + index).val();
+
+        let [h1, m1] = TextBreak.split(':')
+        let [h2, m2] = TextTotal.split(':')
+
+        var startTimeObject = new Date();
+        startTimeObject.setHours(h1, m1, 0);
+
+        //Create date object and set the time to that
+        var endTimeObject = new Date(startTimeObject);
+        endTimeObject.setHours(h2, m2, 0);
+
+        //Now we are ready to compare both the dates
+        if (startTimeObject > endTimeObject) {
+            //alert('Break time should be less than Total time.');
+            document.getElementById("successBody").innerHTML = "Break time should be less than Total time.";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+            $('#txtBreak_' + index).focus();
+        }
+        else {
+           // alert('Entries are perfect.');
+        }
+
+        var decimaltime = ((+h2 + (+m2 / 60)) - (+h1 + (+m1 / 60)));
+        var hrs = parseInt(Number(decimaltime));
+        var min = Math.round((Number(decimaltime) - hrs) * 60);
+        var clocktime = hrs.toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false }) + ':' + min.toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
+
+        $('#txtNet_' + index).val(clocktime);
+    }
+
+</script>
+
+<script>
+    function MonthNext() {
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate);
+        var EmpId = $('#EmpId').val();
+        var endDate = new Date(dt.setMonth(dt.getMonth() + 1));
+        var year = endDate.getFullYear();
+        var month = ("0" + (endDate.getMonth() + 1)).slice(-2);
+        $("#bdaymonth").val(year + '-' + month);
+        var CountOfMonth = new Date(year, month, 0).getDate();
+        var newDate = year + '-' + month + '-' + 10;
+
+        var form_data = new FormData();
+        form_data.append('empId', EmpId);
+        form_data.append('year', year);
+        form_data.append('month', month);
+        form_data.append('NewDate', newDate);
+          $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetMonthAndDay", "TimeRecordingSheet")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+                    debugger;
+                    var resData = response.result;
+                    AddTableBody(CountOfMonth, resData, response.weekName)
+                    GetHolidays();
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+       // SaveData();
+    }
+    function ChangeMonth() {
+         var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate);
+        var EmpId = $('#EmpId').val();
+
+        year = dt.getFullYear();
+        month = dt.getMonth() + 1;
+
+        var CountOfMonth = new Date(year, month, 0).getDate();
+        var newDate = year + '-' + month + '-' + 10;
+
+        var form_data = new FormData();
+        form_data.append('empId', EmpId);
+        form_data.append('year', year);
+        form_data.append('month', month);
+        form_data.append('NewDate', newDate);
+          $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetMonthAndDay", "TimeRecordingSheet")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+                    debugger;
+                    var resData = response.result;
+                    AddTableBody(CountOfMonth, resData, response.weekName)
+                    GetHolidays();
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+
+    }
+</script>
+<script>
+
+    function setpreviousDate() {
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate);
+        var EmpId = $('#EmpId').val();
+        var endDate = new Date(dt.setMonth(dt.getMonth() - 1));
+        var year = endDate.getFullYear();
+        var month = ("0" + (endDate.getMonth() + 1)).slice(-2);
+        $("#bdaymonth").val(year + '-' + month);
+        var CountOfMonth = new Date(year, month, 0).getDate();
+        var newDate = year + '-' + month + '-' + 10;
+        var form_data = new FormData();
+        form_data.append('empId', EmpId);
+        form_data.append('year', year);
+        form_data.append('month', month);
+        form_data.append('NewDate', newDate);
+
+          $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetMonthAndDay", "TimeRecordingSheet")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+                    debugger;
+                    var resData = response.result;
+                    AddTableBody(CountOfMonth, resData, response.weekName)
+                    GetHolidays();
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function EnableCurrentDay(today) {
+        var todayDayNo = today;
+
+        $('#txtIn_' + todayDayNo).removeAttr('disabled');
+        $('#txtOut_' + todayDayNo).removeAttr('disabled');
+      //  $('#txtTotal_' + todayDayNo).removeAttr('disabled');
+        $('#txtBreak_' + todayDayNo).removeAttr('disabled');
+       // $('#txtNet_' + todayDayNo).removeAttr('disabled');
+        $('#txtPrsence_' + todayDayNo).removeAttr('disabled');
+
+        $('#txtIn_' + todayDayNo).prop('required', true);
+        $('#txtOut_' + todayDayNo).prop('required', true);
+      //  $('#txtTotal_' + todayDayNo).prop('required', true);
+        $('#txtBreak_' + todayDayNo).prop('required', true);
+      //  $('#txtNet_' + todayDayNo).prop('required', true);
+        $('#txtPrsence_' + todayDayNo).prop('required', true);
+    }
+
+    function GetHolidays() {
+        debugger
+        var todaysdate = $('#bdaymonth').val();
+        var d = new Date(todaysdate);
+       // var d = new Date();
+        var getTot = daysInMonth(d.getMonth(), d.getFullYear()); //Get total days in a month
+        var sat = new Array();   //Declaring array for inserting Saturdays
+        var sun = new Array();   //Declaring array for inserting Sundays
+
+        for (var i = 1; i <= getTot; i++) {    //looping through days in month
+            var newDate = new Date(d.getFullYear(), d.getMonth(), i)
+            if (newDate.getDay() == 0) {   //if Sunday
+                sun.push(i);
+                $('#trChildRow_' + i).addClass("Holidaybg");
+                /*$('#table.etable tr').addClass("Holidaybg");*/
+            }
+            if (newDate.getDay() == 6) {   //if Saturday
+                sat.push(i);
+                $('#trChildRow_' + i).addClass("Holidaybg");
+                /*$('#table tr:eq(i)').addClass("Holidaybg");*/
+            }
+
+        }
+    }
+    function daysInMonth(month, year) {
+        return new Date(year, month, 0).getDate();
+    }
+
+    function dayNameInWeek(dayNo) {
+        debugger;
+        var todaysdate = $('#bdaymonth').val();
+        var d = new Date(todaysdate);
+        var newDate = new Date(d.getFullYear(), d.getMonth(), i).getDate();
+        var dayOfWeek = weekday[newDate.getDay()];
+        return dayOfWeek;
+    }
+
+    function EnableRow(e) {
+
+        var i = $(e).data("rowid");
+        var flagSubmit = $(e).data("issubmited");
+
+        if (flagSubmit == "False") {
+            $('#txtIn_' + i).removeAttr('disabled');
+            $('#txtOut_' + i).removeAttr('disabled');
+           // $('#txtTotal_' + i).removeAttr('disabled');
+            $('#txtBreak_' + i).removeAttr('disabled');
+           // $('#txtNet_' + i).removeAttr('disabled');
+            $('#txtPrsence_' + i).removeAttr('disabled');
+
+            $('#txtIn_' + i).prop('required', true);
+            $('#txtOut_' + i).prop('required', true);
+          //  $('#txtTotal_' + i).prop('required', true);
+            $('#txtBreak_' + i).prop('required', true);
+          //  $('#txtNet_' + i).prop('required', true);
+            $('#txtPrsence_' + i).prop('required', true);
+
+            var rowCount = $('#MonthDetailsId >tbody >tr').length;
+
+            for (var j = 0; j < rowCount; j++) {
+                if (i != j) {
+                    $('#txtIn_' + j).attr('disabled', 'disabled');
+                    $('#txtOut_' + j).attr('disabled', 'disabled');
+                   // $('#txtTotal_' + j).attr('disabled', 'disabled');
+                    $('#txtBreak_' + j).attr('disabled', 'disabled');
+                   // $('#txtNet_' + j).attr('disabled', 'disabled');
+                    $('#txtPrsence_' + j).attr('disabled', 'disabled');
+                }
+            }
+        }
+
+
+    }
+
+
+</script>
+
+<script>
+    function Clear() {
+        event.preventDefault();
+        window.location.reload();
+        debugger;
+
+        //var rowCount = $('#MonthDetailsId >tbody >tr').length;
+
+
+        //for (var i = 1; i <= rowCount; i++) {
+
+        //            $('#txtIn_' + i).val();
+        //            $('#txtOut_' + i).val();
+        //            $('#txtTotal_' + i).val();
+        //            $('#txtBreak_' + i).val();
+        //            $('#txtNet_' + i).val();
+        //            $('#txtPrsence_' + i).val();
+
+
+        //}
+
+    }
+</script>

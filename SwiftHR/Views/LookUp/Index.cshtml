@@ -1,0 +1,541 @@
+﻿@model SwiftHR.Utility.LookUpMasterU
+
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Add Employee";
+    int i;
+    
+}
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+
+<link rel="stylesheet" href="~/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="~/css/site.css" />
+
+<section class="content-header">
+    <h1>
+        Add LookUp
+    </h1>
+</section>
+
+<section class="content">
+    <div class="alertS alert-success" id="modal-success" style="display:none;">
+        <button type="button" class="close" aria-hidden="true" onclick="successAlertClose(event)">&times;</button>
+        <h4><i class="icon fa fa-check"></i> Success </h4>
+        <p id="successBody"></p>
+    </div>
+    <div class="box box-default">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="nav-tabs-custom">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a id="anchr1" href="#LookUpId" data-toggle="tab">Lookup </a></li>
+                            <li><a id="anchr2" href="#LookUpDetailsId" data-toggle="tab" onclick="GetCategoryData()">Lookup Details</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="LookUpId" style="border: 1px solid #0000001c;">
+                            <form asp-controller="LookUp" asp-action="AddLookUp" method="POST">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtLookUpCode">Code<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtCode" name="Code" class="form-control" placeholder="Code">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtLookUpName">LookUp Namae<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtName" name="LookUpName" class="form-control" placeholder="LookUp Name">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtLookUpDesc">Description No <span style="color:#FF0000;">*</span> </label>
+                                                <input type="text" id="txtDesc" class="form-control" name="Description" placeholder="Description">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+                                <div class="box-footer">
+                                    <div class="col-md-12">
+                                        <button type="button" id="btnNext1" class="btn btn-warning" style="float: right; margin-right: 8%" onclick="Clear(event)">Clear </button>
+                                        <button type="submit" id="btnSave" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="LookUpvalidateData(event);">Save</button>
+                                    </div>
+                                </div>
+                                @if (ViewBag.LookUpList != null)
+                                {
+                                    if (ViewBag.LookUpList.Count > 0)
+                                    {
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divPolicylist">
+
+                                                <table id="tblPolicyList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    @if (ViewBag.LookUpList != null)
+                                                    {
+                                                        IEnumerable<SwiftHR.Models.LookUpM> d = new List<SwiftHR.Models.LookUpM>();
+                                                        d = ViewBag.LookUpList;
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="bg-primary"> Code</th>
+                                                                <th class="bg-primary"> LookUp Name</th>
+                                                                <th class="bg-primary"> Description</th>
+                                                                <th class="bg-primary"> Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var data in d)
+                                                            {
+                                                                <tr id="@data.LookUpId">
+                                                                    <td>
+                                                                        @Html.DisplayFor(modelItem => data.LookUpCode)
+                                                                    </td>
+                                                                    <td>
+                                                                        @Html.DisplayFor(modelItem => data.LookUpName)
+                                                                    </td>
+                                                                    <td>@Html.DisplayFor(modelItem => data.Description) </td>
+                                                                    <td>
+                                                                        <a type="submit" href="" class="btn btn-primary pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="SearchRecordLookUp(@data.LookUpId);"><i id="" class="fa fa-edit"></i> Edit</a>
+                                                                        <button type="submit" class="btn btn-danger pull-left btn-xs" style="float: right; margin-right: 4%;" onclick="DeleteLookUpData(@data.LookUpId);"><i id="" class="fa fa-remove"></i> Disccable</button>
+                                                                    </td>
+
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                        <tfoot class="hidden-print">
+                                                            <tr>
+                                                                <th>Policy Name </th>
+                                                                <th> Desciption</th>
+                                                            </tr>
+                                                        </tfoot>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </form>
+                        </div>
+
+                        <div class="tab-pane" id="LookUpDetailsId" style="border: 1px solid #0000001c;">
+                            <form asp-controller="LookUp" asp-action="AddLookUpDetails" method="POST">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtLookUpId">LookUp Name</label>
+                                                <select class="form-control select2" id="txtLookUpId" name="LookUpId">
+                                                    <option value="0">Choose..</option>
+                                                    @if (Model != null && Model.LookUpList.Count() > 0)
+                                                    {
+                                                        @foreach (var user in Model.LookUpList)
+                                                        {
+                                                            <option value="@user.LookUpId">@user.LookUpName</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtLookUpDetails">Details Name<span style="color:#FF0000;">*</span> </label>
+                                                <input type="text" id="txtLookUpDetails" class="form-control" name="LookUpDetails" placeholder="Details Name">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtDetailsDesc">Description<span style="color:#FF0000;">*</span> </label>
+                                                <input type="text" id="txtDetailsDesc" class="form-control" name="DetailsDesc" placeholder="Description">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+                                <div class="box-footer">
+                                    <div class="col-md-12">
+                                        <button type="button" id="btnNext1" class="btn btn-warning" style="float: right; margin-right: 8%" onclick="Clear(event)">Clear </button>
+                                        <button type="submit" id="btnSave" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="LookUpDetailsvalidateData(event);">Save</button>
+                                    </div>
+                                </div>
+                                @if (ViewBag.LookUpDetailsList != null)
+                                {
+                                    if (ViewBag.LookUpDetailsList.Count > 0)
+                                    {
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divPolicylist">
+
+                                                <table id="tblLookUpDetailsList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    @if (ViewBag.LookUpDetailsList != null)
+                                                    {
+                                                        IEnumerable<SwiftHR.Models.LookUpDetailsM> d = new List<SwiftHR.Models.LookUpDetailsM>();
+                                                        d = ViewBag.LookUpDetailsList;
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="bg-primary"> LookUp Name</th>
+                                                                <th class="bg-primary"> Details </th>
+                                                                <th class="bg-primary"> Description</th>
+                                                                <th class="bg-primary"> Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var data in d)
+                                                            {
+                                                                <tr id="@data.LookUpDetailsId">
+                                                                    <td>
+                                                                        @Html.DisplayFor(modelItem => data.LookUpId)
+                                                                    </td>
+                                                                    <td>
+                                                                        @Html.DisplayFor(modelItem => data.Name)
+                                                                    </td>
+                                                                    <td>@Html.DisplayFor(modelItem => data.Description) </td>
+                                                                    <td>
+                                                                        <a type="submit" href="" class="btn btn-primary pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="SearchRecordLookUpDetails(@data.LookUpDetailsId);"><i id="" class="fa fa-edit"></i> Edit</a>
+                                                                        <button type="submit" class="btn btn-danger pull-left btn-xs" style="float: right; margin-right: 4%;" onclick="DeleteLookUpDeyailsData(@data.LookUpDetailsId);"><i id="" class="fa fa-remove"></i> Disccable</button>
+                                                                    </td>
+
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                        <tfoot class="hidden-print">
+                                                            <tr>
+                                                                <th>Policy Name </th>
+                                                                <th> Desciption</th>
+                                                            </tr>
+                                                        </tfoot>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div style="display:none;">
+        <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+        </button>
+        <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+        </button>
+    </div>
+
+    <div class="alert alert-warning fade" id="modal-warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4>
+            <i class="icon fa fa-warning"></i> Alert!
+        </h4>
+
+        <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+        </div>
+
+        <div class="alert-footer">
+            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+        </div>
+    </div>
+
+    <div class="modal modal-warning fade" id="modal-warning2">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Alert!</h4>
+                </div>
+                <div class="modal-body">
+                    <p>One fine body&hellip;</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+            @*/.modal-content*@
+        </div>
+        @*/.modal-dialog*@
+    </div>
+</section>
+
+@section Scripts {
+
+    <!-- DataTables -->
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/dataTables.buttons.min.js"></script>
+    @*<script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"></script>*@
+
+    <script src="~/bower_components/datatables.net-export/jszip.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/pdfmake.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/vfs_fonts.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.html5.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.print.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.colVis.min.js"></script>
+    <!-- Export plugin -->
+    <script type="text/javascript" src="~/lib/hhurz/libs/FileSaver/FileSaver.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/js-xlsx/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.min.js"></script>
+    @*<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.15.4/extensions/print/bootstrap-table-print.js"></script>*@
+
+<script>
+        function LookUpvalidateData(event) {
+            var IsAnyEmpty = false;
+            var alertMsg = "";
+
+            if (document.getElementById("txtCode").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = "Code <br />";
+            }
+            if (document.getElementById("txtName").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Name <br />";
+            }
+            if (document.getElementById("txtDesc").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Description  <br />";
+            }
+            if (IsAnyEmpty) {
+
+                event.preventDefault();
+
+                document.getElementById("btnAlert").click();
+
+                $('#alertBody').html('<p>' + alertMsg + '<br /> can not be empty </p>');
+                debugger;
+
+                IsAnyEmpty = true;
+            }
+
+
+            return IsAnyEmpty;
+        }
+
+        function LookUpDetailsvalidateData(event) {
+            var IsAnyEmpty = false;
+            var alertMsg = "";
+
+            if (document.getElementById("txtLookUpId").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = "Lookup <br />";
+            }
+            if (document.getElementById("txtLookUpDetails").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Name <br />";
+            }
+            if (document.getElementById("txtDetailsDesc").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Description  <br />";
+            }
+            if (IsAnyEmpty) {
+
+                event.preventDefault();
+
+                document.getElementById("btnAlert").click();
+
+                $('#alertBody').html('<p>' + alertMsg + '<br /> can not be empty </p>');
+                debugger;
+
+                IsAnyEmpty = true;
+            }
+
+
+            return IsAnyEmpty;
+        }
+        function successAlertClose(event) {
+            document.getElementById("modal-success").style.display = "none";
+        }
+
+    function SearchRecordLookUp(LookUpId) {
+        debugger
+        event.preventDefault();
+        var form_data = new FormData();
+        form_data.append('LookUpId', LookUpId);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SearchRecordLookUp", "LookUp")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+                    debugger;
+                    $("#txtCode").val(response[0].lookUpCode);
+                    $("#txtName").val(response[0].lookUpName);
+                    $("#txtDesc").val(response[0].description);
+                    document.getElementById("successBody").innerHTML = "Record Search Success";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+                    //alert(response);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function DeleteLookUpData(LookUpId) {
+        var form_data = new FormData();
+        form_data.append('LookUpId', LookUpId);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("DeleteLookUpRecord", "LookUp")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function SearchRecordLookUpDetails(LookUpDetailsId) {
+        debugger
+        event.preventDefault();
+        var form_data = new FormData();
+        form_data.append('LookUpDetailsId', LookUpDetailsId);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SearchRecordLookUpDetails", "LookUp")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+                    debugger;
+                    $("#txtLookUpId").val(response[0].lookUpId);
+                    $("#txtLookUpDetails").val(response[0].name);
+                    $("#txtDetailsDesc").val(response[0].description);
+                    document.getElementById("successBody").innerHTML = "Record Search Success";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+                    //alert(response);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function DeleteLookUpDeyailsData(LookUpDetailsId) {
+        var form_data = new FormData();
+        form_data.append('LookUpDetailsId', LookUpDetailsId);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("DeleteLookUpDetailsRecord", "LookUp")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+</script>
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+        window.onload = function () {
+             document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+              };
+        </script>
+    }
+}

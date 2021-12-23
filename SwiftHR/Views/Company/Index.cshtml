@@ -1,0 +1,232 @@
+﻿@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Add Company";
+    int i;
+    IEnumerable<SwiftHR.Models.TimeRecordingSheetDetails> A = new List<SwiftHR.Models.TimeRecordingSheetDetails>();
+
+}
+
+<style>
+    .Holidaybg {
+        background-color: #c1c1c1;
+    }
+
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+<section class="content-header">
+    <h1>
+        Add Company
+    </h1>
+</section>
+<section class="content">
+    <div class="alertS alert-success" id="modal-success" style="display:none;">
+        <button type="button" class="close" aria-hidden="true" onclick="successAlertClose(event)">&times;</button>
+        <h4><i class="icon fa fa-check"></i> Success </h4>
+        <p id="successBody"></p>
+    </div>
+    <div class="box box-default">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="PolicyMasterId" style="border: 1px solid #0000001c;">
+                            <form asp-controller="Company" asp-action="AddCompanyDetails" method="POST">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtCompany">Company Namae<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtCompanyName" name="Company" class="form-control" placeholder="Company Name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtWebSite">Web Site</label>
+                                                <input type="text" id="txtWebSiteName" name="WebSite" class="form-control" placeholder="WebSite Name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtPhoneNO">Phone No<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtPhoneNo" name="Phone" class="form-control" placeholder="Phone No">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtMobNO">Mobile No<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtMobNo" name="Mobile" class="form-control" placeholder="Mobile No">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtGSTNO">GST No<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtGSTNo" name="GST" class="form-control" placeholder="GST No" maxlength="15">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtPANNO">PAN No<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtPANNo" name="PAN" class="form-control" placeholder="PAN No">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box-footer">
+                                    <div class="col-md-12">
+                                        <button type="button" id="btnNext1" class="btn btn-warning" style="float: right; margin-right: 8%" onclick="Clear(event)">Clear </button>
+                                        <button type="submit" id="btnSave" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="validateData(event);">Save</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="display:none;">
+        <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+        </button>
+        <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+        </button>
+    </div>
+
+    <div class="alert alert-warning fade" id="modal-warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4>
+            <i class="icon fa fa-warning"></i> Alert!
+        </h4>
+
+        <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+        </div>
+
+        <div class="alert-footer">
+            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+        </div>
+    </div>
+
+    <div class="modal modal-warning fade" id="modal-warning2">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Alert!</h4>
+                </div>
+                <div class="modal-body">
+                    <p>One fine body&hellip;</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+            @*/.modal-content*@
+        </div>
+        @*/.modal-dialog*@
+    </div>
+</section>
+
+<script>
+    function validateData(event) {
+        var IsAnyEmpty = false;
+        var alertMsg = "";
+
+        if (document.getElementById("txtCompanyName").value == "") {
+            IsAnyEmpty = true;
+            alertMsg = "Company Name <br />";
+        }
+        if (document.getElementById("txtMobNo").value == "") {
+            IsAnyEmpty = true;
+            alertMsg = alertMsg + "Mobile <br />";
+        }
+        if (document.getElementById("txtGSTNo").value == "") {
+            IsAnyEmpty = true;
+            alertMsg = alertMsg + "GST No <br />";
+        }
+        if (document.getElementById("txtPANNo").value == "") {
+            IsAnyEmpty = true;
+            alertMsg = alertMsg + "PAN No <br />";
+        }
+
+        if (IsAnyEmpty) {
+
+            event.preventDefault();
+
+            document.getElementById("btnAlert").click();
+
+            $('#alertBody').html('<p>' + alertMsg + '<br /> can not be empty </p>');
+            debugger;
+
+            IsAnyEmpty = true;
+        }
+
+
+        return IsAnyEmpty;
+    }
+
+</script>

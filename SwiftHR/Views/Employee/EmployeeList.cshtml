@@ -1,0 +1,336 @@
+﻿@model IEnumerable<SwiftHR.Models.Employee>
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "EmployeeList";
+}
+
+<!-- DataTables -->
+<link rel="stylesheet" href="~/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="~/css/site.css" />
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-address-card-o"></i>
+        Employee Directory
+    </h1>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="alertS alert-success" id="modal-success" style="display:none;">
+        <button type="button" class="close" aria-hidden="true" onclick="successAlertClose(event)">&times;</button>
+        <h4><i class="icon fa fa-check"></i> Success </h4>
+        <p id="successBody"></p>
+    </div>
+    <div class="box box-info">
+        <!-- /.box-header -->
+        <div class="box-header">
+            <div class="btn-group">
+                <a class="btn btn-primary hidden-print pull-right" asp-controller="Employee" asp-action="AddEmployee"><i class="fa fa-address-card-o"></i> Add Employee </a>
+                @*<div class="btn-group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            Department <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            @if (Model != null && Model.Count() > 0)
+                            {
+                                @foreach (var contact in Model.Distinct().ToList())
+                                {
+                                    <li><a href="#">@contact.Department</a></li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            Designation <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#">Tablet</a></li>
+                            <li><a href="#">Smartphone</a></li>
+                        </ul>
+                    </div>*@
+            </div>
+            @*<a asp-controller="Employee" asp-action="PrintList" class="btn btn-default hidden-print" onclick="menuClick('liEmployeeList')"><i class="fa fa-print"></i> Print</a>
+                <a class="btn btn-default btn-circle pull-right hidden-print" id="btnpDF"><i class="fa fa-file-pdf-o"></i></a>
+                <a class="btn btn-default btn-circle pull-right hidden-print" id="btnExport"><i class="fa fa-file-excel-o"></i></a>
+                <a class="btn btn-default btn-circle pull-right hidden-print" id="btnPrint"><i class="fa fa-print"></i></a>*@
+
+        </div>
+        <div class="box-body">
+            <div class="table-responsive" id="divEmpllist">
+                <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th class="bg-primary"> Name </th>
+                            <th class="bg-primary"> Employee No </th>
+                            <th class="bg-primary"> Contact No </th>
+                            <th class="bg-primary"> Email </th>
+                            <th class="bg-primary"> Department </th>
+                            <th class="bg-primary"> Designation </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @if (Model != null && Model.Count() > 0)
+                        {
+                            @foreach (var contact in Model)
+                            {
+                                <tr>
+                                    <td style="width: 20%; word-wrap:break-word;">
+                                        <a asp-controller="Employee" asp-action="EmployeeProfileDetails" asp-route-empId="@contact.EmployeeId" asp-route-callingView="EmployeeDirectory" data-toggle="modal" data-backdrop="static">
+                                            <img src="../UploadImages/@contact.EmployeeProfilePhoto" alt="Emp Image" style="width:10% !important; border-radius: 50%;">
+                                        </a>
+                                        @*<img src="../UploadImages/@contact.EmployeeProfilePhoto" alt="Emp Image" style="width:10% !important; border-radius: 50%;">*@
+                                        <span style="margin-left:5%;">
+                                            <strong> @String.Concat(@contact.FirstName, " ", @contact.MiddleName, " ", @contact.LastName)</strong>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a asp-controller="Employee" asp-action="EmployeeDetails" asp-route-empId="@contact.EmployeeId" data-toggle="modal" data-target="#modal-default" data-backdrop="static" data-keyboard="false" type="button">@contact.EmployeeNumber</a>
+                                        <input data-tableexport-display="none" id="hndfEmployeeIdVal" name="empId" type="hidden" value="@contact.EmployeeId" class="hidden-print" />
+                                    </td>
+                                    <td>@contact.ContactNumber</td>
+                                    <td>
+                                        <a id="linkEmail1" href="mailto:@contact.Email">@contact.Email</a>
+                                    </td>
+                                    <td>@contact.Department</td>
+                                    <td>@contact.Designation </td>
+                                </tr>
+                            }
+                        }
+
+                    </tbody>
+                    <tfoot class="hidden-print">
+                        <tr>
+                            <th> Name </th>
+                            <th> Employee No </th>
+                            <th> Contact No </th>
+                            <th> Email </th>
+                            <th> Department </th>
+                            <th> Designation </th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <!-- /.box-body -->
+    </div>
+    <div class="modal fade" id="modal-default">
+        <div class="modal-dialog" style="width: 65% !important;">
+
+            <div class="modal-content">
+
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+    <!-- /.modal -->
+
+</section>
+
+
+
+
+@section Scripts {
+
+    <!-- DataTables -->
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/dataTables.buttons.min.js"></script>
+    @*<script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"></script>*@
+
+    <script src="~/bower_components/datatables.net-export/jszip.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/pdfmake.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/vfs_fonts.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.html5.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.print.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.colVis.min.js"></script>
+    <!-- Export plugin -->
+    <script type="text/javascript" src="~/lib/hhurz/libs/FileSaver/FileSaver.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/js-xlsx/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.min.js"></script>
+    @*<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.15.4/extensions/print/bootstrap-table-print.js"></script>*@
+
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+            window.onload = function () {
+                document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                document.getElementById("modal-success").style.display = "block";
+                setTimeout(successAlertClose, 5000);
+                //alert("main window load");
+            };
+
+            function successAlertClose(event) {
+                document.getElementById("modal-success").style.display = "none";
+            }
+        </script>
+    }
+
+    <script>
+        $(document).ready(function () {
+            $("#liEmployee").addClass("active");
+            $("#liEmployeeList").addClass("active");
+            document.getElementById("liEmployeeList").style.backgroundColor = "#3c8dbc45";
+
+
+            @*// Setup - add a text input to each footer cell
+            $('#tblEmpList thead tr').clone(true).appendTo('#tblEmpList thead');
+            $('#tblEmpList thead tr:eq(1) th').each(function (i) {
+                var title = $(this).text();
+                $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+                $(this).removeClass("bg-primary");
+                //$(this).addClass("data-tableexport-display=none");
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i).search() !== this.value) {
+                        table
+                            .column(i)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+
+            var table = $('#tblEmpList').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true
+            });*@
+
+
+            // Setup - add a text input to each footer cell
+            $('#tblEmpList tfoot th').each(function (i) {
+                var title = $('#tblEmpList thead th').eq($(this).index()).text();
+                $(this).html('<input type="text" placeholder="Search ' + title + '" data-index="' + i + '" />');
+            });
+
+
+            // DataTable
+            @* scrollY: "300px",*@
+            var table = $('#tblEmpList').DataTable({
+                "scrollX": true,
+                "scrollY": true,
+                "scrollCollapse": true,
+                "paging": true,
+                "fixedColumns": true,
+                "fixedHeader": true,
+                "bLengthChange": true,
+                "Filter": true,
+                "Info": true,
+                "pagingType": "full_numbers",
+                "pageLength": 10,
+                "pageList": "[10, 25, 50, 100, 200, All]",
+                "dom": 'Bfrtip',
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-copy"></i>'
+                    },
+                    {
+                        extend: 'excel',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-excel-o"></i>'
+                    },
+                    {
+                        extend: 'pdf',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-pdf-o"></i>'
+                    },
+                    {
+                        extend: 'csv',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-csv-o"></i>'
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-print"></i>'
+                    }
+                ],
+            });
+
+
+            // Filter event handler
+            $(table.table().container()).on('keyup', 'tfoot input', function () {
+                table
+                    .column($(this).data('index'))
+                    .search(this.value)
+                    .draw();
+            });
+        });
+
+        @*$(function () {
+            $('#tblEmpList').DataTable();
+        })*@
+
+
+        $("#btnExport").click(function (e) {
+            //alert("excel");
+            //window.open('data:application/vnd.ms-excel,' + $('#divJoinerslist').dataTable.html());
+            $('#tblEmpList').tableExport({ type: 'excel'});
+            @*$('#tblEmpList').tableExport({ type: 'csv' });*@
+            @*$('tblEmpList').tableExport({
+                type: 'excel',
+                mso: {
+                    fileFormat: 'excel',
+                    worksheetName: ['Table 1', 'Table 2', 'Table 3']
+                }
+            });*@
+
+            @*$('tblEmpList').tableExport({
+                type: 'excel',
+                mso: {
+                    fileFormat: 'xmlss',
+                    worksheetName: ['Table 1', 'Table 2', 'Table 3']
+                }
+            });*@
+            e.preventDefault();
+        });
+
+        $("#btnpDF").click(function (e) {
+            //PDF
+             $('#tblEmpList').tableExport({
+                type: 'pdf',
+                jspdf: {
+                    orientation: 'l',
+                    format: 'a4',
+                    margins: { left: 10, right: 10, top: 20, bottom: 20 },
+                    autotable: {
+                        styles: {
+                            fillColor: 'inherit',
+                            textColor: 'inherit'
+                        },
+                        tableWidth: 'auto'
+                    }
+                }
+            });
+            e.preventDefault();
+        });
+
+        $("#btnPrint").click(function (e) {
+            //Print
+            var table = document.getElementById('tblEmpList');
+            table.button('.buttons-print').trigger();
+            //var win = window.open('', '', 'height=700,width=700');
+            //window.document.write(tab.outerHTML);
+            //window.document.print();
+            //window.print();
+            //window.document.close();
+
+            //window.print();
+
+            //e.preventDefault();
+        });
+
+    </script>
+
+}
+

@@ -1,0 +1,393 @@
+﻿@model IEnumerable<SwiftHR.Utility.EmployeeOnboardingDetails>
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Employee Self Onboarding";
+}
+
+<!-- DataTables-->
+<link rel="stylesheet" href="~/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+@*<link rel="stylesheet" href="~/bower_components/databases.net-bs4/css/bootstrap.css">
+    <link rel="stylesheet" href="~/bower_components/databases.net-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/bower_components/databases.net-bs4/css/responsive.bootstrap4.min.css">*@
+
+<link rel="stylesheet" href="~/css/site.css" />
+
+<form id="frmOnboardingList" asp-controller="Employee" asp-action="EmployeeOnbList" method="post">
+    <section class="content-header">
+        <h1>
+            Onboarding Employees
+            <button class="btn btn-flat btn-warning" id="btnBusy" style="float: right; margin-right: 3%; visibility:hidden" disabled>
+                <span class="glyphicon glyphicon-refresh spinning"></span> Loading...
+            </button>
+        </h1>
+
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="alertS alert-success" id="modal-success" style="display:none;">
+            <button type="button" class="close" aria-hidden="true" onclick="successAlertClose(event)">&times;</button>
+            <h4><i class="icon fa fa-check"></i> Success </h4>
+            <p id="successBody"></p>
+        </div>
+
+        <div class="box-body box-profile">
+            <div class="box box-default">
+
+                <div class="box-header">
+                    <h2 class="box-title"><i class="fa fa-address-card-o"></i></h2>
+
+                    <a class="btn btn-default btn-circle pull-right" id="btnpDF"><i class="fa fa-file-pdf-o"></i></a>
+                    @*<a class="btn btn-sm btn-default btn-flat pull-right btn-circle" id="btnExport"> Export To Excel </a>*@
+                    <a class="btn btn-default btn-circle pull-right" id="btnExport"><i class="fa fa-file-excel-o"></i></a>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="tblEmpOnbList" class="table table-bordered table-striped dt-responsive nowrap table-hover" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th class="bg-primary"> Name </th>
+                                <th class="bg-primary"> Onboarding Status </th>
+                                <th class="bg-primary"> Employee No </th>
+                                @*<th> Contact No </th>
+                                    <th> Email </th>*@
+                                <th class="bg-primary"> Department </th>
+                                <th class="bg-primary"> Designation </th>
+                                <th class="bg-primary"> Action </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @if (Model != null && Model.Count() > 0)
+                            {
+                                @foreach (var contact in Model)
+                                {
+                                    <tr id="@contact.empDetails.EmployeeId">
+                                        <td style="width: 20%;"> <img src="../UploadImages/@contact.empDetails.EmployeeProfilePhoto" alt="Emp Image" style="width:10% !important; border-radius: 50%;"> <span style="margin-left:5%;"> <strong> @contact.empDetails.FirstName  @contact.empDetails.MiddleName  @contact.empDetails.LastName </strong>  </span> </td>
+                                        @if (contact.empOnboardingDetails.OnboardingStatus == 0)
+                                        {
+                                            <td style="width: 10%;"><small class="label  bg-red-gradient"><i class="fa fa-gears"></i> Initiated</small></td>
+                                        }
+                                        @if (contact.empOnboardingDetails.OnboardingStatus == 1)
+                                        {
+                                            <td style="width: 10%;"><small class="label  bg-green-gradient"><i class="fa fa-folder-open-o"></i> In Progress</small></td>
+                                        }
+                                        @if (contact.empOnboardingDetails.OnboardingStatus == 2)
+                                        {
+                                            <td style="width: 10%;"><small class="label bg-blue-gradient"><i class="fa fa-calendar-times-o"></i> Pending Approval</small></td>
+                                        }
+                                        <td style="width: 5%;">
+                                            <a asp-controller="Employee" asp-action="EmployeeProfileDetails" asp-route-empId="@contact.empDetails.EmployeeId" asp-route-callingView="EmployeeOnboarding" data-toggle="modal"  data-backdrop="static">
+                                                    @contact.empDetails.EmployeeNumber
+                                                </a>
+                                            @*<a asp-controller="Employee" asp-action="EmployeeProfileDetails" asp-route-empId="@contact.empDetails.EmployeeId" asp-route-callingView="EmployeeOnboarding" onclick="GetOnbData(@contact.empDetails.EmployeeId);">
+                                                @contact.empDetails.EmployeeNumber
+                                            </a>*@
+                                            <input data-tableexport-display="none" id="hndfEmployeeIdVal" name="empId" type="hidden" value="@contact.empDetails.EmployeeId" />
+                                        </td>
+                                        <td>@contact.empDetails.Department</td>
+                                        <td>@contact.empDetails.Designation </td>
+                                        <td style="width: 25%;">
+                                            @if (contact.empOnboardingDetails.OnboardingStatus >= 2)
+                                            {
+                                                <a type="button" id="_@contact.empDetails.EmployeeId" asp-controller="Employee" asp-action="ApproveEmployeeOnboarding" asp-route-empId="@contact.empDetails.EmployeeId" class="btn btn-primary pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="ApproveOnboard(@contact.empDetails.EmployeeId);"><i id="__@contact.empDetails.EmployeeId" class="fa fa-thumbs-up"></i> Approve Onboard </a>
+                                                <a href="" type="button" id="_@contact.empDetails.EmployeeId" class="btn btn-danger pull-right btn-xs" style="float: right; margin-right: 4%;" onclick="validateOnbData(@contact.empDetails.EmployeeId);"><i id="___@contact.empDetails.EmployeeId" class="fa fa-thumbs-down"></i> Send For Updation </a>
+                                            }
+                                            @if (contact.empOnboardingDetails.OnboardingStatus < 2)
+                                            {
+                                                <a type="button" disabled id="_@contact.empDetails.EmployeeId" asp-controller="Employee" asp-action="ApproveEmployeeOnboarding" asp-route-empId="@contact.empDetails.EmployeeId" class="btn btn-default pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="ApproveOnboard(@contact.empDetails.EmployeeId);"><i id="__@contact.empDetails.EmployeeId" class="fa fa-thumbs-up"></i> Approve Onboard </a>
+                                                <button type="button" disabled id="_@contact.empDetails.EmployeeId" class="btn btn-default pull-right btn-xs" style="float: right; margin-right: 4%;" onclick="validateOnbData(@contact.empDetails.EmployeeId);"><i class="fa fa-thumbs-down"></i> Send For Updation </button>
+                                            }
+
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+
+                    </table>
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+        </div>
+        <!-- /.modal -->
+        <div class="modal fade" id="modal-profileOnbd">
+            <div class="modal-dialog" style="width: 70%  !important;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        **--- put your form here inside Onboarding**
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+    </section>
+</form>
+
+
+
+@section Scripts {
+
+    <!-- DataTables-->
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+
+    <!-- DataTables bootstrap 4-->
+    @*<script src="~/bower_components/databases.net-bs4/js/jquery.dataTables.min.js"></script>
+        <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap4.min.js"></script>
+        <script src="~/bower_components/datatables.net-bs/js/dataTables.responsive.min.js"></script>
+        <script src="~/bower_components/datatables.net-bs/js/jquery-3.5.1.js"></script>
+        <script src="~/bower_components/datatables.net-bs/js/responsive.bootstrap4.min.js"></script>*@
+
+    <!-- Export plugin -->
+    <script type="text/javascript" src="~/lib/hhurz/libs/FileSaver/FileSaver.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/js-xlsx/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.min.js"></script>
+
+
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+            window.onload = function () {
+                document.getElementById("btnBusy").style.visibility = 'hidden';
+                document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                document.getElementById("modal-success").style.display = "block";
+                setTimeout(successAlertClose, 5000);
+                //alert("main window load");
+        };
+        </script>
+    }
+
+    <script>
+        $(document).ready(function () {
+            $("#liEmployee").addClass("active");
+            $("#liEmpSelfOnboard").addClass("active");
+            document.getElementById("liEmpSelfOnboard").style.backgroundColor = "#3c8dbc45";
+
+
+            //setTimeout(successAlertClose, 5000);
+
+            @*$("#modal-profile").on("hidden.bs.modal", function () {
+                alert("heret...");
+                //$("#modal-profile").html("asdasdad");
+                //document.getElementById("frmOnboardingList").reset();
+                document.getElementById("frmOnboardingList").submit();
+                document.getElementById("modal-success").style.display = "none";
+            });*@
+
+            
+        });
+
+
+
+        $(function () {
+            $('#tblEmpOnbList').DataTable();
+        })
+
+        function validateOnbData(empId) {
+           // alert(empId);
+            document.body.style.cursor = 'progress';
+            document.getElementById("btnBusy").style.visibility = 'visible';
+            var selectedIcon = "#___" + empId;
+            $(selectedIcon).addClass("fa-pulse fa-spin");
+            var form_data = new FormData();
+            form_data.append('empId', empId);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("RejectEmployeeOnboarding", "Employee")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    var usrMsgData = JSON.parse(response);
+                    //alert("here...sending mail for re work");
+                    if (usrMsgData != null && usrMsgData != undefined) {
+                        var myTable = $('#tblEmpOnbList').DataTable();
+
+                        //alert("here...sending mail for re work1");
+                        //document.getElementById("frmOnboardingList").submit();
+                        var selectedButton = "#_" + empId;
+                        myTable.row($(selectedButton).parents('tr')).remove().draw(false);
+
+                        //<small class="label  bg-red-gradient"><i class="fa fa-gears"></i> Initiated</small>
+                        document.getElementById("successBody").innerHTML = usrMsgData[0];
+                        document.getElementById("modal-success").style.display = "block";
+                        setTimeout(successAlertClose, 5000);
+                        //event.preventDefault();
+                        document.body.style.cursor = 'default';
+                        document.getElementById("btnBusy").style.visibility = 'hidden';
+                        $(selectedIcon).removeClass("fa-pulse fa-spin");
+                    }
+                },
+                error: function (req, status, error) {
+                    console.log(msg);
+                }
+            });
+        }
+
+
+
+        function closeEditEmployeeWindow(event) {
+
+            //alert("inside empoyee self onboarding1");
+            //document.getElementById("frmEditEmployee").reset();
+            //document.getElementById("modal-profile").style.display = "none";
+            //var x = document.getElementById("modal-profile");
+           // x.innerHTML("");
+           // event.preventDefault();
+            //var form_data = new FormData();
+           // form_data.append('CallingViewName', 'N/A');
+            //document.getElementById("frmEditEmployee").append('CallingViewName', 'N/A');
+            //document.getElementById("frmEditEmployee").submit();
+
+            //var data = new FormData($('frmEditEmployee')[0]);
+            //data.append("route", 1); //adding a new value)
+            //data.set('CallingView1', 'newValue'); //use the name attribute of html tag to target the respective key-value pair
+            //document.getElementById("hndCallingView").value = "Close";
+           // document.getElementById("modal-profile").innerHTML = "";
+
+            //document.getElementById("frmEditEmployee").submit();
+           // document.getElementById("modal-profile").style.display = "none";
+            //data.submit();
+            //alert("inside empoyee self onboarding2");
+        }
+
+        function successAlertClose(event) {
+                 document.getElementById("modal-success").style.display = "none";
+         }
+        function ApproveOnboard(empId) {
+            // alert("Inside SavePictureData method1");
+            document.body.style.cursor = 'progress';
+            document.getElementById("btnBusy").style.visibility = 'visible';
+            var selectedIcon = "#__" + empId;
+            $(selectedIcon).addClass("fa-pulse fa-spin");
+            var form_data = new FormData();
+            form_data.append('empId', empId);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("ApproveEmployeeOnboarding", "Employee")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+                    var usrMsgData = JSON.parse(response);
+                    //alert(usrMsgData[0]);
+                    if (usrMsgData != null && usrMsgData != undefined) {
+                        var myTable = $('#tblEmpOnbList').DataTable();
+                        //myTable.cell({ focused: true }).row().remove();
+                        //myTable.draw();
+                        var selectedButton = "#_" + empId;
+                        //alert(selectedButton);
+                        myTable.row($(selectedButton).parents('tr')).remove().draw(false);
+                        //myTable.row($('#_1').parents('tr')).remove().draw(false);
+                        //myTable.row(document.getElementById(selectedButton).parents('tr')).remove().draw(false);
+
+                        document.getElementById("successBody").innerHTML = usrMsgData[0];
+                        document.getElementById("modal-success").style.display = "block";
+                        setTimeout(successAlertClose, 5000);
+                        //alert("saved data");
+                        document.body.style.cursor = 'default';
+                        document.getElementById("btnBusy").style.visibility = 'hidden';
+                        $(selectedIcon).removeClass("fa-pulse fa-spin");
+                    }
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+        $("#btnExport").click(function (e) {
+            //xls
+            alert("xls");
+            $('#tblEmpOnbList').tableExport({ type: 'excel' });
+            e.preventDefault();
+        });
+
+        $("#btnpDF").click(function (e) {
+            //PDF
+            alert("PDF");
+            $('#tblEmpOnbList').tableExport({
+                type: 'pdf',
+                jspdf: {
+                    orientation: 'l',
+                    format: 'a4',
+                    margins: { left: 10, right: 10, top: 20, bottom: 20 },
+                    autotable: {
+                        styles: {
+                            fillColor: 'inherit',
+                            textColor: 'inherit'
+                        },
+                        tableWidth: 'auto'
+                    }
+                }
+            });
+            e.preventDefault();
+        });
+
+         function GetOnbData(empId) {
+             alert("GetOnbData");
+            //document.body.style.cursor = 'progress';
+            //document.getElementById("btnBusy").style.visibility = 'visible';
+            //var selectedIcon = "#___" + empId;
+            //$(selectedIcon).addClass("fa-pulse fa-spin");
+            var form_data = new FormData();
+             form_data.append('empId', empId);
+             form_data.append('callingView', 'EmployeeOnboarding');
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("EmployeeProfileDetails", "Employee")",
+                contentType: 'application/html; charset=utf-8',
+                dataType: 'html',
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    $("#modal-profileOnbd .modal-body").html(response);
+                    $("#modal-profileOnbd").modal("show");
+                    @*var usrMsgData = JSON.parse(response);
+                    //alert("here...sending mail for re work");
+                    if (usrMsgData != null && usrMsgData != undefined) {
+                        var myTable = $('#tblEmpOnbList').DataTable();
+
+                        //alert("here...sending mail for re work1");
+                        //document.getElementById("frmOnboardingList").submit();
+                        var selectedButton = "#_" + empId;
+                        myTable.row($(selectedButton).parents('tr')).remove().draw(false);
+
+
+
+                        //<small class="label  bg-red-gradient"><i class="fa fa-gears"></i> Initiated</small>
+                        document.getElementById("successBody").innerHTML = usrMsgData[0];
+                        document.getElementById("modal-success").style.display = "block";
+                        setTimeout(successAlertClose, 5000);
+                        //event.preventDefault();
+                        document.body.style.cursor = 'default';
+                        document.getElementById("btnBusy").style.visibility = 'hidden';
+                        $(selectedIcon).removeClass("fa-pulse fa-spin");
+                    }*@
+                },
+                error: function (req, status, error) {
+                    console.log(msg);
+                }
+            });
+        }
+    </script>
+
+
+}
+

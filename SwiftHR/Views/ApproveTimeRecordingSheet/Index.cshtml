@@ -1,0 +1,647 @@
+﻿@model SwiftHR.Models.TimeRecordingSheetDetails
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Add Employee";
+    int i;
+    IEnumerable<SwiftHR.Models.TimeRecordingSheetDetails> A = new List<SwiftHR.Models.TimeRecordingSheetDetails>();
+
+}
+
+<!-- bootstrap datepicker -->
+<script src="../../plugins/datepicker/bootstrap-datepicker.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+<link rel="stylesheet" href="~/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+@section Scripts {
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/FileSaver/FileSaver.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/js-xlsx/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+
+            var dt = new Date();
+            var year = dt.getFullYear();
+            var month = ("0" + (dt.getMonth() + 1)).slice(-2);
+            $("#bdaymonth").val(year + '-' + month);
+            CountOfMonth = new Date(year, month, 0).getDate();
+            date = dt.getDate();
+
+            $('#checkall').change(function () {
+                $('.cb-element').prop('checked', this.checked);
+            });
+            //GetHolidays();
+            $('.cb-element').change(function () {
+                if ($('.cb-element:checked').length == $('.cb-element').length) {
+                    $('#checkall').prop('checked', true);
+                }
+                else {
+                    $('#checkall').prop('checked', false);
+                }
+            });
+
+            LoadEmployeeData();
+        });
+
+
+
+
+
+    </script>
+
+}
+<section class="content-header">
+    <h1>
+        Apprved Time Recording Sheet
+    </h1>
+</section>
+
+<section class="content">
+    <div class="alertS alert-success" id="modal-success" style="display:none;">
+        <button type="button" class="close" aria-hidden="true" onclick="successAlertClose(event)">&times;</button>
+        <h4><i class="icon fa fa-check"></i> Success </h4>
+        <p id="successBody"></p>
+    </div>
+    <div class="box box-default">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="PolicyMasterId" style="border: 1px solid #0000001c;">
+                            <form asp-controller="TimeRecordingSheet" asp-action="AddPolicyDetails" method="POST">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <a href="https://www.shobigroup.com" class="logo" style="border-right: 0px !important;">
+                                                    <img src="~/dist/img/shobi_logo.png" alt="homepage" class="logo-lg" style="width:75%;" />
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="bdaymonth">Month And Year: </label>
+                                                <i class="fa fa-chevron-circle-left fa-lg allowed" onclick="setpreviousDate();" title="Previous Date" style="margin-right: 10px"></i>
+                                                <input type="month" id="bdaymonth" name="bdaymonth" onchange="GetEmployeeData();">
+
+                                                <i class="fa fa-chevron-circle-right fa-lg allowed" onclick="MonthNext();" title="Next Date" style="margin-right: 10px"></i>
+
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="ddlPolicyNameId">Employee Name</label>
+                                                @Html.DropDownListFor(model => Model.EmpId, new SelectList(ViewBag.EmployeeList, "Value", "Text"), new { @class = "form-control select2", onchange = "GetEmployeeData()" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtEmpCode">Employee Code<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtEmpCode" name="Company" class="form-control" placeholder="Employee Code">
+                                            </div>
+                                            <div class="form-group">
+                                                <button type="submit" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="GetEmployeeData()">Search</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="MonthDetailsId" class="table table-bordered table-striped dt-responsive nowrap table-hover" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th class="bg-primary">Expand</th>
+                                <th class="bg-primary">Employee Name</th>
+                                <th class="bg-primary">Min Date</th>
+                                <th class="bg-primary">Max Date</th>
+                                <th class="bg-primary">Total</th>
+                                <th class="bg-primary">Net Total</th>
+                                <th class="bg-primary">Grand Total</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+        </div>
+    </div>
+    <div style="display:none;">
+        <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+        </button>
+        <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+        </button>
+    </div>
+
+    <div class="alert alert-warning fade" id="modal-warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4>
+            <i class="icon fa fa-warning"></i> Alert!
+        </h4>
+
+        <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+        </div>
+
+        <div class="alert-footer">
+            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+        </div>
+    </div>
+
+    <div class="modal modal-warning fade" id="modal-warning2">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Alert!</h4>
+                </div>
+                <div class="modal-body">
+                    <p>One fine body&hellip;</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+            @*/.modal-content*@
+        </div>
+        @*/.modal-dialog*@
+    </div>
+</section>
+<script>
+
+
+
+    function setpreviousDate() {
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate);
+        var endDate = new Date(dt.setMonth(dt.getMonth() - 1));
+        var year = endDate.getFullYear();
+        var month = ("0" + (endDate.getMonth() + 1)).slice(-2);
+        $("#bdaymonth").val(year + '-' + month);
+        CountOfMonth = new Date(year, month, 0).getDate();
+
+        var form_data = new FormData();
+          $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetMonthAndDay", "TimeRecordingSheet")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+                    debugger;
+                    var resData = response.result;
+                    GetEmployeeData();
+                   // AddTableBody(CountOfMonth, resData)
+                   // GetHolidays();
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function MonthNext() {
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate);
+
+        var endDate = new Date(dt.setMonth(dt.getMonth() + 1));
+        var year = endDate.getFullYear();
+        var month = ("0" + (endDate.getMonth() + 1)).slice(-2);
+        $("#bdaymonth").val(year + '-' + month);
+        CountOfMonth = new Date(year, month, 0).getDate();
+
+        var form_data = new FormData();
+      //  form_data.append('CountOfMonth', endDate);
+
+          $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetMonthAndDay", "TimeRecordingSheet")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+              data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+                    debugger;
+                    var resData = response.result;
+                    GetEmployeeData();
+                    //AddTableBody(CountOfMonth, resData)
+                  //  GetHolidays();
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+       // SaveData();
+    }
+</script>
+<script>
+    selectedItems = [];
+
+    function LoadEmployeeData() {
+
+        $('#MonthDetailsId > tbody').empty();
+
+
+        var EmployeeId = $('#EmpId').val();
+        var EmployeeName = $("#EmpId option:selected").text();
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate + "-" + 10);
+        year = dt.getFullYear();
+        month = dt.getMonth() + 1;
+       // dd = dt.getDate();
+        var myDate = year + '-' + month; //+ '-' + dd;
+        var updatedFieldTicketItems = [];
+        var workorderjson = "";
+        var obj = new Object();
+        obj.year = year;
+        obj.Month = month;
+        obj.EmpId = parseInt(EmployeeId);
+        obj.EmpName = EmployeeName;
+        obj.InFrom = null;
+        obj.OutTill = null;
+        obj.Total = null;
+        obj.Net = null;
+
+
+        var form_data = new FormData();
+        form_data.append('recordList', JSON.stringify(obj));
+        var updateFieldTicketItemRequestData = JSON.stringify({'recordList':updatedFieldTicketItems});
+        //alert(updateFieldTicketItemRequestData);
+
+        workorderjson = JSON.stringify(obj)
+        workorderjson = workorderjson.replace(/^,/, '');
+        workorderjson = "[" + workorderjson + "]";
+        form_data.append('workorderjson', workorderjson);
+         $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetListOfTimeSheetDetailsFromEmployee", "ApproveTimeRecordingSheet")",
+             processData: false,
+             contentType: false,
+             async: false,
+             cache: false,
+             data: form_data,
+             datatype:"json",
+                //data: '{recordList: ' + JSON.stringify(obj) + '}',
+               //data: updateFieldTicketItemRequestData,
+                //data: myData,
+             success: function (Result) {
+                 debugger;
+
+                 if (Result.result.length > 0) {
+                     var data = Result.result[0];
+                     AddEmployeeTableBody(Result.result.length, Result.result);
+                 }
+
+                 //var obj = XML2jsobj(response.result.responseXML.documentElement);
+                 //alert(obj);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function GetEmployeeData() {
+        event.preventDefault();
+        $('#MonthDetailsId > tbody').empty();
+
+
+        var EmployeeId = $('#EmpId').val();
+        var EmpCode = $('#txtEmpCode').val();
+
+        var EmployeeName = $("#EmpId option:selected").text();
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate + "-" + 10);
+        year = dt.getFullYear();
+        month = dt.getMonth() + 1;
+       // dd = dt.getDate();
+        var myDate = year + '-' + month; //+ '-' + dd;
+        var updatedFieldTicketItems = [];
+        var workorderjson = "";
+        var obj = new Object();
+        obj.year = year;
+        obj.Month = month;
+        obj.EmpId = parseInt(EmployeeId);
+        obj.EmpCode = EmpCode;
+        obj.EmpName = EmployeeName;
+        obj.InFrom = null;
+        obj.OutTill = null;
+        obj.Total = null;
+        obj.Net = null;
+
+
+        var form_data = new FormData();
+        form_data.append('recordList', JSON.stringify(obj));
+        var updateFieldTicketItemRequestData = JSON.stringify({'recordList':updatedFieldTicketItems});
+        //alert(updateFieldTicketItemRequestData);
+
+        workorderjson = JSON.stringify(obj)
+        workorderjson = workorderjson.replace(/^,/, '');
+        workorderjson = "[" + workorderjson + "]";
+        form_data.append('workorderjson', workorderjson);
+         $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetListOfTimeSheetDetailsFromEmployee", "ApproveTimeRecordingSheet")",
+             processData: false,
+             contentType: false,
+             async: false,
+             cache: false,
+             data: form_data,
+             datatype:"json",
+                //data: '{recordList: ' + JSON.stringify(obj) + '}',
+               //data: updateFieldTicketItemRequestData,
+                //data: myData,
+             success: function (Result) {
+                 debugger;
+
+                 if (Result.result.length > 0) {
+                     var data = Result.result[0];
+                     AddEmployeeTableBody(Result.result.length, Result.result);
+                 }
+
+                 //var obj = XML2jsobj(response.result.responseXML.documentElement);
+                 //alert(obj);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function AddEmployeeTableBody(EmployeeDetailslen,EmployeeDetails) {
+        debugger;
+        $('#MonthDetailsId > tbody').empty();
+
+        for (i = 0; i < EmployeeDetailslen; i++) {
+
+            var data = '<tr id="trChildRow_' + i + '">'
+                + '<td><a type="button" id="btnPlus_' + i + '" href="" class="btn btn-primary btn-xs" style="float:center" onclick="expand(' + i + ');"><i id="" class="fa fa-plus" style="float:center"></i> </a><a type="button" id="btnMinus_' + i + '" href="" class="btn btn-primary btn-xs" style="float:center;display: none;" onclick="HideEmpTimeDetails(' + i + ');"><i id="" class="fa fa-minus" style="float:center"></i> </a></td>'
+                    + '<td><input type="hidden" id="HiddenEmpId_' + i + '"value="' + EmployeeDetails[i].empId + '" disabled><input type="text" id="txtEmpName_' + i + '" name="EmpName" class="form-control" value="' + EmployeeDetails[i].empName + '" placeholder="Emp Name" disabled></td>'
+                    + '<td><input type="text" id="txtIn_' + i + '" name="In" class="form-control" placeholder="IN" value="' + EmployeeDetails[i].inFrom + '" disabled></td>'
+                    + '<td><input type="text" id="txtOut_' + i + '" name="In" value="' + EmployeeDetails[i].outTill + '" class="form-control" placeholder="Out" disabled></td>'
+                    + '<td><input type="text" id="txtTotal_' + i + '" name="In" value="' + EmployeeDetails[i].total + '" class="form-control" placeholder="Total" disabled></td>'
+                    + '<td><input type="text" id="txtNet_' + i + '" name="In" class="form-control" value="' + EmployeeDetails[i].net + '" placeholder="Net" disabled></td>'
+                    + '<td><input type="text" id="txtGrandTotal_' + i + '" name="In" class="form-control" value="' + EmployeeDetails[i].net + '" placeholder="GrandTotal" disabled></td></tr>'
+                + '<tr id="trDetailsRow_' + i + '"><td></td><td colspan="6"><table id="EmpDetailsId_' + i + '" class="table table-bordered etable"><thead><tr><th class="bg-primary"><input type="checkbox" name="all" id="checkall_' + i + '" onchange="changeCheckAll(this)" /> All</th><th class="bg-primary">Day No</th><th class="bg-primary">In</th><th class="bg-primary">Out</th><th class="bg-primary"> Total</th><th class="bg-primary">Break</th><th class="bg-primary">Net</th><th class="bg-primary">Day</th><th class="bg-primary" style="width:19%; text-align:center">Prseence</th><th class="bg-primary" style="text-align:center"><a type="button" href="" id="btnApproveAll_' + i + '" class="btn btn-primary pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="ApproveAll(' + i + ');"  disabled><i id="" class="fa fa-edit"></i> Approve All</a></th></tr ></thead > <tbody></tbody></table></td></tr>'
+                    $('#MonthDetailsId').append(data);
+
+            }
+
+    }
+    function HideEmpTimeDetails(i) {
+        event.preventDefault();
+        $('#btnMinus_' + i).attr("style", "display:none");
+        $('#btnPlus_' + i).attr("style", "display:block");
+        $('#EmpDetailsId_'+i+' > tbody').empty();
+    }
+
+
+    function changeCheck(e) {
+        var id = "";
+        id = $(e).attr("data-id");
+        var rowid = $(e).attr("data-row");
+
+
+        if (e.checked) { // check select status
+
+            selectedItems.push(id);
+
+        } else {
+            selectedItems.pop(id);
+        }
+
+        if (selectedItems.length > 1) {
+            $('#btnApproveAll_' + rowid).removeAttr('disabled');
+        }
+        else {
+            $('#btnApproveAll_' + rowid).attr('disabled', 'disabled');
+        }
+    }
+
+    function changeCheckAll(e){
+        var rowid = $(e).attr("data-row");
+        alert(rowid);
+        if (e.checked) { // check select status
+            $('#btnApproveAll_' + rowid).removeAttr('disabled');
+        } else {
+            $('#btnApproveAll_' + rowid).attr('disabled', 'disabled');
+        }
+    }
+
+
+    function expand(i) {
+
+        event.preventDefault();
+        selectedItems = [];
+        $('#btnMinus_' + i).attr("style", "display:block");
+        $('#btnPlus_' + i).attr("style", "display:none");
+        var empId = $('#HiddenEmpId_' + i).val();
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate + "-" + 10);
+        year = dt.getFullYear();
+         month = dt.getMonth() + 1;
+
+         var form_data = new FormData();
+         form_data.append('empId', empId);
+         form_data.append('year', year);
+         form_data.append('month', month);
+
+         CountOfMonth = new Date(year, month, 0).getDate();
+
+        $.ajax({
+                type: "POST",
+                url: "@Url.Action("TimeRecordingSheetList", "ApproveTimeRecordingSheet")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+               // data: "{empId:'" + empId + "',year:'" + year + "',month:'" + month + "'}",
+                success: function (response) {
+                    debugger;
+                    var data = response.result[0];
+
+                    AddTableBody(i,CountOfMonth, response.result);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function Approve(i) {
+
+        event.preventDefault();
+
+        var empId = $('#HiddenEmpId_' + i).val();
+        var timesheetrecId = $('#HiddenRecordId_' + i).val();
+
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate + "-" + 10);
+        year = dt.getFullYear();
+        month = dt.getMonth() + 1;
+
+        var form_data = new FormData();
+        form_data.append('timeSheetRecId', timesheetrecId);
+         //form_data.append('day', i);
+         //form_data.append('empId', empId);
+         //form_data.append('year', year);
+         //form_data.append('month', month);
+
+         CountOfMonth = new Date(year, month, 0).getDate();
+
+        $.ajax({
+                type: "POST",
+                url: "@Url.Action("ApproveTimeRecordingSheetList", "ApproveTimeRecordingSheet")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    debugger;
+                    var data = response.result[0];
+
+                    AddTableBody(i,CountOfMonth, response.result);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function ApproveAll(i) {
+
+         event.preventDefault();
+         var rowCount = $('#EmpDetailsId_'+i+' >tbody >tr').length;
+         var empId = $('#HiddenEmpId_' + i).val();
+         var todaysdate = $('#bdaymonth').val();
+         var dt = new Date(todaysdate + "-" + 10);
+         var timeSheetDetailsIds = "";
+         var days = "";
+         year = dt.getFullYear();
+         month = dt.getMonth() + 1;
+
+         var CountOfMonth = new Date(year, month, 0).getDate();
+        debugger;
+        for (var i = 1; i <= CountOfMonth; i++) {
+            for (var j = 0; j < selectedItems.length; j++) {
+                if (selectedItems[j] == 'chk_' + i) {
+                    timeSheetDetailsIds = timeSheetDetailsIds +","+ $('#HiddenRecordId_' + i).val();
+                }
+            }
+        }
+        alert(timeSheetDetailsIds);
+         var form_data = new FormData();
+         form_data.append('timeSheetDetailsIds', timeSheetDetailsIds);
+
+
+
+        $.ajax({
+                type: "POST",
+                url: "@Url.Action("ApproveAllTimeRecordingSheetList", "ApproveTimeRecordingSheet")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    debugger;
+                    var data = response.result[0];
+
+                    AddTableBody(i,CountOfMonth, response.result);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+
+    function AddTableBody(tblId,NoOfDays, TimeSheetRecordingDetails) {
+        debugger;
+        $('#EmpDetailsId_' + tblId+' > tbody').empty();
+        if (NoOfDays != 0) {
+            for (i = 1; i <= NoOfDays; i++) {
+                var DbRecordId = "";
+                var DbEmpIN = "";
+                var DbEmpOut = "";
+                var DbEmpTotal = "";
+                var DbEmpNet = "";
+                var DbEmpBreak = "";
+                var DbPresence = "";
+                var DbDayName = "";
+                var DbisSubmitData = "False";
+                var DbisApproveData = false;
+                for (var item = 0; item < TimeSheetRecordingDetails.length; item++) {
+                    if (i == TimeSheetRecordingDetails[item].dayNo) {
+                        debugger;
+                        DbRecordId = TimeSheetRecordingDetails[item].recTimeSheetDetailsId;
+                        DbEmpIN = TimeSheetRecordingDetails[item].empIn;
+                        DbEmpOut = TimeSheetRecordingDetails[item].empOut;
+                        DbEmpTotal = TimeSheetRecordingDetails[item].total;
+                        DbEmpBreak = TimeSheetRecordingDetails[item].empBreak;
+                        DbEmpNet = TimeSheetRecordingDetails[item].net;
+                        DbPresence = TimeSheetRecordingDetails[item].presence;
+                        DbDayName = TimeSheetRecordingDetails[item].day;
+                        DbisApproveData = TimeSheetRecordingDetails[item].isApprove;
+
+                        var data = '<tr>'
+                            + '<td><input type="checkbox" data-row="' + tblId + '" data-id="chk_' + i + '" onchange="changeCheck(this)" class="cb-element chkchild" /></td>'
+                            + '<td data-rowId="' + i + '" >' + i + '</td>'
+                            + '<td><input type="hidden" id="HiddenRecordId_' + i + '" value="' + DbRecordId + '"><input type="time" id="txtIn_' + i + '" style="color:orangered" name="In" class="form-control" placeholder="IN" value="' + DbEmpIN + '" disabled></td>'
+                            + '<td><input type="time" id="txtOut_' + i + '" name="In" style="color:orangered" value="' + DbEmpOut + '" onblur="calculateTotalTime(' + i + ');" class="form-control" placeholder="Out" disabled></td>'
+                            + '<td><input type="time" id="txtTotal_' + i + '" name="In" style="color:orangered" value="' + DbEmpTotal + '" class="form-control" placeholder="Total" disabled></td>'
+                            + '<td><input type="time" id="txtBreak_' + i + '" name="In" style="color:orangered" class="form-control" onblur="calculateBreakTime(' + i + ');" value="' + DbEmpBreak + '" placeholder="Break" disabled></td>'
+                            + '<td><input type="time" id="txtNet_' + i + '" name="In" style="color:orangered" class="form-control" value="' + DbEmpNet + '" placeholder="Net" disabled></td>'
+                            + '<td><input type="text" id="txtDayName_' + i + '" name="DayName" style="color:orangered" class="form-control" value="' + DbDayName + '" disabled></td>'
+                            + '<td><input type="text" id="txtPrsence_' + i + '" name="txtPrsence" style="color:orangered" class="form-control" value="' + DbPresence + '" disabled></td>'
+                            + '<td><a type="button" href="" id="btnApprove_' + i + '" class="btn btn-primary pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="Approve(' + i + ');"><i id="" class="fa fa-edit"></i> Approve</a></td></tr>'
+
+                        $('#EmpDetailsId_' + tblId).append(data);
+                        if (DbisApproveData == true) {
+                            $('#btnApprove_' + i).attr('disabled', 'disabled');
+                        }
+                        break;
+                    }
+                }
+
+
+
+            }
+        }
+    }
+</script>

@@ -1,0 +1,1007 @@
+﻿
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Add Salary";
+}
+
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+
+<section class="content-header">
+    <h1>
+        Add / Revision Salary
+    </h1>
+
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="box box-default">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="SalaryID" style="border: 1px solid #0000001c;">
+                            <form asp-controller="AddSalary" asp-action="AddSalaryDetails" method="POST">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="txtEmployeeNumber">Employee Code<span style="color:#FF0000;">*</span></label>
+                                                        <input type="hidden" id="ID" name="ID">
+                                                        <input type="hidden" id="txtEmployeeId" name="EmployeeID">
+                                                        <input type="hidden" id="txtVersionNumber" name="VersionNumber">
+                                                        <input type="text" id="txtEmployeeNumber" name="EmployeeNumber" class="form-control" placeholder="Employee Code" onchange="GetEmpDetails()">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="txtEmployeeName">Employee Name</label>
+                                                        <input type="text" id="txtEmployeeName" name="EmployeeName" class="form-control" readonly="" placeholder="Employee Name">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="ddlEmployeeType">Employee Type</label>
+                                                        <input type="text" id="ddlEmployeeType" name="EmployeeType" class="form-control" readonly="" placeholder="Employee Type">
+                                                        @*<select class="form-control select2" id="ddlEmployeeType" name="EmployeeType">
+                                                            <option value="1">Internal</option>
+                                                            <option value="2">External</option>
+                                                        </select>*@
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="ddlGender">Gender</label>
+                                                        <input type="text" id="ddlGender" name="Gender" class="form-control" readonly="" placeholder="Gender">
+                                                        @*<select class="form-control select2" id="ddlGender" name="Gender">
+                                                            <option value="">Male</option>
+                                                            <option value="">Female</option>
+                                                        </select>*@
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="chkPFAvailability">PF Availability</label>
+                                                        <input type="checkbox" id="chkPFAvailability" name="PFAvailability">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="dtDOJ">DOJ</label>
+                                                        <input type="text" id="dtDOJ" name="DOJ" class="form-control" readonly="" placeholder="DOJ">
+                                                        @*<input class="form-control" id="dtDOJ" name="DOJ" type="date">*@
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="dtDOB">DOB</label>
+                                                        <input type="text" id="dtDOB" name="DOB" class="form-control" readonly="" placeholder="DOB">
+                                                        @*<input class="form-control" id="dtDOB" name="DOB" type="date">*@
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="dtLastPayrollProceesedDate">Last Payroll Proceesed Date</label>
+                                                        <input type="text" id="dtLastPayrollProceesedDate" name="LastPayrollProceesedDate" class="form-control" readonly="" placeholder="Last Payroll Proceesed Date">
+                                                        @*<input class="form-control" id="dtLastPayrollProceesedDate" name="LastPayrollProceesedDate" type="date">*@
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="txtLocation">Location</label>
+                                                        <input type="text" id="txtLocation" name="Location" class="form-control" placeholder="Location" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="box-body">
+                                                    <div class="table-responsive" id="divEmpllist">
+                                                        <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="bg-primary"> Salary Item </th>
+                                                                    <th class="bg-primary"> Previous Salary </th>
+                                                                    <th class="bg-primary"> Revised Salary </th>
+                                                                    <th class="bg-primary"> Revision % </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+
+                                                                @*@if (Model != null && Model.Count() > 0)
+                                                            {
+                                                                @foreach (var contact in Model)
+                                                                {*@
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">EARNING COMPONENTS</td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Basic</td>
+                                                                    <td><input type="text" id="txtBasicOld" name="BasicOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtBasic" name="Basic" class="form-control" placeholder="0.00" value="" onchange="CalculateBasicSalary()"></td>
+                                                                    <td><input type="text" id="txtBasicPer" name="BasicPer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">HRA</td>
+                                                                    <td><input type="text" id="txtHRAOld" name="HRAOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtHRA" name="HRA" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtHRAPer" name="HRAPer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Bonus</td>
+                                                                    <td><input type="text" id="txtBonusOld" name="BonusOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtBonus" name="Bonus" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtBonusPer" name="BonusPer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Other Allowance</td>
+                                                                    <td><input type="text" id="txtOtherAllowanceOld" name="OtherAllowanceOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtOtherAllowance" name="OtherAllowance" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtOtherAllowancePer" name="OtherAllowancePer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Overttime</td>
+                                                                    <td><input type="text" id="txtOverttimeOld" name="OverttimeOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtOverttime" name="Overttime" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtOverttimePer" name="OverttimePer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">DEDUCTION COMPONENTS</td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Prof Tax</td>
+                                                                    <td><input type="text" id="txtProfTaxOld" name="ProfTaxOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtProfTax" name="ProfTax" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtProfTaxPer" name="ProfTaxPer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Loan</td>
+                                                                    <td><input type="text" id="txtLoanOld" name="LoanOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtLoan" name="Loan" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtLoanPer" name="LoanPer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Advance Salary</td>
+                                                                    <td><input type="text" id="txtAdvanceSalaryOld" name="AdvanceSalaryOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtAdvanceSalary" name="AdvanceSalary" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtAdvanceSalaryPer" name="AdvanceSalaryPer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Employee Contribution PF</td>
+                                                                    <td><input type="text" id="txtEmployeeContributionPFOld" name="EmployeeContributionPFOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtEmployeeContributionPF" name="EmployeeContributionPF" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtEmployeeContributionPFPer" name="EmployeeContributionPFPer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Employee Contribution ESIC</td>
+                                                                    <td><input type="text" id="txtEmployeeContributionESICOld" name="EmployeeContributionESICOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtEmployeeContributionESIC" name="EmployeeContributionESIC" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtEmployeeContributionESICPer" name="EmployeeContributionESICPer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Employer Contribution PF</td>
+                                                                    <td><input type="text" id="txtEmployerContributionPFOld" name="EmployerContributionPFOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtEmployerContributionPF" name="EmployerContributionPF" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtEmployerContributionPFPer" name="EmployerContributionPFPer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Employer Contribution ESIC</td>
+                                                                    <td><input type="text" id="txtEmployerContributionESICOld" name="EmployerContributionESICOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtEmployerContributionESIC" name="EmployerContributionESIC" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtEmployerContributionESICPer" name="EmployerContributionESICPer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Monthly Net Pay</td>
+                                                                    <td><input type="text" id="txtMonthlyNetPayOld" name="MonthlyNetPayOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtMonthlyNetPay" name="MonthlyNetPay" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtMonthlyNetPayPer" name="MonthlyNetPayPer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Monthly Gross Pay</td>
+                                                                    <td><input type="text" id="txtMonthlyGrossPayOld" name="MonthlyGrossPayOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtMonthlyGrossPay" name="MonthlyGrossPay" class="form-control" placeholder="0.00" value="" onchange="CalculateSalary()"></td>
+                                                                    <td><input type="text" id="txtMonthlyGrossPayPer" name="MonthlyGrossPayPer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Annual Gross Salary</td>
+                                                                    <td><input type="text" id="txtAnnualGrossSalaryOld" name="AnnualGrossSalaryOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtAnnualGrossSalary" name="AnnualGrossSalary" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtAnnualGrossSalaryPer" name="AnnualGrossSalaryPer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="width: 20%; word-wrap:break-word;">Annual Gross CTC</td>
+                                                                    <td><input type="text" id="txtAnnualGrossCTCOld" name="AnnualGrossCTCOld" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtAnnualGrossCTC" name="AnnualGrossCTC" class="form-control" placeholder="0.00" value="" readonly></td>
+                                                                    <td><input type="text" id="txtAnnualGrossCTCPer" name="AnnualGrossCTCPer" class="form-control" placeholder="0.00 %" value="" readonly></td>
+                                                                </tr>
+                                                                @*}
+                                                            }*@
+
+                                                            </tbody>
+                                                            @*<tfoot class="hidden-print">
+                                                            <tr>
+                                                                <th> Salary Item </th>
+                                                                <th> Previous Salary </th>
+                                                                <th> Revised Salary </th>
+                                                                <th> Revision % </th>
+                                                            </tr>
+                                                        </tfoot>*@
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <!-- /.box-body -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="PayoutMonth">Payout Month</label>
+                                                        <select class="form-control select2" id="PayoutMonth" name="PayoutMonth">
+                                                            <option value="1">Jan</option>
+                                                            <option value="2">Feb</option>
+                                                            <option value="3">Mar</option>
+                                                            <option value="4">Apr</option>
+                                                            <option value="5">May</option>
+                                                            <option value="6">Jun</option>
+                                                            <option value="7">Jul</option>
+                                                            <option value="8">Aug</option>
+                                                            <option value="9">Sep</option>
+                                                            <option value="10">Oct</option>
+                                                            <option value="11">Nov</option>
+                                                            <option value="12">Dec</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="txtEffectiveStartDate">Effective Start Date<span style="color:#FF0000;">*</span></label>
+                                                        <input class="form-control" id="txtEffectiveStartDate" name="EffectiveStartDate" type="date">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="txtRemarks">Remarks</label>
+                                                        <textarea id="txtRemarks" name="Remarks" class="form-control" placeholder=""></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="txtEffectiveEndDate">Effective End Date<span style="color:#FF0000;">*</span></label>
+                                                        <input class="form-control" id="dtEffectiveEndDate" name="EffectiveEndDate" type="date">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <div class="col-md-12">
+                                        <button type="button" id="btnNext1" class="btn btn-warning" style="float: right; margin-right: 8%" onclick="Clear(event)">Clear </button>
+                                        <button type="submit" id="btnSave" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="AddSalaryvalidateData(event);">Save</button>
+                                    </div>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:none;">
+                <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+                </button>
+                <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+                </button>
+            </div>
+
+
+            <div class="alert alert-warning fade" id="modal-warning">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4>
+                    <i class="icon fa fa-warning"></i> Alert!
+                </h4>
+
+                <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+                </div>
+
+                <div class="alert-footer">
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+
+
+            <div class="modal modal-warning fade" id="modal-warning2">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">Alert!</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>One fine body&hellip;</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                        </div>
+                    </div>
+                    @*/.modal-content*@
+                </div>
+                @*/.modal-dialog*@
+            </div>
+            <!-- /.modal -->
+
+            <div class="alertS alert-success" id="modal-success" style="display:none;">
+                <button type="button" class="close" aria-hidden="true" onclick="successAlertClose()">&times;</button>
+                <h4><i class="icon fa fa-check"></i> Success </h4>
+
+                <p id="successBody"></p>
+
+            </div>
+
+        </div>
+                    </div>
+</section>
+
+
+<script>
+
+    function CalculateBasicSalary() {
+        event.preventDefault();
+        var MonthlyGrossPay = $("#txtBasic").val();
+        var form_data = new FormData();
+        form_data.append('GrossPay', MonthlyGrossPay);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("CalculateBasicSalary", "AddSalary")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert(response.basic);
+
+                    $("#txtBasic").val(response.basic);
+                    $("#txtHRA").val(response.hra);
+                    $("#txtBonus").val(response.bonus);
+                    //$("#txtOtherAllowance").val(response.otherAllowance);
+                    //$("#txtOverttime").val(response.overttime);
+                    //$("#txtProfTax").val(response.profTax);
+                    //$("#txtLoan").val(response.loan);
+                    //$("#txtAdvanceSalary").val(response.advanceSalary);
+                    //$("#txtEmployeeContributionPF").val(response.employeeContributionPF);
+                    //$("#txtEmployeeContributionESIC").val(response.employeeContributionESIC);
+                    $("#txtEmployerContributionPF").val(response.employerContributionPF);
+                    //$("#txtEmployerContributionESIC").val(response.employerContributionESIC);
+                    //$("#txtMonthlyNetPay").val(response.monthlyNetPay);
+                    //$("#txtAnnualGrossSalary").val(response.annualGrossSalary);
+                    //$("#txtAnnualGrossCTC").val(response.annualGrossCTC);
+
+
+                    //alert(response);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function CalculateSalary() {
+        event.preventDefault();
+        var MonthlyGrossPay = $("#txtMonthlyGrossPay").val();
+        var form_data = new FormData();
+        form_data.append('GrossPay', MonthlyGrossPay);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("CalculateSalary", "AddSalary")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert(response.basic);
+                    var NewVal = 0;
+                    var IncreasePer = 0;
+                    var OldVal = 0;
+
+                    $("#txtBasic").val(response.basic);
+                    OldVal = $("#txtBasicOld").val();
+                    NewVal = response.basic - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtBasicPer").val(IncreasePer.toFixed(2));
+
+                    $("#txtHRA").val(response.hra);
+                    OldVal = $("#txtHRAOld").val();
+                    NewVal = response.hra - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtHRAPer").val(IncreasePer.toFixed(2));
+
+                    $("#txtBonus").val(response.bonus);
+                    OldVal = $("#txtBonusOld").val();
+                    NewVal = response.bonus - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtBonusPer").val(IncreasePer.toFixed(2));
+
+                    $("#txtOtherAllowance").val(response.otherAllowance);
+                    OldVal = $("#txtOtherAllowanceOld").val();
+                    NewVal = response.otherAllowance - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtOtherAllowancePer").val(IncreasePer.toFixed(2));
+
+                    $("#txtOverttime").val(response.overttime);
+                    OldVal = $("#txtOverttimeOld").val();
+                    NewVal = response.overttime - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtOverttimePer").val(IncreasePer.toFixed(2));
+
+                    $("#txtProfTax").val(response.profTax);
+                    OldVal = $("#txtProfTaxOld").val();
+                    NewVal = response.profTax - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtProfTaxPer").val(IncreasePer.toFixed(2));
+
+                    $("#txtLoan").val(response.loan);
+                    OldVal = $("#txtLoanOld").val();
+                    NewVal = response.loan - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtLoanPer").val(IncreasePer.toFixed(2));
+
+                    $("#txtAdvanceSalary").val(response.advanceSalary);
+                    OldVal = $("#txtAdvanceSalaryOld").val();
+                    NewVal = response.advanceSalary - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtAdvanceSalaryPer").val(IncreasePer.toFixed(2));
+
+                    $("#txtEmployeeContributionPF").val(response.employeeContributionPF);
+                    OldVal = $("#txtEmployeeContributionPFOld").val();
+                    NewVal = response.employeeContributionPF - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtEmployeeContributionPFPer").val(IncreasePer.toFixed(2));
+
+                    $("#txtEmployeeContributionESIC").val(response.employeeContributionESIC);
+                    OldVal = $("#txtEmployeeContributionESICOld").val();
+                    NewVal = response.employeeContributionESIC - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtEmployeeContributionESICPer").val(IncreasePer.toFixed(2));
+
+                    $("#txtEmployerContributionPF").val(response.employerContributionPF);
+                    OldVal = $("#txtEmployerContributionPFOld").val();
+                    NewVal = response.employerContributionPF - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtEmployerContributionPFPer").val(IncreasePer.toFixed(2));
+
+                    $("#txtEmployerContributionESIC").val(response.employerContributionESIC);
+                    OldVal = $("#txtEmployerContributionESICOld").val();
+                    NewVal = response.employerContributionESIC - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtEmployerContributionESICPer").val(IncreasePer.toFixed(2));
+
+                    $("#txtMonthlyNetPay").val(response.monthlyNetPay);
+                    OldVal = $("#txtMonthlyNetPayOld").val();
+                    NewVal = response.monthlyNetPay - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtMonthlyNetPayPer").val(IncreasePer.toFixed(2));
+
+                    $("#txtAnnualGrossSalary").val(response.annualGrossSalary);
+                    OldVal = $("#txtAnnualGrossSalaryOld").val();
+                    NewVal = response.annualGrossSalary - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtAnnualGrossSalaryPer").val(IncreasePer.toFixed(2));
+
+                    $("#txtAnnualGrossCTC").val(response.annualGrossCTC);
+                    OldVal = $("#txtAnnualGrossCTCOld").val();
+                    NewVal = response.annualGrossCTC - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtAnnualGrossCTCPer").val(IncreasePer.toFixed(2));
+
+                    OldVal = $("#txtMonthlyGrossPayOld").val();
+                    NewVal = MonthlyGrossPay - OldVal;
+                    IncreasePer = ((NewVal / OldVal) * 100);
+                    IncreasePer = isNaN(IncreasePer) ? 0 : IncreasePer;
+                    $("#txtMonthlyGrossPayPer").val(IncreasePer.toFixed(2));
+
+
+                    //alert(response);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function GetEmpDetails() {
+        event.preventDefault();
+        var EmployeeNo = $("#txtEmployeeNumber").val();
+        var form_data = new FormData();
+        form_data.append('EmpNo', EmployeeNo);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetEmpName", "AddSalary")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert(response[0].dateOfJoining);
+                    //alert(response[0].dateOfBirth);
+                    //alert(response[0].pfIsApplicable);
+
+                    $("#txtEmployeeName").val(response[0].firstName + ' ' + response[0].lastName);
+                    $("#txtEmployeeId").val(response[0].employeeId);
+                    $("#dtDOJ").val(response[0].dateOfJoining);
+                    $("#dtDOB").val(response[0].dateOfBirth);
+                    $("#ddlGender").val(response[0].gender);
+                    $("#txtLocation").val(response[0].location);
+                    if (response[0].pfIsApplicable == true) {
+                        $("#chkPFAvailability").prop("checked", true);
+                    } else {
+                        $("#chkPFAvailability").prop("checked", false);
+                    }
+                    $("#txtVersionNumber").val(response[0].versionNumber);
+                    $("#txtBasicOld").val(response[0].basic);
+                    $("#txtHRAOld").val(response[0].hra);
+                    $("#txtBonusOld").val(response[0].bonus);
+                    $("#txtOtherAllowanceOld").val(response[0].otherAllowance);
+                    $("#txtOverttimeOld").val(response[0].overttime);
+                    $("#txtProfTaxOld").val(response[0].profTax);
+                    $("#txtLoanOld").val(response[0].loan);
+                    $("#txtAdvanceSalaryOld").val(response[0].advanceSalary);
+                    $("#txtEmployeeContributionPFOld").val(response[0].employeeContributionPF);
+                    $("#txtEmployeeContributionESICOld").val(response[0].employeeContributionESIC);
+                    $("#txtEmployerContributionPFOld").val(response[0].employerContributionPF);
+                    $("#txtEmployerContributionESICOld").val(response[0].employerContributionESIC);
+                    $("#txtMonthlyNetPayOld").val(response[0].monthlyNetPay);
+                    $("#txtMonthlyGrossPayOld").val(response[0].monthlyGrossPay);
+                    $("#txtAnnualGrossSalaryOld").val(response[0].annualGrossSalary);
+                    $("#dtLastPayrollProceesedDate").val("01-01-2022");
+                    $("#txtAnnualGrossCTCOld").val(response[0].annualGrossCTC);
+                    //alert(response);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function SearchRecord(ID) {
+        event.preventDefault();
+        var form_data = new FormData();
+        form_data.append('EMPPFID', ID);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SearchRecord", "EmpPFESICDetails")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+
+                    $("#ID").val(response[0].id);
+                    $("#txtEmployeeId").val(response[0].employeeId);
+                    $("#txtEmployeeNumber").val(response[0].employeeNumber);
+                    $("#txtEmployeeName").val(response[0].employeeName);
+                    $("#ddlBankID").val(response[0].bankID);
+                    $("#txtBankBranch").val(response[0].bankBranch);
+                    $("#ddlAccountTypeID").val(response[0].accountTypeID);
+                    $("#txtAccountNo").val(response[0].accountNo);
+                    $("#txtIFSCCode").val(response[0].iFSCCode);
+                    $("#txtEmployeeNameAsBankRecords").val(response[0].employeeNameAsBankRecords);
+                    $("#txtIBAN").val(response[0].iBAN);
+                    $("#ddlPaymentMethod").val(response[0].paymentMethod);
+                    $("#txtESICIsApplicable").val(response[0].eSICIsApplicable);
+                    $("#txtESICAccountNo").val(response[0].eSICAccountNo);
+                    $("#chkPFIsApplicable").val(response[0].pFIsApplicable);
+                    $("#chkAllowEPFExcessContribution").val(response[0].allowEPFExcessContribution);
+                    $("#chkAllowEPSExcessContribution").val(response[0].allowEPSExcessContribution);
+                    $("#txtPFAccountNo").val(response[0].pFAccountNo);
+                    $("#txtUAN").val(response[0].uan);
+                    $("#txtStartDate").val(response[0].startDate);
+
+                    document.getElementById("successBody").innerHTML = "Record Search Success";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+                    //alert(response);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+
+    function SalaryDataDelete(ID) {
+        var form_data = new FormData();
+        form_data.append('SalaryID', ID);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("DeleteRecordSalary", "EmpPFESICDetails")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function successAlertClose(event) {
+        document.getElementById("modal-success").style.display = "none";
+    }
+
+</script>
+
+@section Scripts {
+
+    <!-- DataTables -->
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/dataTables.buttons.min.js"></script>
+    @*<script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"></script>*@
+
+    <script src="~/bower_components/datatables.net-export/jszip.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/pdfmake.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/vfs_fonts.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.html5.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.print.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.colVis.min.js"></script>
+    <!-- Export plugin -->
+    <script type="text/javascript" src="~/lib/hhurz/libs/FileSaver/FileSaver.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/js-xlsx/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.min.js"></script>
+    @*<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.15.4/extensions/print/bootstrap-table-print.js"></script>*@
+
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+        window.onload = function () {
+             document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+              };
+        </script>
+    }
+
+    <script>
+
+        $(document).ready(function () {
+            $("#liAttendance").addClass("active");
+            $("#liAttandancePolicy").addClass("active");
+            document.getElementById("liAttandancePolicy").style.backgroundColor = "#3c8dbc45";
+        });
+        function AddSalaryvalidateData(event) {
+            var IsAnyEmpty = false;
+            var alertMsg = "";
+
+            alert('num ' + document.getElementById("txtEmployeeNumber").value);
+            if (document.getElementById("txtEmployeeNumber").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = "Employee Number <br />";
+            }
+
+            alert('gross ' + document.getElementById("txtMonthlyGrossPay").value);
+            if (document.getElementById("txtMonthlyGrossPay").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = "Monthly Gross Pay <br />";
+            }
+
+            alert('Basic ' + document.getElementById("txtBasic").value);
+            if (document.getElementById("txtBasic").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Basic <br />";
+            }
+            alert('Start date ' + document.getElementById("txtEffectiveStartDate").value);
+            if (document.getElementById("txtEffectiveStartDate").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Effective Start Date <br />";
+            }
+
+            alert('End date ' + document.getElementById("txtEffectiveEndDate").value);
+            if (document.getElementById("txtEffectiveEndDate").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Effective End Date <br />";
+            }
+
+            //if (document.getElementById("ddlGender").value == "") {
+            //    IsAnyEmpty = true;
+            //    alertMsg = alertMsg + "Gender <br />";
+            //}
+
+            //if (document.getElementById("dtDOJ").value == "") {
+            //    IsAnyEmpty = true;
+            //    alertMsg = alertMsg + "DOJ <br />";
+            //}
+
+            //if (document.getElementById("ddlDOB").value == "") {
+            //    IsAnyEmpty = true;
+            //    alertMsg = alertMsg + "DOB <br />";
+            //}
+
+            //if (document.getElementById("dtLastPayrollProceesedDate").value == "") {
+            //    IsAnyEmpty = true;
+            //    alertMsg = alertMsg + "Last Payroll Proceesed Date <br />";
+            //}
+
+            //if (document.getElementById("txtLocation").value == "") {
+            //    IsAnyEmpty = true;
+            //    alertMsg = alertMsg + "Location <br />";
+            //}
+
+            if (IsAnyEmpty) {
+
+                event.preventDefault();
+
+                document.getElementById("btnAlert").click();
+
+                $('#alertBody').html('<p>' + alertMsg + '<br /> can not be empty </p>');
+                debugger;
+
+                IsAnyEmpty = true;
+            }
+
+            return IsAnyEmpty;
+
+            function successAlertClose(event) {
+                document.getElementById("modal-success").style.display = "none";
+            }
+        }
+        function Clear() {
+
+            document.getElementById("txtEmployeeNumber").value = null;
+            document.getElementById("txtEmployeeName").value = null;
+
+            document.getElementById("txtPayrollMonth").value = null;
+            document.getElementById("dtEffectiveDateFrom").value = null;
+            document.getElementById("txtAmount").value = null;
+
+            document.getElementById("txtRemarks").value = null;
+
+        }
+
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#liEmployee").addClass("active");
+            $("#liEmployeeList").addClass("active");
+            document.getElementById("liEmployeeList").style.backgroundColor = "#3c8dbc45";
+
+            //// Setup - add a text input to each footer cell
+            //$('#tblPolicyList tfoot th').each(function (i) {
+            //    var title = $('#tblPolicyList thead th').eq($(this).index()).text();
+            //    $(this).html('<input type="text" placeholder="Search ' + title + '" data-index="' + i + '" />');
+            //});
+
+
+            // DataTable
+            @* scrollY: "300px",*@
+            var table = $('#tblArrearsList').DataTable({
+                "scrollX": true,
+                "scrollY": true,
+                "scrollCollapse": true,
+                "paging": true,
+                "fixedColumns": true,
+                "fixedHeader": true,
+                "bLengthChange": true,
+                "Filter": true,
+                "Info": true,
+                "pagingType": "full_numbers",
+                "pageLength": 10,
+                "pageList": "[10, 25, 50, 100, 200, All]",
+                "dom": 'Bfrtip',
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-copy"></i>'
+                    },
+                    {
+                        extend: 'excel',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-excel-o"></i>'
+                    },
+                    {
+                        extend: 'pdf',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-pdf-o"></i>'
+                    },
+                    {
+                        extend: 'csv',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-csv-o"></i>'
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-print"></i>'
+                    }
+                ],
+            });
+
+
+            // Filter event handler
+            $(table.table().container()).on('keyup', 'tfoot input', function () {
+                table
+                    .column($(this).data('index'))
+                    .search(this.value)
+                    .draw();
+            });
+        });
+
+        @*$(function () {
+            $('#tblEmpList').DataTable();
+        })*@
+
+
+        $("#btnExport").click(function (e) {
+            //alert("excel");
+            //window.open('data:application/vnd.ms-excel,' + $('#divJoinerslist').dataTable.html());
+            $('#tblArrearsList').tableExport({ type: 'excel'});
+            @*$('#tblEmpList').tableExport({ type: 'csv' });*@
+            @*$('tblEmpList').tableExport({
+                type: 'excel',
+                mso: {
+                    fileFormat: 'excel',
+                    worksheetName: ['Table 1', 'Table 2', 'Table 3']
+                }
+            });*@
+
+            @*$('tblEmpList').tableExport({
+                type: 'excel',
+                mso: {
+                    fileFormat: 'xmlss',
+                    worksheetName: ['Table 1', 'Table 2', 'Table 3']
+                }
+            });*@
+            e.preventDefault();
+        });
+
+        $("#btnpDF").click(function (e) {
+            //PDF
+            $('#tblArrearsList').tableExport({
+                type: 'pdf',
+                jspdf: {
+                    orientation: 'l',
+                    format: 'a4',
+                    margins: { left: 10, right: 10, top: 20, bottom: 20 },
+                    autotable: {
+                        styles: {
+                            fillColor: 'inherit',
+                            textColor: 'inherit'
+                        },
+                        tableWidth: 'auto'
+                    }
+                }
+            });
+            e.preventDefault();
+        });
+
+        $("#btnPrint").click(function (e) {
+            //Print
+            var table = document.getElementById('tblArrearsList');
+            table.button('.buttons-print').trigger();
+            //var win = window.open('', '', 'height=700,width=700');
+            //window.document.write(tab.outerHTML);
+            //window.document.print();
+            //window.print();
+            //window.document.close();
+
+            //window.print();
+
+            //e.preventDefault();
+        });
+
+    </script>
+}

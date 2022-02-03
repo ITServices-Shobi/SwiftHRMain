@@ -1,0 +1,820 @@
+﻿@model SwiftHR.Utility.EmpPFESICDetailsUtility
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Add Employee Bank ESIC PF";
+}
+
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+
+<section class="content-header">
+    <h1>
+        Add Employee Bank/ESIC/PF
+    </h1>
+
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="box box-default">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="EMPPFID" style="border: 1px solid #0000001c;">
+                            <form asp-controller="EmpPFESICDetails" asp-action="AddPFESICDetails" method="POST">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtFName">Employee Code<span style="color:#FF0000;">*</span></label>
+                                                <input type="hidden" id="ID" name="ID">
+                                                <input type="hidden" id="txtEmployeeId" name="EmployeeID">
+                                                <input type="text" id="txtEmployeeNumber" name="EmployeeNumber" class="form-control" placeholder="Employee Code" onchange="GetEmpDetails()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtEmployeeName">Employee Name<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtEmployeeName" name="EmployeeName" class="form-control" readonly="" placeholder="Employee Name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box-group" id="accordion">
+                                    <!-- we are adding the .panel class so bootstrap.js collapse plugin detects it -->
+
+                                    <div id="divPanelBox1" class="panel box" style="border-top: none !important;">
+                                        <div class="box-header">
+                                            <h4 class="box-title">
+                                                Bank Details
+                                            </h4>
+                                            <div class="box-tools pull-right">
+                                                <button id="btnPToggle1" type="button" class="btn btn-box-tool" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" title="Collapse" onclick="onToggle(this)">
+                                                    <i id="iconPToggle1" class="fa fa-minus"></i>
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                        <div id="collapseOne" class="panel-collapse collapse in">
+                                            <hr style="border-top: 1px solid #d2d6de;" />
+                                            <div class="box-body">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="row">
+                                                            <div class="col-md-4">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="ddlBankID">Bank Name<span style="color:#FF0000;">*</span></label>
+                                                                        <select class="form-control select2" id="ddlBankID" name="BankID">
+                                                                            <option value="1">SBI</option>
+                                                                            <option value="2">ICICI</option>
+                                                                            <option value="3">HDFC</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="txtBankBranch">Bank Branch<span style="color:#FF0000;">*</span></label>
+                                                                        <input type="text" id="txtBankBranch" name="BankBranch" class="form-control" placeholder="Bank Branch">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="ddlAccountTypeID">Account Type<span style="color:#FF0000;">*</span></label>
+                                                                        <select class="form-control select2" id="ddlAccountTypeID" name="AccountTypeID">
+                                                                            <option value="1">Saving</option>
+                                                                            <option value="2">Fixed</option>
+                                                                            <option value="3">Current</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="row">
+                                                            <div class="col-md-4">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="txtAccountNo">Account No<span style="color:#FF0000;">*</span></label>
+                                                                        <input type="text" id="txtAccountNo" name="AccountNo" class="form-control" placeholder="Account Number">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="txtIFSCCode">IFSC Code</label>
+                                                                        <input type="text" id="txtIFSCCode" name="IFSCCode" class="form-control" readonly="" placeholder="IFSC Code">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="txtEmployeeNameAsBankRecords">Employee Name As Bank Records</label>
+                                                                        <input type="text" id="txtEmployeeNameAsBankRecords" name="EmployeeNameAsBankRecords" class="form-control" readonly="" placeholder="Employee Name As Bank Records">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="row">
+                                                            <div class="col-md-4">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="txtIBAN">IBAN</label>
+                                                                        <input type="text" id="txtIBAN" name="IBAN" class="form-control" readonly="" placeholder="IBAN">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="ddlPaymentMethod">Payment Method</label>
+                                                                        <select class="form-control select2" id="ddlPaymentMethod" name="PaymentMethod">
+                                                                            <option value="1">Cash</option>
+                                                                            <option value="2">Cheque</option>
+                                                                            <option value="3">Bank Transfer</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="divPanelBox2" class="panel box" style="border-top: none !important;">
+                                        <div class="box-header">
+                                            <h4 class="box-title">
+                                                ESIC Details
+                                            </h4>
+                                            <input type="hidden" id="hndCallingView1" name="CallingView1" class="form-control">
+                                            <div class="box-tools pull-right">
+                                                <button id="btnPToggle2" type="button" class="btn btn-box-tool" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" title="Expand" onclick="onToggle(this)">
+                                                    <i id="iconPToggle2" class="fa fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div id="collapseTwo" class="panel-collapse collapse">
+                                            <hr style="border-top: 1px solid #d2d6de;" />
+                                            <div class="box-body" style="margin-top: -3%;">
+
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="chkESICIsApplicable">ESIC Is Applicable</label>
+                                                                        <input type="checkbox" id="chkESICIsApplicable" name="ESICIsApplicable">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="txtESICAccountNo">ESIC Account No</label>
+                                                                        <input type="text" id="txtESICAccountNo" name="ESICAccountNo" class="form-control" readonly="" placeholder="ESIC Account Number">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="panel box" id="divPanelBox3" style="border-top: none !important;">
+                                        <div class="box-header">
+                                            <h4 class="box-title">
+                                                PF Details
+                                            </h4>
+                                            <div class="box-tools pull-right">
+                                                <button id="btnPToggle3" type="button" class="btn btn-box-tool" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" title="Expand" onclick="onToggle(this)">
+                                                    <i id="iconPToggle3" class="fa fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div id="collapseThree" class="panel-collapse collapse">
+                                            <hr style="border-top: 1px solid #d2d6de;" />
+                                            <div class="box-body">
+
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="row">
+                                                            <div class="col-md-4">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="txtFName">PF Is Applicable</label>
+                                                                        <input type="checkbox" id="chkPFIsApplicable" name="PFIsApplicable">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="txtFName">Allow EPF Excess Contribution</label>
+                                                                        <input type="checkbox" id="chkAllowEPFExcessContribution" name="AllowEPFExcessContribution">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="txtFName">Allow EPS Excess Contribution</label>
+                                                                        <input type="checkbox" id="chkAllowEPSExcessContribution" name="AllowEPSExcessContribution">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="row">
+                                                            <div class="col-md-4">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="txtPFAccountNo">PF Account No</label>
+                                                                        <input type="text" id="txtPFAccountNo" name="PFAccountNo" class="form-control" readonly="" placeholder="PF Account Number">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="txtUAN">UAN</label>
+                                                                        <input type="text" id="txtUAN" name="UAN" class="form-control" readonly="" placeholder="ESIC Account Number">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="box-body">
+                                                                    <div class="form-group">
+                                                                        <label for="txtFName">Start Date</label>
+                                                                        <input type="text" id="txtESICAccountNo" name="ESICAccountNo" class="form-control" readonly="" placeholder="ESIC Account Number">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @*<div class="box-footer">
+                                            <button type="submit" id="btnSaveAll" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="validateData(event);"> Save All </button>
+                                        </div>*@
+
+                                </div>
+
+                                <div class="box-footer">
+                                    <div class="col-md-12">
+                                        <button type="button" id="btnNext1" class="btn btn-warning" style="float: right; margin-right: 8%" onclick="Clear(event)">Clear </button>
+                                        <button type="submit" id="btnSave" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="PFESICvalidateData(event);">Save</button>
+                                    </div>
+                                </div>
+                                
+                                @if (ViewBag.PFESICList != null)
+                                {
+                                    if (ViewBag.PFESICList.Count > 0)
+                                    {
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divArrearslist">
+
+                                                <table id="tblArrearsList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    @if (ViewBag.PFESICList != null)
+                                                    {
+                                                        IEnumerable<SwiftHR.Models.EmpPFESICDetails> d = new List<SwiftHR.Models.EmpPFESICDetails>();
+                                                        d = ViewBag.PFESICList;
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="bg-primary"> Employee No</th>
+                                                                <th class="bg-primary"> Employee</th>
+                                                                <th class="bg-primary"> Bank Name</th>
+                                                                <th class="bg-primary"> Bank Branch</th>
+                                                                <th class="bg-primary"> Account Type</th>
+                                                                <th class="bg-primary"> Account No</th>
+                                                                <th class="bg-primary"> ESIC Account No</th>
+                                                                <th class="bg-primary"> PF Account No</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var data in d)
+                                                            {
+                                                            <tr id="@data.ID">
+                                                                <td>
+                                                                    @Html.DisplayFor(modelItem => data.EmployeeNumber)
+                                                                </td>
+                                                                <td>@Html.DisplayFor(modelItem => data.EmployeeName) </td>
+                                                                <td>@Html.DisplayFor(modelItem => data.BankName) </td>
+                                                                <td>@Html.DisplayFor(modelItem => data.BankBranch) </td>
+                                                                <td>@Html.DisplayFor(modelItem => data.AccountTypeID) </td>
+                                                                <td>@Html.DisplayFor(modelItem => data.AccountNo) </td>
+                                                                <td>@Html.DisplayFor(modelItem => data.ESICAccountNo) </td>
+                                                                <td>@Html.DisplayFor(modelItem => data.PFAccountNo) </td>
+                                                                
+                                                            </tr>
+                                                            }
+                                                        </tbody>
+                                                        <tfoot class="hidden-print">
+                                                            <tr>
+                                                                <th> Employee No</th>
+                                                                <th> Employee</th>
+                                                                <th> Bank Name</th>
+                                                                <th> Bank Branch</th>
+                                                                <th> Account Type</th>
+                                                                <th> Account No</th>
+                                                                <th> ESIC Account No</th>
+                                                                <th> PF Account No</th>
+                                                            </tr>
+                                                        </tfoot>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:none;">
+                <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+                </button>
+                <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+                </button>
+            </div>
+
+
+            <div class="alert alert-warning fade" id="modal-warning">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4>
+                    <i class="icon fa fa-warning"></i> Alert!
+                </h4>
+
+                <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+                </div>
+
+                <div class="alert-footer">
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+
+
+            <div class="modal modal-warning fade" id="modal-warning2">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">Alert!</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>One fine body&hellip;</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                        </div>
+                    </div>
+                    @*/.modal-content*@
+                </div>
+                @*/.modal-dialog*@
+            </div>
+            <!-- /.modal -->
+
+            <div class="alertS alert-success" id="modal-success" style="display:none;">
+                <button type="button" class="close" aria-hidden="true" onclick="successAlertClose()">&times;</button>
+                <h4><i class="icon fa fa-check"></i> Success </h4>
+
+                <p id="successBody"></p>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    function GetEmpDetails() {
+        event.preventDefault();
+        var EmployeeNo = $("#txtEmployeeNumber").val();
+        var form_data = new FormData();
+        form_data.append('EmpNo', EmployeeNo);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetEmpName", "EmpPFESICDetails")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+                    debugger;
+                    $("#txtEmployeeName").val(response[0].firstName + ' ' + response[0].middleName + ' ' + response[0].lastName);
+                    $("#txtEmployeeId").val(response[0].employeeId);
+                    //alert(response);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function SearchRecord(ID) {
+        event.preventDefault();
+        var form_data = new FormData();
+        form_data.append('EMPPFID', ID);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SearchRecord", "EmpPFESICDetails")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+                    
+                    $("#ID").val(response[0].id);
+                    $("#txtEmployeeId").val(response[0].employeeId);
+                    $("#txtEmployeeNumber").val(response[0].employeeNumber);
+                    $("#txtEmployeeName").val(response[0].employeeName);
+                    $("#ddlBankID").val(response[0].bankID);
+                    $("#txtBankBranch").val(response[0].bankBranch);
+                    $("#ddlAccountTypeID").val(response[0].accountTypeID);
+                    $("#txtAccountNo").val(response[0].accountNo);
+                    $("#txtIFSCCode").val(response[0].iFSCCode);
+                    $("#txtEmployeeNameAsBankRecords").val(response[0].employeeNameAsBankRecords);
+                    $("#txtIBAN").val(response[0].iBAN);
+                    $("#ddlPaymentMethod").val(response[0].paymentMethod);
+                    $("#txtESICIsApplicable").val(response[0].eSICIsApplicable);
+                    $("#txtESICAccountNo").val(response[0].eSICAccountNo);
+                    $("#chkPFIsApplicable").val(response[0].pFIsApplicable);
+                    $("#chkAllowEPFExcessContribution").val(response[0].allowEPFExcessContribution);
+                    $("#chkAllowEPSExcessContribution").val(response[0].allowEPSExcessContribution);
+                    $("#txtPFAccountNo").val(response[0].pFAccountNo);
+                    $("#txtUAN").val(response[0].uan);
+                    $("#txtStartDate").val(response[0].startDate);
+
+                    document.getElementById("successBody").innerHTML = "Record Search Success";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+                    //alert(response);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+
+    function ArrearsDataDelete(ID) {
+        var form_data = new FormData();
+        form_data.append('EMPPFID', ID);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("DeleteRecordPFESIC", "EmpPFESICDetails")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function successAlertClose(event) {
+        document.getElementById("modal-success").style.display = "none";
+    }
+
+</script>
+
+@section Scripts {
+
+    <!-- DataTables -->
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/dataTables.buttons.min.js"></script>
+    @*<script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"></script>*@
+
+    <script src="~/bower_components/datatables.net-export/jszip.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/pdfmake.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/vfs_fonts.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.html5.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.print.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.colVis.min.js"></script>
+    <!-- Export plugin -->
+    <script type="text/javascript" src="~/lib/hhurz/libs/FileSaver/FileSaver.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/js-xlsx/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.min.js"></script>
+    @*<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.15.4/extensions/print/bootstrap-table-print.js"></script>*@
+
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+        window.onload = function () {
+             document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+              };
+        </script>
+    }
+
+    <script>
+
+        $(document).ready(function () {
+            $("#liAttendance").addClass("active");
+            $("#liAttandancePolicy").addClass("active");
+            document.getElementById("liAttandancePolicy").style.backgroundColor = "#3c8dbc45";
+        });
+        function PFESICvalidateData(event) {
+            var IsAnyEmpty = false;
+            var alertMsg = "";
+
+            if (document.getElementById("txtEmployeeNumber").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = "Employee Number <br />";
+            }
+
+
+            if (document.getElementById("ddlBankID").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Bank <br />";
+            }
+
+            if (document.getElementById("txtBankBranch").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Bank Branch <br />";
+            }
+
+            if (document.getElementById("ddlAccountTypeID").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Account Type <br />";
+            }
+
+            if (document.getElementById("txtAccountNo").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Account No <br />";
+            }
+
+            if (IsAnyEmpty) {
+
+                event.preventDefault();
+
+                document.getElementById("btnAlert").click();
+
+                $('#alertBody').html('<p>' + alertMsg + '<br /> can not be empty </p>');
+                debugger;
+
+                IsAnyEmpty = true;
+            }
+
+            return IsAnyEmpty;
+
+            function successAlertClose(event) {
+                document.getElementById("modal-success").style.display = "none";
+            }
+        }
+        function Clear() {
+
+            document.getElementById("txtEmployeeNumber").value = null;
+            document.getElementById("txtEmployeeName").value = null;
+
+            document.getElementById("txtPayrollMonth").value = null;
+            document.getElementById("dtEffectiveDateFrom").value = null;
+            document.getElementById("txtAmount").value = null;
+
+            document.getElementById("txtRemarks").value = null;
+
+        }
+
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#liEmployee").addClass("active");
+            $("#liEmployeeList").addClass("active");
+            document.getElementById("liEmployeeList").style.backgroundColor = "#3c8dbc45";
+
+            //// Setup - add a text input to each footer cell
+            //$('#tblPolicyList tfoot th').each(function (i) {
+            //    var title = $('#tblPolicyList thead th').eq($(this).index()).text();
+            //    $(this).html('<input type="text" placeholder="Search ' + title + '" data-index="' + i + '" />');
+            //});
+
+
+            // DataTable
+            @* scrollY: "300px",*@
+            var table = $('#tblArrearsList').DataTable({
+                "scrollX": true,
+                "scrollY": true,
+                "scrollCollapse": true,
+                "paging": true,
+                "fixedColumns": true,
+                "fixedHeader": true,
+                "bLengthChange": true,
+                "Filter": true,
+                "Info": true,
+                "pagingType": "full_numbers",
+                "pageLength": 10,
+                "pageList": "[10, 25, 50, 100, 200, All]",
+                "dom": 'Bfrtip',
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-copy"></i>'
+                    },
+                    {
+                        extend: 'excel',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-excel-o"></i>'
+                    },
+                    {
+                        extend: 'pdf',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-pdf-o"></i>'
+                    },
+                    {
+                        extend: 'csv',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-csv-o"></i>'
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-print"></i>'
+                    }
+                ],
+            });
+
+
+            // Filter event handler
+            $(table.table().container()).on('keyup', 'tfoot input', function () {
+                table
+                    .column($(this).data('index'))
+                    .search(this.value)
+                    .draw();
+            });
+        });
+
+        @*$(function () {
+            $('#tblEmpList').DataTable();
+        })*@
+
+
+        $("#btnExport").click(function (e) {
+            //alert("excel");
+            //window.open('data:application/vnd.ms-excel,' + $('#divJoinerslist').dataTable.html());
+            $('#tblArrearsList').tableExport({ type: 'excel'});
+            @*$('#tblEmpList').tableExport({ type: 'csv' });*@
+            @*$('tblEmpList').tableExport({
+                type: 'excel',
+                mso: {
+                    fileFormat: 'excel',
+                    worksheetName: ['Table 1', 'Table 2', 'Table 3']
+                }
+            });*@
+
+            @*$('tblEmpList').tableExport({
+                type: 'excel',
+                mso: {
+                    fileFormat: 'xmlss',
+                    worksheetName: ['Table 1', 'Table 2', 'Table 3']
+                }
+            });*@
+            e.preventDefault();
+        });
+
+        $("#btnpDF").click(function (e) {
+            //PDF
+            $('#tblArrearsList').tableExport({
+                type: 'pdf',
+                jspdf: {
+                    orientation: 'l',
+                    format: 'a4',
+                    margins: { left: 10, right: 10, top: 20, bottom: 20 },
+                    autotable: {
+                        styles: {
+                            fillColor: 'inherit',
+                            textColor: 'inherit'
+                        },
+                        tableWidth: 'auto'
+                    }
+                }
+            });
+            e.preventDefault();
+        });
+
+        $("#btnPrint").click(function (e) {
+            //Print
+            var table = document.getElementById('tblArrearsList');
+            table.button('.buttons-print').trigger();
+            //var win = window.open('', '', 'height=700,width=700');
+            //window.document.write(tab.outerHTML);
+            //window.document.print();
+            //window.print();
+            //window.document.close();
+
+            //window.print();
+
+            //e.preventDefault();
+        });
+
+    </script>
+}

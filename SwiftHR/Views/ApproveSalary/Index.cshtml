@@ -1,0 +1,361 @@
+﻿@model SwiftHR.Utility.AddSalaryUtility
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Approve Salary";
+    int i;
+    IEnumerable<SwiftHR.Models.SalaryHeader> A = new List<SwiftHR.Models.SalaryHeader>();
+
+}
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+
+<link rel="stylesheet" href="~/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="~/css/site.css" />
+<section class="content-header">
+    <h1>
+        Apprved Salary
+    </h1>
+</section>
+
+<section class="content">
+    <div class="alertS alert-success" id="modal-success" style="display:none;">
+        <button type="button" class="close" aria-hidden="true" onclick="successAlertClose(event)">&times;</button>
+        <h4><i class="icon fa fa-check"></i> Success </h4>
+        <p id="successBody"></p>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="MonthDetailsId" class="table table-bordered table-striped dt-responsive nowrap table-hover" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th class="bg-primary">Expand</th>
+                                <th class="bg-primary">Employee Name</th>
+                                <th class="bg-primary">DOJ</th>
+                                <th class="bg-primary">DOB</th>
+                                <th class="bg-primary">Last Process Date</th>
+                                <th class="bg-primary">Payout Month</th>
+                                <th class="bg-primary">Effective Start Date</th>
+                                <th class="bg-primary">Effective End Date</th>
+                                <th class="bg-primary">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-warning fade" id="modal-warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4>
+            <i class="icon fa fa-warning"></i> Alert!
+        </h4>
+
+        <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+        </div>
+
+        <div class="alert-footer">
+            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+        </div>
+    </div>
+
+    <div class="modal modal-warning fade" id="modal-warning2">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Alert!</h4>
+                </div>
+                <div class="modal-body">
+                    <p>One fine body&hellip;</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+            @*/.modal-content*@
+        </div>
+        @*/.modal-dialog*@
+    </div>
+</section>
+<script>
+    function LoadSalaryData() {
+
+        debugger;
+                 $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetListOfSalaryHeader", "ApproveSalary")",
+             processData: false,
+             contentType: false,
+             async: false,
+             cache: false,
+
+             datatype:"json",
+             success: function (Result) {
+                 debugger;
+
+                 if (Result.result.length > 0) {
+                     var data = Result.result[0];
+                     AddSalaryHeaderTableBody(Result.result.length, Result.result);
+                 }
+
+                 //var obj = XML2jsobj(response.result.responseXML.documentElement);
+                 //alert(obj);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function AddSalaryHeaderTableBody(SalaryHeaderlen, EmployeeDetails) {
+        debugger;
+        $('#MonthDetailsId > tbody').empty();
+
+        for (i = 0; i < SalaryHeaderlen; i++) {
+
+            var data = '<tr id="trChildRow_' + i + '">'
+                + '<td><a type="button" id="btnPlus_' + i + '" href="" class="btn btn-primary btn-xs" style="float:center" onclick="expand(' + i + ');"><i id="" class="fa fa-plus" style="float:center"></i> </a><a type="button" id="btnMinus_' + i + '" href="" class="btn btn-primary btn-xs" style="float:center;display: none;" onclick="HideExpand(' + i + ');"><i id="" class="fa fa-minus" style="float:center"></i> </a></td>'
+
+                + '<td><input type="hidden" id="HiddenSalHeaderId_' + i + '"value="' + EmployeeDetails[i].salHeaderId + '" disabled><input type="text" id="txtEmpName_' + i + '" name="EmpName" class="form-control" value="' + EmployeeDetails[i].employeeName + '" placeholder="Emp Name" disabled></td>'
+
+                + '<td><input type="text" id="txtIn_' + i + '" name="In" class="form-control" placeholder="Doj" value="' + EmployeeDetails[i].doj + '" disabled></td>'
+
+                + '<td><input type="text" id="txtOut_' + i + '" name="In" value="' + EmployeeDetails[i].dob + '" class="form-control" placeholder="Dob" disabled></td>'
+
+                + '<td><input type="text" id="txtTotal_' + i + '" name="In" value="' + EmployeeDetails[i].lastPayrollProceesedDate + '" class="form-control" placeholder="LastPayrollProceesedDate" disabled></td>'
+
+                + '<td><input type="text" id="txtNet_' + i + '" name="In" class="form-control" value="' + EmployeeDetails[i].payoutMonth + '" placeholder="PayoutMonth" disabled></td>'
+
+                + '<td><input type="text" id="txtGrandTotal_' + i + '" name="In" class="form-control" value="' + EmployeeDetails[i].effectiveStartDate+ '" placeholder="EffStartDate" disabled></td>'
+
+                + '<td><input type="text" id="txtEffEndDate_' + i + '" name="In" class="form-control" value="' + EmployeeDetails[i].effectiveEndDate + '" placeholder="EffEndDate" disabled></td>'
+
+                + '<td><a type = "button" href = "" id = "btnApprove_' + i + '" class="btn btn-success pull-left btn-xs" style = "float: left; margin-right: 4%;" onclick = "Approve(' + i + ');"> <i id="" class="fa fa-check"></i> Approve</a ><a type = "button" href = "" id = "btnReject_' + i + '" class="btn btn-danger pull-left btn-xs" style = "float: left; margin-right: 4%;" onclick = "Reject(' + i + ');"> <i id="" class="fa fa-close"></i> Reject</a ></td ></tr > '
+
+                + '<tr id="trDetailsRow_' + i + '" hidden><td></td><td colspan="6"><table id="EmpDetailsId_' + i + '" class="table table-bordered etable"><thead><tr></tr ></thead > <tbody></tbody></table></td></tr>'
+            $('#MonthDetailsId').append(data);
+
+        }
+
+    }
+
+    function expand(i) {
+
+        event.preventDefault();
+        selectedItems = [];
+        $('#btnMinus_' + i).attr("style", "display:block");
+        $('#btnPlus_' + i).attr("style", "display:none");
+        $('#trDetailsRow_'+i).show()
+
+        //$('#trDetailsRow_' + i).attr("style", "display: block");
+        /*$('#EmpDetailsId_' + i).attr("style", "display:block");*/
+        var SalHeaderId = $('#HiddenSalHeaderId_' + i).val();
+
+         var form_data = new FormData();
+         form_data.append('SalHeaderId', SalHeaderId);
+
+        $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetListOfSalaryDetails", "ApproveSalary")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+               // data: "{empId:'" + empId + "',year:'" + year + "',month:'" + month + "'}",
+                success: function (response) {
+                    debugger;
+                    var data = response.result[0];
+
+                    AddTableBody(i, response.result);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function AddTableBody(tblId,SalaryDetails) {
+        debugger;
+        $('#EmpDetailsId_' + tblId + ' > tbody').empty();
+        if (SalaryDetails.length != 0) {
+            for (i = 0; i <= SalaryDetails.length-1; i++) {
+                var data = '<tr>'
+
+                    + '<td style="line-height:0.4235676">' + SalaryDetails[i].singalColName + '</td>'
+                    + '<td style="line-height:0.4235676">' + SalaryDetails[i].colValue +'</td></tr>'
+                $('#EmpDetailsId_' + tblId).append(data);
+            }
+        }
+    }
+
+    function HideExpand(i) {
+        event.preventDefault();
+        $('#btnMinus_' + i).attr("style", "display:none");
+        $('#btnPlus_' + i).attr("style", "display:block");
+        $('#EmpDetailsId_' + i + ' > tbody').empty();
+        $('#trDetailsRow_' + i).hide()
+
+    }
+
+
+    function Approve(i) {
+        event.preventDefault();
+        var salHeaderId = $('#HiddenSalHeaderId_' + i).val();
+        var form_data = new FormData();
+        form_data.append('salHeaderId', salHeaderId);
+
+        $.ajax({
+                type: "POST",
+                url: "@Url.Action("ApproveSalaryHeader", "ApproveSalary")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    document.getElementById("successBody").innerHTML = "Approved Success";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+
+                },
+                error: function (req, status, error) {
+                }
+        });
+        window.location.reload();
+    }
+    function Reject(i) {
+        event.preventDefault();
+        var salHeaderId = $('#HiddenSalHeaderId_' + i).val();
+        var form_data = new FormData();
+        form_data.append('salHeaderId', salHeaderId);
+
+        $.ajax({
+                type: "POST",
+                url: "@Url.Action("RejectSalary", "ApproveSalary")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    debugger;
+                    document.getElementById("successBody").innerHTML = "Reject Success";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+
+                },
+                error: function (req, status, error) {
+                }
+        });
+        window.location.reload();
+    }
+    function successAlertClose(event) {
+        document.getElementById("modal-success").style.display = "none";
+    }
+</script>
+@section Scripts {
+    <!-- DataTables -->
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/dataTables.buttons.min.js"></script>
+    @*<script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"></script>*@
+
+    <script src="~/bower_components/datatables.net-export/jszip.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/pdfmake.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/vfs_fonts.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.html5.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.print.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.colVis.min.js"></script>
+    <!-- Export plugin -->
+    <script type="text/javascript" src="~/lib/hhurz/libs/FileSaver/FileSaver.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/js-xlsx/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.min.js"></script>
+    @*<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.15.4/extensions/print/bootstrap-table-print.js"></script>*@
+
+
+
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+        window.onload = function () {
+             document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+              };
+        </script>
+    }
+    <script>
+        $(document).ready(function () {
+            LoadSalaryData();
+        });
+    </script>
+}

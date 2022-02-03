@@ -1,9 +1,9 @@
-﻿@model SwiftHR.Utility.EmpLOPDetailsU
+﻿@model SwiftHR.Utility.EmpArrearDetailsUtility
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
 @{
     Layout = "_MainLayout";
-    ViewData["Title"] = "Add Employee LOP";
+    ViewData["Title"] = "Add Employee Arrears";
 }
 <style>
     .alert {
@@ -66,7 +66,7 @@
 
 <section class="content-header">
     <h1>
-        Add Employee LOP Details
+        Add Employee Arrear Details
     </h1>
 </section>
 
@@ -81,8 +81,8 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="tab-content">
-                        <div class="active tab-pane" id="LookUpId" style="border: 1px solid #0000001c;">
-                            <form asp-controller="EmpLOPDetails" asp-action="AddLOPDetails" method="POST">
+                        <div class="active tab-pane" id="EMPARREARID" style="border: 1px solid #0000001c;">
+                            <form asp-controller="EmpArrearDetails" asp-action="AddArrearDetails" method="POST">
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="box-body">
@@ -107,19 +107,21 @@
                                     <div class="col-md-4">
                                         <div class="box-body">
                                             <div class="form-group">
-                                                <label for="txtLOPMonth">LOP Month<span style="color:#FF0000;">*</span> </label>
-                                                @*<input type="text" id="txtLOPMonth" class="form-control" name="LOPMonth" placeholder="LOP Month">*@
-                                            <select class="form-control select2" id="txtLOPMonth" name="LOPMonth">
-                                                <option value="0">Choose..</option>
-                                                @if (Model != null && Model.LoanTypeList.Count() > 0)
-                                                {
-                                                    @foreach (var user in Model.LoanTypeList)
-                                                    {
-                                                        <option value="@user.LookUpDetailsId">@user.Description</option>
-                                                    }
-                                                }
-                                            </select>
-
+                                                <label for="ddlPayrollMonth">Payroll Month<span style="color:#FF0000;">*</span> </label>
+                                                <select class="form-control select2" id="ddlPayrollMonth" name="PayrollMonth">
+                                                    <option value="1">JAN</option>
+                                                    <option value="2">FEB</option>
+                                                    <option value="3">MAR</option>
+                                                    <option value="4">APR</option>
+                                                    <option value="5">MAY</option>
+                                                    <option value="6">JUN</option>
+                                                    <option value="7">JUL</option>
+                                                    <option value="8">AUG</option>
+                                                    <option value="9">SEP</option>
+                                                    <option value="10">OCT</option>
+                                                    <option value="11">NOV</option>
+                                                    <option value="12">DEC</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <!-- /.box-body -->
@@ -127,8 +129,17 @@
                                     <div class="col-md-4">
                                         <div class="box-body">
                                             <div class="form-group">
-                                                <label for="txtTotalLOPDays">Total LOP Days<span style="color:#FF0000;">*</span> </label>
-                                                <input type="text" id="txtTotalLOPDays" class="form-control" name="TotalLOPDays" placeholder="LOP Days">
+                                                <label for="dtEffectiveDateFrom">Effective Date From<span style="color:#FF0000;">*</span> </label>
+                                                <input class="form-control" name="EffectiveDateFrom" type="date" id="dtEffectiveDateFrom">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtAmount">Amount<span style="color:#FF0000;">*</span> </label>
+                                                <input type="text" id="txtAmount" class="form-control" name="Amount" placeholder="Amount">
                                             </div>
                                         </div>
                                         <!-- /.box-body -->
@@ -146,27 +157,28 @@
                                 <div class="box-footer">
                                     <div class="col-md-12">
                                         <button type="button" id="btnNext1" class="btn btn-warning" style="float: right; margin-right: 8%" onclick="Clear(event)">Clear </button>
-                                        <button type="submit" id="btnSave" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="LOPvalidateData(event);">Save</button>
+                                        <button type="submit" id="btnSave" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="ArrearsvalidateData(event);">Save</button>
                                     </div>
                                 </div>
-                                @if (ViewBag.LOPList != null)
+                                @if (ViewBag.ArrearsList != null)
                                 {
-                                    if (ViewBag.LOPList.Count > 0)
+                                    if (ViewBag.ArrearsList.Count > 0)
                                     {
                                         <div class="box-body">
-                                            <div class="table-responsive" id="divLOPlist">
+                                            <div class="table-responsive" id="divArrearslist">
 
-                                                <table id="tblLOPList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
-                                                    @if (ViewBag.LOPList != null)
+                                                <table id="tblArrearsList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    @if (ViewBag.ArrearsList != null)
                                                     {
-                                                        IEnumerable<SwiftHR.Models.EmpLOPDetails> d = new List<SwiftHR.Models.EmpLOPDetails>();
-                                                        d = ViewBag.LOPList;
+                                                        IEnumerable<SwiftHR.Models.EmpArrearDetails> d = new List<SwiftHR.Models.EmpArrearDetails>();
+                                                        d = ViewBag.ArrearsList;
                                                         <thead>
                                                             <tr>
                                                                 <th class="bg-primary"> Employee No</th>
                                                                 <th class="bg-primary"> Employee</th>
-                                                                <th class="bg-primary"> LOP Month</th>
-                                                                <th class="bg-primary"> LOP Days</th>
+                                                                <th class="bg-primary"> Payroll Month</th>
+                                                                <th class="bg-primary"> Effective Date From</th>
+                                                                <th class="bg-primary"> Amount</th>
                                                                 <th class="bg-primary"> Remark</th>
                                                                 <th class="bg-primary"> Action</th>
                                                             </tr>
@@ -179,12 +191,27 @@
                                                                     @Html.DisplayFor(modelItem => data.EmployeeNumber)
                                                                 </td>
                                                                 <td>@Html.DisplayFor(modelItem => data.EmployeeName) </td>
-                                                                <td>@Html.DisplayFor(modelItem => data.LOPMonth) </td>
-                                                                <td>@Html.DisplayFor(modelItem => data.TotalLOPDays) </td>
+                                                                <td>@Html.DisplayFor(modelItem => data.PayrollMonth) </td>
+                                                                @*<td><select class="form-control select2" id="ddlPayrollMonth" name="PayrollMonth">
+                                                                    <option value="1" selected="@(data.PayrollMonth == 1 ? "selected" : "")">JAN</option>
+                                                                    <option value="2" selected="@(data.PayrollMonth == 2 ? "selected" : "")">FEB</option>
+                                                                    <option value="3" selected="@(data.PayrollMonth == 3 ? "selected" : "")">MAR</option>
+                                                                    <option value="4" selected="@(data.PayrollMonth == 4 ? "selected" : "")">APR</option>
+                                                                    <option value="5" selected="@(data.PayrollMonth == 5 ? "selected" : "")">MAY</option>
+                                                                    <option value="6" selected="@(data.PayrollMonth == 6 ? "selected" : "")">JUN</option>
+                                                                    <option value="7" selected="@(data.PayrollMonth == 7 ? "selected" : "")">JUL</option>
+                                                                    <option value="8" selected="@(data.PayrollMonth == 8 ? "selected" : "")">AUG</option>
+                                                                    <option value="9" selected="@(data.PayrollMonth == 9 ? "selected" : "")">SEP</option>
+                                                                    <option value="10" selected="@(data.PayrollMonth == 10 ? "selected" : "")">OCT</option>
+                                                                    <option value="11" selected="@(data.PayrollMonth == 11 ? "selected" : "")">NOV</option>
+                                                                    <option value="12" selected="@(data.PayrollMonth == 12 ? "selected" : "")">DEC</option>
+                                                                </select> </td>*@
+                                                                <td>@Html.DisplayFor(modelItem => data.EffectiveDateFrom) </td>
+                                                                <td>@Html.DisplayFor(modelItem => data.Amount) </td>
                                                                 <td>@Html.DisplayFor(modelItem => data.Remarks) </td>
                                                                 <td>
                                                                     <a type="submit" href="" class="btn btn-primary pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="SearchRecord(@data.ID);"><i id="" class="fa fa-edit"></i> Edit</a>
-                                                                    <button type="submit" class="btn btn-danger pull-left btn-xs" style="float: right; margin-right: 4%;" onclick="LOPDataDelete(@data.ID);"><i id="" class="fa fa-remove"></i> Disccable</button>
+                                                                    <button type="submit" class="btn btn-danger pull-left btn-xs" style="float: right; margin-right: 4%;" onclick="ArrearsDataDelete(@data.ID);"><i id="" class="fa fa-remove"></i> Disabled</button>
                                                                 </td>
 
                                                             </tr>
@@ -194,8 +221,9 @@
                                                             <tr>
                                                                 <th> Employee No</th>
                                                                 <th> Employee</th>
-                                                                <th> LOP Month</th>
-                                                                <th> LOP Days</th>
+                                                                <th> Payroll Month</th>
+                                                                <th> Effective Date From</th>
+                                                                <th> Amount</th>
                                                                 <th> Remark</th>
                                                                 <th> Action</th>
                                                             </tr>
@@ -265,7 +293,7 @@
         form_data.append('EmpNo', EmployeeNo);
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("GetEmpName", "EmpLOPDetails")",
+                url: "@Url.Action("GetEmpName", "EmpArrearDetails")",
                 processData: false,
                 contentType: false,
                 async: false,
@@ -287,10 +315,10 @@
     function SearchRecord(ID) {
         event.preventDefault();
         var form_data = new FormData();
-        form_data.append('EMPLOPID', ID);
+        form_data.append('EMPARREARID', ID);
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("SearchRecord", "EmpLOPDetails")",
+                url: "@Url.Action("SearchRecord", "EmpArrearDetails")",
                 processData: false,
                 contentType: false,
                 async: false,
@@ -298,13 +326,14 @@
                 data: form_data,
                 success: function (response) {
                     //alert($(this).parent().);
-                    debugger;
-
-                    $("#Id").val(response[0].id);
+                    
+                    $("#ID").val(response[0].id);
+                    $("#txtEmployeeId").val(response[0].employeeId);
                     $("#txtEmployeeNumber").val(response[0].employeeNumber);
                     $("#txtEmployeeName").val(response[0].employeeName);
-                    $("#txtLOPMonth").val(response[0].lOPMonth);
-                    $("#txtTotalLOPDays").val(response[0].totalLOPDays);
+                    $("#ddlPayrollMonth").val(response[0].payrollMonth);
+                    $("#dtEffectiveDateFrom").val(response[0].effectiveDateFrom);
+                    $("#txtAmount").val(response[0].amount);
                     $("#txtRemarks").val(response[0].remarks);
 
 
@@ -320,12 +349,12 @@
     }
 
 
-    function LOPDataDelete(ID) {
+    function ArrearsDataDelete(ID) {
         var form_data = new FormData();
-        form_data.append('EMPLOPID', ID);
+        form_data.append('EMPARREARID', ID);
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("DeleteRecordLOP", "EmpLOPDetails")",
+                url: "@Url.Action("DeleteRecordArrears", "EmpArrearDetails")",
                 processData: false,
                 contentType: false,
                 async: false,
@@ -391,7 +420,7 @@
             $("#liAttandancePolicy").addClass("active");
             document.getElementById("liAttandancePolicy").style.backgroundColor = "#3c8dbc45";
         });
-        function LOPvalidateData(event) {
+        function ArrearsvalidateData(event) {
             var IsAnyEmpty = false;
             var alertMsg = "";
 
@@ -401,14 +430,19 @@
             }
 
 
-            if (document.getElementById("txtLOPMonth").value == "") {
+            if (document.getElementById("ddlPayrollMonth").value == "") {
                 IsAnyEmpty = true;
-                alertMsg = alertMsg + "LOP Month <br />";
+                alertMsg = alertMsg + "Payroll Month <br />";
             }
 
-            if (document.getElementById("txtTotalLOPDays").value == "") {
+            if (document.getElementById("dtEffectiveDateFrom").value == "") {
                 IsAnyEmpty = true;
-                alertMsg = alertMsg + "LOP Days <br />";
+                alertMsg = alertMsg + "Effective Date From <br />";
+            }
+
+            if (document.getElementById("txtAmount").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Amount <br />";
             }
 
             if (document.getElementById("txtRemarks").value == "") {
@@ -439,13 +473,15 @@
             document.getElementById("txtEmployeeNumber").value = null;
             document.getElementById("txtEmployeeName").value = null;
 
-            document.getElementById("txtLOPMonth").value = null;
-            document.getElementById("txtTotalLOPDays").value = null;
+            document.getElementById("ddlPayrollMonth").value = null;
+            document.getElementById("dtEffectiveDateFrom").value = null;
+            document.getElementById("txtAmount").value = null;
 
             document.getElementById("txtRemarks").value = null;
-            
+
         }
-        }
+
+
     </script>
     <script>
         $(document).ready(function () {
@@ -462,7 +498,7 @@
 
             // DataTable
             @* scrollY: "300px",*@
-            var table = $('#tblLOPList').DataTable({
+            var table = $('#tblArrearsList').DataTable({
                 "scrollX": true,
                 "scrollY": true,
                 "scrollCollapse": true,
@@ -523,7 +559,7 @@
         $("#btnExport").click(function (e) {
             //alert("excel");
             //window.open('data:application/vnd.ms-excel,' + $('#divJoinerslist').dataTable.html());
-            $('#tblLOPList').tableExport({ type: 'excel'});
+            $('#tblArrearsList').tableExport({ type: 'excel'});
             @*$('#tblEmpList').tableExport({ type: 'csv' });*@
             @*$('tblEmpList').tableExport({
                 type: 'excel',
@@ -545,7 +581,7 @@
 
         $("#btnpDF").click(function (e) {
             //PDF
-            $('#tblLOPList').tableExport({
+            $('#tblArrearsList').tableExport({
                 type: 'pdf',
                 jspdf: {
                     orientation: 'l',
@@ -565,7 +601,7 @@
 
         $("#btnPrint").click(function (e) {
             //Print
-            var table = document.getElementById('tblLOPList');
+            var table = document.getElementById('tblArrearsList');
             table.button('.buttons-print').trigger();
             //var win = window.open('', '', 'height=700,width=700');
             //window.document.write(tab.outerHTML);

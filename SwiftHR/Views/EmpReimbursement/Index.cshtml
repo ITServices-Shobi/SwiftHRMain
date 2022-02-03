@@ -66,7 +66,7 @@
 
 <section class="content-header">
     <h1>
-        Add Employee Reimbursement
+        Earnings Components
     </h1>
 </section>
 
@@ -87,10 +87,13 @@
                                     <div class="col-md-4">
                                         <div class="box-body">
                                             <div class="form-group">
-                                                <label for="txtEmployeeNumber">Employee Code<span style="color:#FF0000;">*</span></label>
-                                                <input type="hidden" id="ReimbursementId" name="ReimbursementId">
+                                                <label for="txtEmpCodeName">
+                                                    Employee Code/Name<span style="color:#FF0000;">*</span>
+                                                </label>
+                                                <input type="hidden" id="ReimbId" name="Id">
                                                 <input type="hidden" id="txtEmployeeId" name="EmployeeID">
-                                                <input type="text" id="txtEmployeeNumber" name="EmployeeNumber" class="form-control" placeholder="Employee Code" onchange="GetEmpDetails()">
+                                                <input type="text" id="txtEmpCodeName" name="EmpCodeName" class="form-control" placeholder="Employee Code">
+                                                <button title="Search" id="btn" type="submit" class="btn btn-primary" style="float: right; margin-right: -10%; margin-top: -11%; cursor:  pointer;" onclick="GetEmpDetails()">:</button>
                                             </div>
                                         </div>
                                         <!-- /.box-body -->
@@ -104,6 +107,26 @@
                                         </div>
                                         <!-- /.box-body -->
                                     </div>
+
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="EarningType">Earnings Components<span style="color:#FF0000;">*</span></label>
+                                                <select class="form-control select2" id="txtEarningType" name="EarningType">
+                                                    <option value="0">Choose..</option>
+                                                    @if (Model != null && Model.EarningscomponentsList.Count() > 0)
+                                                    {
+                                                        @foreach (var user in Model.EarningscomponentsList)
+                                                        {
+                                                            <option value="@user.LookUpDetailsId">@user.Name</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+
                                     <div class="col-md-4">
                                         <div class="box-body">
                                             <div class="form-group">
@@ -118,6 +141,15 @@
                                             <div class="form-group">
                                                 <label for="txtAmount">Amount<span style="color:#FF0000;">*</span> </label>
                                                 <input type="text" id="txtAmount" class="form-control" name="Amount" placeholder="Amount">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="dtEffectedDate">Payment Effected Date<span style="color:#FF0000;">*</span></label>
+                                                <input class="form-control" name="EffectedDate" type="date" id="dtEffectedDate">
                                             </div>
                                         </div>
                                         <!-- /.box-body -->
@@ -144,49 +176,65 @@
                                     {
                                         <div class="box-body">
                                             <div class="table-responsive" id="divReimbursementlist">
-
                                                 <table id="tblReimbursementList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
                                                     @if (ViewBag.ReimbursementList != null)
                                                     {
-                                                        IEnumerable<SwiftHR.Models.EmpReimbursement> d = new List<SwiftHR.Models.EmpReimbursement>();
+                                                        IEnumerable<SwiftHR.Models.UspEmpReimbursementDetailsViewModel> d = new List<SwiftHR.Models.UspEmpReimbursementDetailsViewModel>();
                                                         d = ViewBag.ReimbursementList;
                                                         <thead>
                                                             <tr>
                                                                 <th class="bg-primary"> Employee No</th>
                                                                 <th class="bg-primary"> Employee</th>
+                                                                <th class="bg-primary"> Earnings</th>
                                                                 <th class="bg-primary">Date</th>
                                                                 <th class="bg-primary"> Amount</th>
-                                                                <th class="bg-primary"> Remark</th>
+                                                                <th class="bg-primary">Status</th>
+                                                                <th class="bg-primary">EffectedDate</th>
+                                                                <th class="bg-primary">Remark</th>
                                                                 <th class="bg-primary"> Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             @foreach (var data in d)
                                                             {
-                                                                <tr id="@data.Id">
-                                                                    <td>
-                                                                        @Html.DisplayFor(modelItem => data.EmployeeNumber)
-                                                                    </td>
-                                                                    <td>@Html.DisplayFor(modelItem => data.EmployeeName) </td>
-                                                                    <td>@Html.DisplayFor(modelItem => data.Date) </td>
-                                                                    <td>@Html.DisplayFor(modelItem => data.Amount) </td>
-                                                                    <td>@Html.DisplayFor(modelItem => data.Remarks) </td>
-                                                                    <td>
+                                                            <tr id="@data.Id">
+                                                                <td>
+                                                                    @Html.DisplayFor(modelItem => data.EmployeeNumber)
+                                                                </td>
+                                                                <td>@Html.DisplayFor(modelItem => data.EmployeeName) </td>
+                                                                <td>@Html.DisplayFor(modelItem => data.EarningsType) </td>
+                                                                <td>@Html.DisplayFor(modelItem => data.Date)</td>
+                                                                <td>@Html.DisplayFor(modelItem => data.Amount)</td>
+                                                                <td>@Html.DisplayFor(modelItem => data.Status)</td>
+                                                                <td>@Html.DisplayFor(modelItem => data.PaymentEffectedDate)</td>
+                                                                <td>@Html.DisplayFor(modelItem => data.Remarks) </td>
+                                                                <td>
+                                                                    @if (@data.Status == "Apply")
+                                                                    {
                                                                         <a type="submit" href="" class="btn btn-primary pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="SearchRecord(@data.Id);"><i id="" class="fa fa-edit"></i> Edit</a>
-                                                                        <button type="submit" class="btn btn-danger pull-left btn-xs" style="float: right; margin-right: 4%;" onclick="LOPDataDelete(@data.Id);"><i id="" class="fa fa-remove"></i> Disccable</button>
-                                                                    </td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @*<a type="button" href="" class="btn btn-primary pull-left btn-xs" style="float: left; margin-right: 4%;" disabled><i id="" class="fa fa-edit"></i> Edit</a>*@
+                                                                   }
 
-                                                                </tr>
+                                                                    <button type="submit" class="btn btn-danger pull-right btn-xs" style="float: right; margin-right: 4%;" onclick="ReimbDataDelete(@data.Id);"><i id="" class="fa fa-remove"></i> Delete</button>
+                                                                </td>
+
+                                                            </tr>
                                                             }
                                                         </tbody>
                                                         <tfoot class="hidden-print">
                                                             <tr>
-                                                                <th>Employee No</th>
-                                                                <th>Employee</th>
+                                                                <th> Employee No</th>
+                                                                <th> Employee</th>
+                                                                <th> Earnings</th>
                                                                 <th>Date</th>
-                                                                <th>Amount</th>
+                                                                <th> Amount</th>
+                                                                <th>Status</th>
+                                                                <th>EffectedDate</th>
                                                                 <th>Remark</th>
-                                                                <th>Action</th>
+                                                                <th> Action</th>
                                                             </tr>
                                                         </tfoot>
                                                     }
@@ -246,101 +294,6 @@
         @*/.modal-dialog*@
     </div>
 </section>
-<script>
-    function GetEmpDetails() {
-        event.preventDefault();
-        var EmployeeNo = $("#txtEmployeeNumber").val();
-        var form_data = new FormData();
-        form_data.append('EmpNo', EmployeeNo);
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("GetEmpName", "EmpLOPDetails")",
-                processData: false,
-                contentType: false,
-                async: false,
-                cache: false,
-                data: form_data,
-                success: function (response) {
-                    //alert($(this).parent().);
-                    debugger;
-                    $("#txtEmployeeName").val(response[0].firstName + ' ' + response[0].middleName + ' ' + response[0].lastName);
-                    $("#txtEmployeeId").val(response[0].employeeId);
-                    //alert(response);
-                },
-                error: function (req, status, error) {
-                    //console.log(msg);
-                }
-            });
-    }
-
-    function SearchRecord(Id) {
-        event.preventDefault();
-        var form_data = new FormData();
-        form_data.append('EMPReimbID', Id);
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("SearchReimbursementRecord", "EmpReimbursement")",
-                processData: false,
-                contentType: false,
-                async: false,
-                cache: false,
-                data: form_data,
-                success: function (response) {
-                    //alert($(this).parent().);
-                    debugger;
-
-                    $("#ReimbursementId").val(response[0].id);
-                    $("#txtEmployeeId").val(response[0].employeeId);
-                    $("#txtEmployeeNumber").val(response[0].employeeNumber);
-                    $("#txtEmployeeName").val(response[0].employeeName);
-                   
-                    $("#dtDate").val(response[0].date);
-                    //$("#dtDate").format('dd-MM-yyyy').val('2021-12-21');
-                    $("#txtAmount").val(response[0].amount);
-                    $("#txtRemarks").val(response[0].remarks);
-
-
-                    document.getElementById("successBody").innerHTML = "Record Search Success";
-                    document.getElementById("modal-success").style.display = "block";
-                    setTimeout(successAlertClose, 5000);
-                    //alert(response);
-                },
-                error: function (req, status, error) {
-                    //console.log(msg);
-                }
-            });
-    }
-
-
-    function LOPDataDelete(ID) {
-        var form_data = new FormData();
-        form_data.append('EMPReimbID', ID);
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("ReimbursementDelete", "EmpReimbursement")",
-                processData: false,
-                contentType: false,
-                async: false,
-                cache: false,
-                data: form_data,
-                success: function (response) {
-                    document.getElementById("successBody").innerHTML = "@ViewBag.Message";
-                    document.getElementById("modal-success").style.display = "block";
-                    setTimeout(successAlertClose, 5000);
-
-                },
-                error: function (req, status, error) {
-                    //console.log(msg);
-                }
-            });
-    }
-
-    function successAlertClose(event) {
-        document.getElementById("modal-success").style.display = "none";
-    }
-
-</script>
-
 @section Scripts {
 
     <!-- DataTables -->
@@ -365,8 +318,6 @@
     @*<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">*@
     @*<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.15.4/extensions/print/bootstrap-table-print.js"></script>*@
 
-
-
     @if (ViewBag.Message != null)
     {
         <script type="text/javascript">
@@ -378,7 +329,6 @@
         </script>
     }
 
-    
     <script>
 
         $(document).ready(function () {
@@ -390,12 +340,16 @@
             var IsAnyEmpty = false;
             var alertMsg = "";
 
-            if (document.getElementById("txtEmployeeNumber").value == "") {
+            if (document.getElementById("txtEmpCodeName").value == "") {
                 IsAnyEmpty = true;
                 alertMsg = "Employee Number <br />";
             }
+            if (document.getElementById("txtEarningType").value == "" || document.getElementById("txtEarningType").value == 0) {
+                IsAnyEmpty = true;
+                alertMsg = "Earning Type <br />";
+            }
 
-
+            
             if (document.getElementById("dtDate").value == "") {
                 IsAnyEmpty = true;
                 alertMsg = alertMsg + "Date <br />";
@@ -405,6 +359,11 @@
                 IsAnyEmpty = true;
                 alertMsg = alertMsg + "Amount <br />";
             }
+            if (document.getElementById("dtEffectedDate").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Payment Effected Date <br />";
+            }
+
 
             if (IsAnyEmpty) {
 
@@ -435,7 +394,9 @@
             document.getElementById("txtRemarks").value = null;
 
         }
-
+        function successAlertClose(event) {
+            document.getElementById("modal-success").style.display = "none";
+        }
 
     </script>
     <script>
@@ -570,4 +531,198 @@
         });
 
     </script>
+
+    <script>
+        function SearchRecord(ReimbId) {
+        event.preventDefault();
+        var form_data = new FormData();
+        form_data.append('ReimbId', ReimbId);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SearchRecord", "EmpReimbursement")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+                    debugger;
+                    $("#ReimbId").val(response.earningscomponentsListData[0].id);
+                    $("#txtEmployeeId").val(response.earningscomponentsListData[0].employeeId);
+                    $("#txtEmpCodeName").val(response.earningscomponentsListData[0].employeeNumber);
+                    $("#txtEmployeeName").val(response.earningscomponentsListData[0].employeeName);
+                    $("#txtEarningType").val(response.earningscomponentsListData[0].earningsTypeFromLookUp);
+                    $("#dtDate").val(response.earningscomponentsListData[0].date);
+                    $("#txtAmount").val(response.earningscomponentsListData[0].amount);
+                    $("#dtEffectedDate").val(response.earningscomponentsListData[0].paymentEffectedDate);
+                    $("#txtRemarks").val(response.earningscomponentsListData[0].remarks);
+
+
+                    document.getElementById("successBody").innerHTML = "Record Search Success";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+                    //alert(response);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+        function ReimbDataDelete(ReimbId) {
+        //    event.preventDefault();
+        var form_data = new FormData();
+            form_data.append('ReimbId', ReimbId);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("DeleteReimbRecord", "EmpReimbursement")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+            window.location.reload();
+    }
+    </script>
+
+
+@*-----------------Search Record -----------------*@
+
+
+    <script>
+    function GetEmpDetails() {
+        event.preventDefault();
+            $('#tblEmplist > tbody').empty();
+            //$("#tdEmpId").html('');
+            var EmployeeNoAndCode = $("#txtEmpCodeName").val();
+            var form_data = new FormData();
+            form_data.append('EmpNo', EmployeeNoAndCode);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SearchEmpNameDetails", "EmpReimbursementApproved")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    // emplist = response;
+                    debugger;
+                    if (response.length > 0) {
+                        var data = response[0];
+                        AddEmployeeTableBody(response.length, response);
+                    }
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+
+    }
+    function AddEmployeeTableBody(EmployeeDetailslen, EmployeeDetails) {
+        debugger;
+        $('#tblEmplist > tbody').empty();
+
+        for (i = 0; i < EmployeeDetailslen; i++) {
+
+            var data = '<tr onclick="SetEmployeeName(' + i + ')">'
+
+                + '<td style="color:blue;"><input  type="hidden" id="HiddenEmpId_' + i + '"value="' + EmployeeDetails[i].employeeId + '" disabled><input type="text" style="color:blue;cursor:pointer" id="txtEmpNumber_' + i + '" class="form-control" value="' + EmployeeDetails[i].employeeNumber + '"  disabled></td>'
+                + '<td><input type="text" id="txtEmpName_' + i + '"  class="form-control" value="' + EmployeeDetails[i].firstName + ' ' + EmployeeDetails[i].lastName + '" disabled></td></tr>'
+
+            $('#tblEmplist').append(data);
+
+        }
+
+    }
+    function SetEmployeeName(index) {
+        var EmpName = $('#txtEmpName_' + index).val();
+        var EmpNo = $('#txtEmpNumber_' + index).val();
+        var EmpId = $('#HiddenEmpId_' + index).val();
+
+        $('#txtEmployeeName').val(EmpName);
+        $('#txtEmployeeCode').val(EmpNo);
+        $('#txtEmployeeId').val(EmpId);
+        $('#modelWindow').modal('hide');
+    }
+
+
+    selectedItems = [];
+    $(document).on("change", ".chkchild", function (item) {
+        var id = "";
+        id = $(this).attr("data-id");
+
+        if (this.checked) { // check select status
+
+            selectedItems.push(id);
+
+        } else {
+            selectedItems.pop(id);
+        }
+
+    });
+    </script>
+   
+    <div class="modal fade" id="modelWindow" role="dialog">
+        <div class="modal-dialog modal-sm vertical-align-center">
+            <div class="modal-content">
+
+                <div class="box-body">
+                    <div class="table-responsive" id="tblEmplist">
+
+                        <table id="tblEmplist" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                            @if (ViewBag.EmpList != null)
+                            {
+                                IEnumerable<SwiftHR.Models.Employee> d = new List<SwiftHR.Models.Employee>();
+                                d = ViewBag.EmpList;
+                                <thead>
+                                    <tr>
+                                        <th class="bg-primary"> Employee No</th>
+                                        <th class="bg-primary"> Employee</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var Adata in d)
+                                    {
+                                        <tr id="@Adata.EmployeeId">
+                                            <td id="tdEmpId">
+                                                @Html.Hidden("EmpId", Adata.EmployeeId)
+                                                @Html.Display("EmpNumber", Adata.EmployeeNumber)
+                                            </td>
+                                            <td>
+                                                @Html.Display("EmpName", Adata.FirstName)
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            }
+                        </table>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#btn').click(function () {
+            $('#modelWindow').modal('show');
+        });
+    </script>
+
+@*-----------------------END -------------------------*@
+
 }

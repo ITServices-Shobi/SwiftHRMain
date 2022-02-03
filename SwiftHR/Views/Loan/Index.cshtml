@@ -1,0 +1,860 @@
+﻿@model SwiftHR.Utility.LoanDetailsU
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Add Loan Details";
+}
+
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+<link rel="stylesheet" href="~/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" href="~/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="~/css/site.css" />
+
+<section class="content-header">
+    <h1>
+        Add Loan Details
+    </h1>
+
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="alertS alert-success" id="modal-success" style="display:none;">
+        <button type="button" class="close" aria-hidden="true" onclick="successAlertClose()">&times;</button>
+        <h4><i class="icon fa fa-check"></i> Success </h4>
+        <p id="successBody"></p>
+    </div>
+    <div class="box box-default">
+        <div class="box-body">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="nav-tabs-custom">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a id="anchr1" href="#BasicInfo" data-toggle="tab">General</a></li>
+                            <li><a id="anchr2" href="#EmploymentSelections" data-toggle="tab">Loan Details</a></li>
+                            <li><a id="anchr3" href="#PF_ESI_LWF" data-toggle="tab">Loan Repayment</a></li>
+                            <li><a id="anchr4" href="#PaymentMode" data-toggle="tab">Loan Revision</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="tab-content">
+
+                        <div class="active tab-pane" id="BasicInfo" style="border: 1px solid #0000001c;">
+                            <form asp-controller="Loan" asp-action="AddLoanHeaderDetails" method="POST">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                @*<label for="txtEmployeeNumber">Employee Number<span style="color:#FF0000;">*</span></label>*@
+                                                <label for="txtEmpCodeName">Employee Code/Name<span style="color:#FF0000;">*</span></label>
+                                                <input type="hidden" id="LoanHeaderId" name="LoanHeaderId">
+                                                <input type="hidden" id="txtEmployeeId" name="EmployeeID">
+                                                <input type="text" id="txtEmpCodeName" name="EmpCodeName" class="form-control" placeholder="Employee Code">
+                                                @*<input type="text" id="txtEmployeeNumber" name="EmployeeNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="GetEmpDetails()">*@
+                                                <button id="btn" type="submit" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="GetEmpDetails()">Search..</button>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtEmployeeName">Employee Name</label>
+                                                <input type="text" id="txtEmployeeName" name="EmployeeName" class="form-control" readonly="" placeholder="Employee Name">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtDateOfJoining">Date of Loan<span style="color:#FF0000;">*</span></label>
+                                                <input class="form-control" name="DateOfLoan" type="date" id="txtDateOfJoining">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtStartFrom">Start from<span style="color:#FF0000;">*</span></label>
+                                                <input class="form-control" name="StartFrom" type="date" id="txtStartFrom">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtLoanAmt">Loan amount<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtLoanAmt" name="LoanAmt" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtLoanComplateDate">Loan Completed<span style="color:#FF0000;">*</span></label>
+                                                <input type="checkbox" id="txtLoanComplateDate" name="LoanComplate">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="dtComplateDate">Completed Date</label>
+                                                <input class="form-control" name="ComplateDates" type="date" id="dtComplateDate">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtLookUpId">Loan Type</label>
+                                                <select class="form-control select2" id="txtLOPMonth" name="LOPMonth">
+                                                    <option value="0">Choose..</option>
+                                                    @if (Model != null && Model.LoanTypeList.Count() > 0)
+                                                    {
+                                                        @foreach (var user in Model.LoanTypeList)
+                                                        {
+                                                            <option value="@user.LookUpDetailsId">@user.Description</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtEMINo">Number Of EMI</label>
+                                                <input type="text" id="txtEMINo" name="EMINo" class="form-control" placeholder="" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtMonthlyEMI">Monthly EMI Amount<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtMonthlyEMI" name="MonthlyEMI" class="form-control" placeholder="">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtInterestRate">Interest Rate</label>
+                                                <input type="text" id="txtInterestRate" name="InterestRate" class="form-control" placeholder="">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtDemandPromissory">Demand Promissory Note</label>
+                                                <input type="checkbox" id="txtDemandPromissory" name="DemandPromissory">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtRequiredRate">Perquisite Rate<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtRequiredRate" name="PerquisiteRate" class="form-control" placeholder="" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtLoanACNo">Loan Account No<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtLoanACNo" name="LoanACNo" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtPrincipalBal">Principal Balance<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtPrincipalBal" name="PrincipalBal" class="form-control" placeholder="" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtInterestBal">Interest Balance</label>
+                                                <input type="text" id="txtInterestBal" name="InterestBal" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="txtRemark">Remarks</label>
+                                                <input class="form-control" name="Remarks" type="text" id="txtRemark">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button type="button" id="btnNext1" class="btn btn-warning" style="float: right; margin-right: 8%" onclick="NextClick(event, '2')">Next </button>
+                                        <button type="submit" id="btnSave" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="validateHeaderData(event);">Save</button>
+                                    </div>
+
+                                </div>
+                                @if (ViewBag.LoanHList != null)
+                                {
+                                    if (ViewBag.LoanHList.Count > 0)
+                                    {
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divLOPlist">
+
+                                                <table id="tblLoanList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    @if (ViewBag.LoanHList != null)
+                                                    {
+                                                        IEnumerable<SwiftHR.Models.UspLoanDetailsViewModel> d = new List<SwiftHR.Models.UspLoanDetailsViewModel>();
+                                                        d = ViewBag.LoanHList;
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="bg-primary"> Date</th>
+                                                                <th class="bg-primary"> Trans Type</th>
+                                                                <th class="bg-primary"> Amount</th>
+                                                                <th class="bg-primary"> To Principal</th>
+                                                                <th class="bg-primary"> To Intreset</th>
+                                                                <th class="bg-primary"> Actual Prin...</th>
+                                                                <th class="bg-primary"> Actual Intr...</th>
+                                                                <th class="bg-primary"> Remark</th>
+                                                                <th class="bg-primary"> Perk Value</th>
+                                                                <th class="bg-primary"> Perk Amount</th>
+                                                                <th class="bg-primary"> Perk Rate</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var data in d)
+                                                            {
+                                                                <tr id="@data.ID">
+                                                                    <td>@data.Date</td>
+                                                                    <td>@data.LoanType</td>
+                                                                    <td>@data.Amount</td>
+                                                                    <td>@data.ToPrincipale</td>
+                                                                    <td>@data.ToInterest</td>
+                                                                    <td>@data.ActualPrincipal</td>
+                                                                    <td>@data.ActualInterest</td>
+                                                                    <td>@data.Remarks</td>
+                                                                    <td>@data.PerkValue</td>
+                                                                    <td>@data.PerkAmt</td>
+                                                                    <td>@data.PerkRate</td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </form>
+                        </div>
+
+                        <div class="tab-pane" id="EmploymentSelections" style="border: 1px solid #0000001c;">
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="box-body">
+                                        <div class="table-responsive" id="divEmpLoanllist">
+                                            <table id="tblEmpLoanList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="bg-primary"> Date </th>
+                                                        <th class="bg-primary"> Transaction Type </th>
+                                                        <th class="bg-primary"> Amount </th>
+                                                        <th class="bg-primary"> To Interest </th>
+                                                        <th class="bg-primary"> To Principal </th>
+                                                        <th class="bg-primary"> Actual Interest </th>
+                                                        <th class="bg-primary"> Actual Principal</th>
+                                                        <th class="bg-primary"> Perk Value</th>
+                                                        <th class="bg-primary"> Perk Amount</th>
+                                                        <th class="bg-primary"> Perk Rate</th>
+                                                        <th class="bg-primary"> Remarks</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                    @*@if (Model != null && Model.Count() > 0)
+                                                        {
+                                                            @foreach (var contact in Model)
+                                                            {*@
+                                                    <tr>
+                                                        <td><input class="form-control" name="ConfirmationDate" type="text" id="dtConfirmationDate"></td>
+                                                        <td>
+                                                            <select class="form-control select2" id="ddlEmployeeNoSelection" name="EmployeeNoSelection">
+                                                                <option value="Manual Entry"></option>
+                                                            </select>
+                                                        </td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                    </tr>
+                                                    @*}
+                                                        }*@
+
+                                                </tbody>
+                                                <tfoot class="hidden-print">
+                                                    <tr>
+                                                        <th> Date </th>
+                                                        <th> Transaction Type </th>
+                                                        <th> Amount </th>
+                                                        <th> To Interest </th>
+                                                        <th> To Principal </th>
+                                                        <th> Actual Interest </th>
+                                                        <th> Actual Principal</th>
+                                                        <th> Perk Value</th>
+                                                        <th> Perk Amount</th>
+                                                        <th> Perk Rate</th>
+                                                        <th> Remarks</th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- /.box-body -->
+                                </div>
+                            </div>
+
+                            <div class="box-footer">
+                                <button type="button" id="btnNext2" class="btn btn-warning" style="float: right; margin-right: 4%" onclick="NextClick(event, '3')">Next </button>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="PF_ESI_LWF" style="border: 1px solid #0000001c;">
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="box-body">
+                                        <div class="table-responsive" id="divEmpllist">
+                                            <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="bg-primary"> Date </th>
+                                                        <th class="bg-primary"> To Interest </th>
+                                                        <th class="bg-primary"> To Principal </th>
+                                                        <th class="bg-primary"> Amount </th>
+                                                        <th class="bg-primary"> Modified Date </th>
+                                                        <th class="bg-primary"> Remarks </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                    @*@if (Model != null && Model.Count() > 0)
+                                                        {
+                                                            @foreach (var contact in Model)
+                                                            {*@
+                                                    <tr>
+                                                        <td><input class="form-control" name="ConfirmationDate" type="text" id="dtConfirmationDate"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input class="form-control" name="ConfirmationDate" type="text" id="dtConfirmationDate"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                    </tr>
+                                                    @*}
+                                                        }*@
+
+                                                </tbody>
+                                                <tfoot class="hidden-print">
+                                                    <tr>
+                                                        <th> Date </th>
+                                                        <th> To Interest </th>
+                                                        <th> To Principal </th>
+                                                        <th> Amount </th>
+                                                        <th> Modified Date </th>
+                                                        <th> Remarks </th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="box-footer">
+                                <button type="button" id="btnNext3" class="btn btn-warning" style="float: right; margin-right: 4%" onclick="NextClick(event, '4')">Next </button>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="PaymentMode" style="border: 1px solid #0000001c;">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="box-body">
+                                        <div class="form-group">
+                                            <label for="ddlEmployeeNoSelection">Loan Type</label>
+                                            <select class="form-control select2" id="ddlEmployeeNoSelection" name="EmployeeNoSelection">
+                                                <option value="Manual Entry"></option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="txtFName">Loan Amount<span style="color:#FF0000;">*</span></label>
+                                            <input type="text" id="txtFName" name="FirstName" class="form-control" placeholder="" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="txtMobileNo">Current Interest Rate<span style="color:#FF0000;">*</span></label>
+                                            <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="txtMobileNo">Principal Balance<span style="color:#FF0000;">*</span></label>
+                                            <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="txtMobileNo">New Loan Period<span style="color:#FF0000;">*</span></label>
+                                            <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="box-body">
+                                        <div class="form-group">
+                                            <label for="ddlEmployeeNoSelection">Top Up Amount</label>
+                                            <input type="text" id="txtFName" name="FirstName" class="form-control" placeholder="" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="txtFName">New Interest Rate<span style="color:#FF0000;">*</span></label>
+                                            <input type="text" id="txtFName" name="FirstName" class="form-control" placeholder="" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="txtMobileNo">Total Installments<span style="color:#FF0000;">*</span></label>
+                                            <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="txtMobileNo">No. of Installments Paid<span style="color:#FF0000;">*</span></label>
+                                            <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="box-body">
+                                        <div class="table-responsive" id="divEmpllist">
+                                            <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="bg-primary"> Effective From </th>
+                                                        <th class="bg-primary"> Effective Till </th>
+                                                        <th class="bg-primary"> Opening Balance </th>
+                                                        <th class="bg-primary"> Top Up Amount </th>
+                                                        <th class="bg-primary"> Loan Amount </th>
+                                                        <th class="bg-primary"> Overall Loan Amount </th>
+                                                        <th class="bg-primary"> Interest Rate </th>
+                                                        <th class="bg-primary"> Remaining Period </th>
+                                                        <th class="bg-primary"> Remarks </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                    @*@if (Model != null && Model.Count() > 0)
+                                                        {
+                                                            @foreach (var contact in Model)
+                                                            {*@
+                                                    <tr>
+                                                        <td><input class="form-control" name="ConfirmationDate" type="text" id="dtConfirmationDate"></td>
+                                                        <td><input class="form-control" name="ConfirmationDate" type="text" id="dtConfirmationDate"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                    </tr>
+                                                    @*}
+                                                        }*@
+
+                                                </tbody>
+                                                <tfoot class="hidden-print">
+                                                    <tr>
+                                                        <th> Effective From </th>
+                                                        <th> Effective Till </th>
+                                                        <th> Opening Balance </th>
+                                                        <th> Top Up Amount </th>
+                                                        <th> Loan Amount </th>
+                                                        <th> Overall Loan Amount </th>
+                                                        <th> Interest Rate </th>
+                                                        <th> Remaining Period </th>
+                                                        <th> Remarks </th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="box-footer">
+                                <button type="submit" id="btnSaveAll" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="validateData(event);"> Save All </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="display:none;">
+        <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+        </button>
+        <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+        </button>
+    </div>
+
+
+    <div class="alert alert-warning fade" id="modal-warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4>
+            <i class="icon fa fa-warning"></i> Alert!
+        </h4>
+
+        <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+        </div>
+
+        <div class="alert-footer">
+            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+        </div>
+    </div>
+
+
+    <div class="modal modal-warning fade" id="modal-warning2">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Alert!</h4>
+                </div>
+                <div class="modal-body">
+                    <p>One fine body&hellip;</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+            @*/.modal-content*@
+        </div>
+        @*/.modal-dialog*@
+    </div>
+    <!-- /.modal -->
+
+
+
+
+</section>
+
+<script>
+    function GetEmpDetails() {
+
+        event.preventDefault();
+
+            $('#tblEmplist > tbody').empty();
+            //$("#tdEmpId").html('');
+            var EmployeeNoAndCode = $("#txtEmpCodeName").val();
+            var form_data = new FormData();
+            form_data.append('EmpNo', EmployeeNoAndCode);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SearchEmpNameDetails", "EmpReimbursementApproved")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    // emplist = response;
+                    debugger;
+                    if (response.length > 0) {
+                        var data = response[0];
+                        AddEmployeeTableBody(response.length, response);
+                    }
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+
+    }
+
+    function AddEmployeeTableBody(EmployeeDetailslen, EmployeeDetails) {
+        debugger;
+        $('#tblEmplist > tbody').empty();
+
+        for (i = 0; i < EmployeeDetailslen; i++) {
+
+            var data = '<tr onclick="SetEmployeeName(' + i + ')">'
+
+                + '<td style="color:blue;"><input  type="hidden" id="HiddenEmpId_' + i + '"value="' + EmployeeDetails[i].employeeId + '" disabled><input type="text" style="color:blue;cursor:pointer" id="txtEmpNumber_' + i + '" class="form-control" value="' + EmployeeDetails[i].employeeNumber + '"  disabled></td>'
+                + '<td><input type="text" id="txtEmpName_' + i + '"  class="form-control" value="' + EmployeeDetails[i].firstName + ' ' + EmployeeDetails[i].lastName + '" disabled></td></tr>'
+
+            $('#tblEmplist').append(data);
+
+        }
+
+    }
+    function SetEmployeeName(index) {
+        var EmpName = $('#txtEmpName_' + index).val();
+        var EmpNo = $('#txtEmpNumber_' + index).val();
+        var EmpId = $('#HiddenEmpId_' + index).val();
+
+        alert(EmpId);
+        GetEmpLoanHeaderDetails();
+        $('#txtEmployeeName').val(EmpName);
+        $('#txtEmployeeCode').val(EmpNo);
+        $('#txtEmployeeRecordId').val(EmpId);
+        $('#modelWindow').modal('hide');
+
+        GetEmpLoanHeadrDetails(EmpId);
+    }
+
+
+    selectedItems = [];
+    $(document).on("change", ".chkchild", function (item) {
+        var id = "";
+        id = $(this).attr("data-id");
+
+        if (this.checked) { // check select status
+
+            selectedItems.push(id);
+
+        } else {
+            selectedItems.pop(id);
+        }
+
+    });
+</script>
+<script>
+     function GetEmpLoanHeadrDetails(EmpId) {
+
+        event.preventDefault();
+            var form_data = new FormData();
+         form_data.append('EmpNo', EmpId);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetLoanDataFromSP", "Loan")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+
+    }
+</script>
+
+<div class="modal fade" id="modelWindow" role="dialog">
+    <div class="modal-dialog modal-sm vertical-align-center">
+        <div class="modal-content">
+
+            <div class="box-body">
+                <div class="table-responsive" id="tblEmplist">
+
+                    <table id="tblEmplist" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                        @if (ViewBag.EmpList != null)
+                        {
+                            IEnumerable<SwiftHR.Models.Employee> d = new List<SwiftHR.Models.Employee>();
+                            d = ViewBag.EmpList;
+                            <thead>
+                                <tr>
+                                    <th class="bg-primary"> Employee No</th>
+                                    <th class="bg-primary"> Employee</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var Adata in d)
+                                {
+                                    <tr id="@Adata.EmployeeId">
+                                        <td id="tdEmpId">
+                                            @Html.Hidden("EmpId", Adata.EmployeeId)
+                                            @Html.Display("EmpNumber", Adata.EmployeeNumber)
+                                        </td>
+                                        <td>
+                                            @Html.Display("EmpName", Adata.FirstName)
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        }
+                    </table>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#btn').click(function () {
+        $('#modelWindow').modal('show');
+    });
+</script>
+
+@section Scripts {
+    <!-- DataTables -->
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/dataTables.buttons.min.js"></script>
+    @*<script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"></script>*@
+
+    <script src="~/bower_components/datatables.net-export/jszip.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/pdfmake.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/vfs_fonts.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.html5.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.print.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.colVis.min.js"></script>
+    <!-- Export plugin -->
+    <script type="text/javascript" src="~/lib/hhurz/libs/FileSaver/FileSaver.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/js-xlsx/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.min.js"></script>
+    @*<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.15.4/extensions/print/bootstrap-table-print.js"></script>*@
+
+
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+        window.onload = function () {
+             document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+              };
+        </script>
+    }
+
+    <script>
+
+        $(document).ready(function () {
+            $("#liEmployee").addClass("active");
+            $("#liAddEmployee").addClass("active");
+            document.getElementById("liAddEmployee").style.backgroundColor = "#3c8dbc45";
+        });
+
+        function validateHeaderData(event) {
+
+            debugger
+            var IsAnyEmpty = false;
+            var alertMsg = "";
+
+            if (document.getElementById("txtEmployeeNumber").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = "Employee Number <br />";
+            }
+            if (document.getElementById("txtDateOfJoining").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Date Of Joining <br />";
+            }
+            if (document.getElementById("txtStartFrom").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Start From Date <br />";
+            }
+            if (document.getElementById("txtLoanAmt").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Loan Amount <br />";
+            }
+            if (document.getElementById("dtComplateDate").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Complate Date <br />";
+            }
+
+            //if (document.getElementById("ddlLoanType").value == "") {
+            //    IsAnyEmpty = true;
+            //    alertMsg = alertMsg + "Loan Type <br />";
+            //}
+
+            if (document.getElementById("txtEMINo").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "EMI Number <br />";
+            }
+
+            if (document.getElementById("txtMonthlyEMI").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Monthly EMI <br />";
+            }
+
+            if (document.getElementById("txtInterestRate").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Interest Rate <br />";
+            }
+
+            if (document.getElementById("txtDemandPromissory").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Demand Promissory <br />";
+            }
+
+            if (document.getElementById("txtRequiredRate").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Required Rate <br />";
+            }
+            if (document.getElementById("txtLoanACNo").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Loan A/C No <br />";
+            }
+
+            if (document.getElementById("txtPrincipalBal").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Principal Balance <br />";
+            }
+            if (document.getElementById("txtInterestBal").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Interest Balance <br />";
+            }
+
+            if (IsAnyEmpty) {
+
+                event.preventDefault();
+
+                document.getElementById("btnAlert").click();
+
+                $('#alertBody').html(
+
+                    '<p>' + alertMsg + '<br /> can not be empty </p>'
+
+                );
+
+                IsAnyEmpty = true;
+            }
+
+
+            return IsAnyEmpty;
+
+            function successAlertClose(event) {
+                document.getElementById("modal-success").style.display = "none";
+            }
+        }
+
+    </script>
+}

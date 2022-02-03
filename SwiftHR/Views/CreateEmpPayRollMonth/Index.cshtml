@@ -1,0 +1,286 @@
+﻿@model SwiftHR.Utility.CreateEmpPayRollMonthU
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Create Employee Pay Roll Month";
+}
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+<link rel="stylesheet" href="~/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="~/css/site.css" />
+
+<section class="content-header">
+    <h1>
+        Create Employee Pay Roll Month
+    </h1>
+</section>
+<section class="content">
+    <div class="alertS alert-success" id="modal-success" style="display:none;">
+        <button type="button" class="close" aria-hidden="true" onclick="successAlertClose(event)">&times;</button>
+        <h4><i class="icon fa fa-check"></i> Success </h4>
+        <p id="successBody"></p>
+    </div>
+    <div class="box box-default">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="LookUpId" style="border: 1px solid #0000001c;">
+                            <form asp-controller="CreateEmpPayRollMonth" asp-action="AddCreatePayRollMonth" method="POST">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="MonthId">Month<span style="color:#FF0000;">*</span></label>
+                                                <input type="hidden" id="PayRollId" name="CreatePayRollId">
+                                                <select class="form-control select2" id="txtMonthNAmeId" onchange="setRange()" name="MonthName">
+                                                    <option value="0">Choose..</option>
+                                                    @if (Model != null && Model.MonthNameList.Count() > 0)
+                                                    {
+                                                        @foreach (var user in Model.MonthNameList)
+                                                        {
+                                                            <option value="@user.Name">@user.Description</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                            <!-- /.box-body -->
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="FromdtDate">From PayRoll Period<span style="color:#FF0000;">*</span></label>
+                                                <input class="form-control" name="FromPeriodDate" type="date" id="FromdtDate" readonly="">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="ToDate">To PayRoll Period<span style="color:#FF0000;">*</span></label>
+                                                <input class="form-control" name="ToPeriodDate" type="date" id="ToDate" readonly="">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+                                <div class="box-footer">
+                                    <div class="col-md-12">
+                                        <button type="button" id="btnNext1" class="btn btn-warning" style="float: right; margin-right: 8%" onclick="Clear(event)">Clear </button>
+                                        <button type="submit" id="btnSave" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="CreatePayRollvalidateData(event);">Save</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div style="display:none;">
+        <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+        </button>
+        <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+        </button>
+    </div>
+
+    <div class="alert alert-warning fade" id="modal-warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4>
+            <i class="icon fa fa-warning"></i> Alert!
+        </h4>
+
+        <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+        </div>
+
+        <div class="alert-footer">
+            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+        </div>
+    </div>
+
+    <div class="modal modal-warning fade" id="modal-warning2">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Alert!</h4>
+                </div>
+                <div class="modal-body">
+                    <p>One fine body&hellip;</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+            @*/.modal-content*@
+        </div>
+        @*/.modal-dialog*@
+    </div>
+</section>
+@section Scripts {
+
+    <!-- DataTables -->
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/dataTables.buttons.min.js"></script>
+    @*<script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"></script>*@
+
+    <script src="~/bower_components/datatables.net-export/jszip.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/pdfmake.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/vfs_fonts.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.html5.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.print.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.colVis.min.js"></script>
+    <!-- Export plugin -->
+    <script type="text/javascript" src="~/lib/hhurz/libs/FileSaver/FileSaver.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/js-xlsx/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.min.js"></script>
+    @*<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.15.4/extensions/print/bootstrap-table-print.js"></script>*@
+
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+        window.onload = function () {
+             document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+              };
+        </script>
+    }
+    <script>
+
+        $(document).ready(function () {
+            $("#liAttendance").addClass("active");
+            $("#liAttandancePolicy").addClass("active");
+            document.getElementById("liAttandancePolicy").style.backgroundColor = "#3c8dbc45";
+        });
+        function CreatePayRollvalidateData(event) {
+            var IsAnyEmpty = false;
+            var alertMsg = "";
+
+            if (document.getElementById("txtMonthNAmeId").value == "" || document.getElementById("txtMonthNAmeId").value == 0) {
+                IsAnyEmpty = true;
+                alertMsg = "Month Name <br />";
+            }
+            if (document.getElementById("FromdtDate").value == "" ) {
+                IsAnyEmpty = true;
+                alertMsg = "From Period Date <br />";
+            }
+
+
+            if (document.getElementById("ToDate").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "To Period Date <br />";
+            }
+
+            if (IsAnyEmpty) {
+
+                event.preventDefault();
+
+                document.getElementById("btnAlert").click();
+
+                $('#alertBody').html('<p>' + alertMsg + '<br /> can not be empty </p>');
+                debugger;
+
+                IsAnyEmpty = true;
+            }
+
+            return IsAnyEmpty;
+
+            function successAlertClose(event) {
+                document.getElementById("modal-success").style.display = "none";
+            }
+        }
+        function successAlertClose(event) {
+            document.getElementById("modal-success").style.display = "none";
+        }
+
+        function setRange()
+        {
+            var monthId = $('#txtMonthNAmeId').val();
+            var today = new Date();
+            var yyyy = today.getFullYear();
+            
+            today =  yyyy+'-'+ monthId + '-01';
+            $('#FromdtDate').val(today);
+            var CountOfMonth = new Date(yyyy, monthId, 0).getDate();
+            var endDate = yyyy + '-' + monthId + '-' + CountOfMonth;
+            $('#ToDate').val(endDate);
+        }
+    </script>
+    <script>
+        function Clear() {
+            document.getElementById("txtMonthNAmeId").value = null;
+            document.getElementById("FromdtDate").value = null;
+            document.getElementById("ToDate").value = null;
+        }
+    </script>
+}
+
+

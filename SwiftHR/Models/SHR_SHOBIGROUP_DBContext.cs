@@ -11,7 +11,7 @@ namespace SwiftHR.Models
 {
     public partial class SHR_SHOBIGROUP_DBContext : DbContext
     {
-        private const string ConnectionString = "Server=DESKTOP-44RC688\\SQLEXPRESS;Database=SHR_SHOBIGROUP_DB;Trusted_Connection=True;";
+        private const string ConnectionString = "Server=L-PANKAJ\\SQLEXPRESS;Database=SHR_SHOBIGROUP_DB;Trusted_Connection=True;";
 
         public SHR_SHOBIGROUP_DBContext()
         {
@@ -41,13 +41,19 @@ namespace SwiftHR.Models
         public virtual DbSet<AttandancePolicySetup> AttandancePolicySetups { get; set; }
         public virtual DbSet<AuthorizedSignatory> AuthorizedSignatories { get; set; }
         public virtual DbSet<BankMaster> BankMasters { get; set; }
-
         public virtual DbSet<LookUpM> LookUpM { get; set; }
         public virtual DbSet<EmpLOPDetails> EmpLOPDetails { get; set; }
 
         public virtual DbSet<EmpReimbursement> EmpReimbursement { get; set; }
 
+        public virtual DbSet<CreateEmpPayRollMonth> CreateEmpPayRollMonth { get; set; }
+        public virtual DbSet<LoanHeader> LoanHeader { get; set; }
+
         public virtual DbSet<LookUpDetailsM> LookUpDetailsM { get; set; }
+        public virtual DbSet<EmpArrearDetails> EmpArrearDetails { get; set; }
+        public virtual DbSet<EmpPFESICDetails> EmpPFESICDetails { get; set; }
+        public virtual DbSet<SalaryHeader> SalaryHeaders { get; set; }
+        public virtual DbSet<SalaryDetails> SalaryDetails { get; set; }
         public virtual DbSet<EmpAddress> EmpAddress { get; set; }
         public virtual DbSet<CurrancyMaster> CurrancyMasters { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
@@ -101,6 +107,8 @@ namespace SwiftHR.Models
         public virtual DbSet<UserActionLog> UserActionLogs { get; set; }
         public virtual DbSet<UserDetail> UserDetails { get; set; }
         public virtual DbSet<Presence> Presences { get; set; }
+
+        public virtual DbSet<LookUpDetailsM> LookupDetailsM { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -199,7 +207,187 @@ namespace SwiftHR.Models
                     .HasMaxLength(500)
                     .IsUnicode(false);
             });
+            modelBuilder.Entity<SalaryHeader>(entity =>
+            {
+                entity.ToTable("SalaryHeader");
 
+
+                entity.Property(e => e.EmployeeID)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeNumber)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeName)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeType)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Gender)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PFAvailability)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DOJ)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DOB)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LastPayrollProceesedDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Location)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PayoutMonth)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Remarks)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EffectiveStartDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EffectiveEndDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedBy)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IsActive)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdatedBy)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+            });
+
+            modelBuilder.Entity<SalaryDetails>(entity =>
+            {
+                entity.ToTable("SalaryDetails");
+
+
+                entity.Property(e => e.HeaderID)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Basic)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.HRA)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Bonus)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.OtherAllowance)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Overttime)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ProfTax)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Loan)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AdvanceSalary)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeContributionPF)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeContributionESIC)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployerContributionPF)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployerContributionESIC)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MonthlyNetPay)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MonthlyGrossPay)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AnnualGrossSalary)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AnnualGrossCTC)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedBy)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IsActive)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdatedBy)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+            });
             modelBuilder.Entity<Presence>(entity =>
             {
                 entity.ToTable("Presence");
@@ -366,6 +554,10 @@ namespace SwiftHR.Models
                     .HasMaxLength(250)
                     .IsUnicode(false);
 
+                entity.Property(e => e.EarningsTypeFromLookUp)
+                   .HasMaxLength(250)
+                   .IsUnicode(false);
+
                 entity.Property(e => e.Date)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -380,15 +572,495 @@ namespace SwiftHR.Models
 
 
                 entity.Property(e => e.CreatedDate)
-                      .HasMaxLength(20)
+                      .HasMaxLength(200)
                       .IsUnicode(false);
 
 
                 entity.Property(e => e.UpdatedDate)
+                      .HasMaxLength(200)
+                      .IsUnicode(false);
+
+                entity.Property(e => e.PaymentEffectedDate)
+                      .HasMaxLength(200)
+                      .IsUnicode(false);
+
+                entity.Property(e => e.Status)
+                      .HasMaxLength(20)
+                      .IsUnicode(false);
+
+
+                entity.Property(e => e.ApprovedBy)
+                      .HasMaxLength(20)
+                      .IsUnicode(false);
+
+
+                entity.Property(e => e.ApprovedDate)
+                      .HasMaxLength(200)
+                      .IsUnicode(false);
+
+            });
+
+            modelBuilder.Entity<CreateEmpPayRollMonth>(entity =>
+            {
+                entity.ToTable("CreateEmpPayRollMonth");
+
+
+                entity.Property(e => e.Id)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PayRollMonth)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FromPayRollPeriod)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ToPayRollPeriod)
+                   .HasMaxLength(250)
+                   .IsUnicode(false);
+
+
+                entity.Property(e => e.CreatedDate)
+                      .HasMaxLength(200)
+                      .IsUnicode(false);
+
+
+                entity.Property(e => e.UpdatedDate)
+                      .HasMaxLength(200)
+                      .IsUnicode(false);
+
+                entity.Property(e => e.Status)
                       .HasMaxLength(20)
                       .IsUnicode(false);
 
             });
+
+            modelBuilder.Entity<LoanHeader>(entity =>
+            {
+                entity.ToTable("LoanHeader");
+
+
+                entity.Property(e => e.EmployeeID)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeName)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeNumber)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                //entity.Property(e => e.DateOfLoan)
+                //    .HasMaxLength(50)
+                //    .IsUnicode(false);
+
+                //entity.Property(e => e.StartFrom)
+                //    .HasMaxLength(20)
+                //    .IsUnicode(false);
+
+                //entity.Property(e => e.LoanAmount)
+                //    .HasMaxLength(20)
+                //    .IsUnicode(false);
+
+
+                //entity.Property(e => e.LoanCompleted)
+                //    .HasMaxLength(20)
+                //    .IsUnicode(false);
+                //entity.Property(e => e.CompletedDate)
+                //    .HasMaxLength(20)
+                //    .IsUnicode(false);
+
+
+                //entity.Property(e => e.LoanType)
+                //    .HasMaxLength(20)
+                //    .IsUnicode(false);
+
+                //entity.Property(e => e.NumberOfEMI)
+                //    .HasMaxLength(20)
+                //    .IsUnicode(false);
+
+
+                //entity.Property(e => e.MonthlyEMIAmount)
+                //    .HasMaxLength(20)
+                //    .IsUnicode(false);
+
+
+                //entity.Property(e => e.InterestRate)
+                //    .HasMaxLength(20)
+                //    .IsUnicode(false);
+
+
+                //entity.Property(e => e.DemandPromissoryNote)
+                //    .HasMaxLength(20)
+                //    .IsUnicode(false);
+
+
+                //entity.Property(e => e.PerquisiteRate)
+                //    .HasMaxLength(20)
+                //    .IsUnicode(false);
+
+
+                //entity.Property(e => e.LoanAccountNo)
+                //    .HasMaxLength(20)
+                //    .IsUnicode(false);
+
+
+                //entity.Property(e => e.PrincipalBalance)
+                //    .HasMaxLength(20)
+                //    .IsUnicode(false);
+
+
+                //entity.Property(e => e.InterestBalance)
+                //    .HasMaxLength(20)
+                //    .IsUnicode(false);
+
+                //entity.Property(e => e.Remarks)
+                //    .HasMaxLength(20)
+                //    .IsUnicode(false);
+
+
+                //entity.Property(e => e.CreatedDate)
+                //      .HasMaxLength(20)
+                //      .IsUnicode(false);
+
+
+                //entity.Property(e => e.UpdatedDate)
+                //      .HasMaxLength(20)
+                //      .IsUnicode(false);
+
+            });
+
+
+            modelBuilder.Entity<EmpArrearDetails>(entity =>
+            {
+                entity.ToTable("EmpArrearDetails");
+
+
+                entity.Property(e => e.EmployeeID)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeNumber)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeName)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PayrollMonth)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EffectiveDateFrom)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Amount)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Remarks)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+            });
+
+
+            modelBuilder.Entity<EmpPFESICDetails>(entity =>
+            {
+                entity.ToTable("EmpPFESICDetails");
+
+
+                entity.Property(e => e.EmployeeID)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeNumber)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeName)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankName)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankID)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankBranch)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AccountTypeID)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AccountNo)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IFSCCode)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeNameAsBankRecords)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IBAN)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PaymentMethod)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ESICIsApplicable)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ESICAccountNo)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PFAccountNo)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UAN)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StartDate)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PFIsApplicable)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AllowEPFExcessContribution)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AllowEPSExcessContribution)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedBy)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IsActive)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdatedBy)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+            });
+
+
+            modelBuilder.Entity<SalaryHeader>(entity =>
+            {
+                entity.ToTable("SalaryHeader");
+
+
+                entity.Property(e => e.EmployeeID)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeNumber)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeName)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeType)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Gender)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PFAvailability)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DOJ)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DOB)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LastPayrollProceesedDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Location)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PayoutMonth)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Remarks)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EffectiveStartDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EffectiveEndDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedBy)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IsActive)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdatedBy)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+            });
+
+            modelBuilder.Entity<SalaryDetails>(entity =>
+            {
+                entity.ToTable("SalaryDetails");
+
+
+                entity.Property(e => e.HeaderID)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Basic)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.HRA)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Bonus)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.OtherAllowance)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Overttime)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ProfTax)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Loan)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AdvanceSalary)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeContributionPF)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeContributionESIC)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployerContributionPF)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployerContributionESIC)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MonthlyNetPay)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MonthlyGrossPay)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AnnualGrossSalary)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AnnualGrossCTC)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedBy)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IsActive)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdatedBy)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+            });
+
 
             modelBuilder.Entity<EmpAddress>(entity =>
             {

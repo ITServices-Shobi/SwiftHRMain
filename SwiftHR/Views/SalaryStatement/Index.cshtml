@@ -1,0 +1,651 @@
+﻿
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Salary Statement";
+}
+
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+
+<section class="content-header">
+    <h1>
+        Salary Statement
+    </h1>
+
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="box box-default">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="SalaryID" style="border: 1px solid #0000001c;">
+                            <form asp-controller="SalaryStatement" asp-action="SalaryStatementDetails" method="POST">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="ddlEmployeeType">Employee Status</label>
+                                                        <select class="form-control select2" id="ddlEmployeeType" name="EmployeeType">
+                                                            <option value="1">All</option>
+                                                            <option value="2">Probation</option>
+                                                            <option value="3">Confirmed</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="ddlEmployeeType">Employee Filter</label>
+                                                        <select class="form-control select2" id="ddlEmployeeType" name="EmployeeType">
+                                                            <option value="1">All</option>
+                                                            <option value="2">Current Employees</option>
+                                                            <option value="3">Past Employees</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="box-body">
+                                                    <div class="table-responsive" id="divEmpllist">
+                                                        <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="bg-primary"> Employee No </th>
+                                                                    <th class="bg-primary"> Name </th>
+                                                                    <th class="bg-primary"> Join Date </th>
+                                                                    <th class="bg-primary"> Days In Month </th>
+                                                                    <th class="bg-primary"> LOP </th>
+                                                                    <th class="bg-primary"> Totak Working Days </th>
+                                                                    <th class="bg-primary"> Basic </th>
+                                                                    <th class="bg-primary"> HRA </th>
+                                                                    <th class="bg-primary"> Bonus </th>
+                                                                    <th class="bg-primary"> Special Allowance </th>
+                                                                    <th class="bg-primary"> Overtime </th>
+                                                                    <th class="bg-primary"> Arrears </th>
+                                                                    <th class="bg-primary"> Reimbursement </th>
+                                                                    <th class="bg-primary"> Gross </th>
+                                                                    <th class="bg-primary"> PF </th>
+                                                                    <th class="bg-primary"> ESI </th>
+                                                                    <th class="bg-primary"> Proof Tax </th>
+                                                                    <th class="bg-primary"> Loan </th>
+                                                                    <th class="bg-primary"> Total Deduction </th>
+                                                                    <th class="bg-primary"> Net Pay </th>
+                                                                </tr>
+                                                            </thead>
+                                                            @if (ViewBag.SalaryStatementList != null)
+                                                            {
+                                                                IEnumerable<SwiftHR.Models.SalaryMonthlyStatement> d = new List<SwiftHR.Models.SalaryMonthlyStatement>();
+                                                                d = ViewBag.SalaryStatementList;
+                                                                <tbody>
+                                                                    @foreach (var data in d)
+                                                                    {
+                                                                    <tr id="@data.ID">
+                                                                        <td>@data.EmployeeNumber</td>
+                                                                        <td>@data.EmployeeName</td>
+                                                                        <td>@data.DOJ</td>
+                                                                        <td>@data.DaysInMonth</td>
+                                                                        <td>@data.LOPDays</td>
+                                                                        <td>@data.TotalWorkingDays</td>
+                                                                        <td>@data.Basic</td>
+                                                                        <td>@data.HRA</td>
+                                                                        <td>@data.Bonus</td>
+                                                                        <td>@data.OtherAllowance</td>
+                                                                        <td>@data.Overttime</td>
+                                                                        <td>@data.Arrears</td>
+                                                                        <td>@data.Reimbursement</td>
+                                                                        <td>@data.MonthlyGrossPay</td>
+                                                                        <td>@data.MonthlyPF</td>
+                                                                        <td>@data.MonthlyESIC</td>
+                                                                        <td>@data.ProfTax</td>
+                                                                        <td>@data.Loan</td>
+                                                                        <td>@data.TotalDeduction</td>
+                                                                        <td>@data.NetPay</td>
+                                                                    </tr>
+                                                                    }
+                                                                </tbody>
+                                                            }
+                                                            @*<tfoot class="hidden-print">
+            <tr>
+                <th> Salary Item </th>
+                <th> Previous Salary </th>
+                <th> Revised Salary </th>
+                <th> Revision % </th>
+            </tr>
+        </tfoot>*@
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <!-- /.box-body -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <div class="col-md-12">
+                                        @*<button type="button" id="btnNext1" class="btn btn-warning" style="float: right; margin-right: 8%" onclick="Clear(event)">Clear </button>*@
+                                        <button type="submit" id="btnShowDetails" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="GetSalStatementDetails();">Export Details</button>
+                                    </div>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:none;">
+                <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+                </button>
+                <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+                </button>
+            </div>
+
+
+            <div class="alert alert-warning fade" id="modal-warning">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4>
+                    <i class="icon fa fa-warning"></i> Alert!
+                </h4>
+
+                <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+                </div>
+
+                <div class="alert-footer">
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+
+
+            <div class="modal modal-warning fade" id="modal-warning2">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">Alert!</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>One fine body&hellip;</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                        </div>
+                    </div>
+                    @*/.modal-content*@
+                </div>
+                @*/.modal-dialog*@
+            </div>
+            <!-- /.modal -->
+
+            <div class="alertS alert-success" id="modal-success" style="display:none;">
+                <button type="button" class="close" aria-hidden="true" onclick="successAlertClose()">&times;</button>
+                <h4><i class="icon fa fa-check"></i> Success </h4>
+
+                <p id="successBody"></p>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<script>
+    function GetEmpDetails() {
+        event.preventDefault();
+        var EmployeeNo = $("#txtEmployeeNumber").val();
+        var form_data = new FormData();
+        form_data.append('EmpNo', EmployeeNo);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetEmpName", "AddSalary")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+                    debugger;
+                    $("#txtEmployeeName").val(response[0].firstName + ' ' + response[0].middleName + ' ' + response[0].lastName);
+                    $("#txtEmployeeId").val(response[0].employeeId);
+                    $("#dtDOJ").val(response[0].dateOfJoining);
+                    $("#dtDOB").val(response[0].dateOfBirth);
+                    $("#ddlGender").val(response[0].gender);
+                    //alert(response);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function SearchRecord(ID) {
+        event.preventDefault();
+        var form_data = new FormData();
+        form_data.append('EMPPFID', ID);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SearchRecord", "EmpPFESICDetails")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert($(this).parent().);
+
+                    $("#ID").val(response[0].id);
+                    $("#txtEmployeeId").val(response[0].employeeId);
+                    $("#txtEmployeeNumber").val(response[0].employeeNumber);
+                    $("#txtEmployeeName").val(response[0].employeeName);
+                    $("#ddlBankID").val(response[0].bankID);
+                    $("#txtBankBranch").val(response[0].bankBranch);
+                    $("#ddlAccountTypeID").val(response[0].accountTypeID);
+                    $("#txtAccountNo").val(response[0].accountNo);
+                    $("#txtIFSCCode").val(response[0].iFSCCode);
+                    $("#txtEmployeeNameAsBankRecords").val(response[0].employeeNameAsBankRecords);
+                    $("#txtIBAN").val(response[0].iBAN);
+                    $("#ddlPaymentMethod").val(response[0].paymentMethod);
+                    $("#txtESICIsApplicable").val(response[0].eSICIsApplicable);
+                    $("#txtESICAccountNo").val(response[0].eSICAccountNo);
+                    $("#chkPFIsApplicable").val(response[0].pFIsApplicable);
+                    $("#chkAllowEPFExcessContribution").val(response[0].allowEPFExcessContribution);
+                    $("#chkAllowEPSExcessContribution").val(response[0].allowEPSExcessContribution);
+                    $("#txtPFAccountNo").val(response[0].pFAccountNo);
+                    $("#txtUAN").val(response[0].uan);
+                    $("#txtStartDate").val(response[0].startDate);
+
+                    document.getElementById("successBody").innerHTML = "Record Search Success";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+                    //alert(response);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+
+    function SalaryDataDelete(ID) {
+        var form_data = new FormData();
+        form_data.append('SalaryID', ID);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("DeleteRecordSalary", "EmpPFESICDetails")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+    }
+
+    function successAlertClose(event) {
+        document.getElementById("modal-success").style.display = "none";
+    }
+
+</script>
+
+@section Scripts {
+
+    <!-- DataTables -->
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/dataTables.buttons.min.js"></script>
+    @*<script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"></script>*@
+
+    <script src="~/bower_components/datatables.net-export/jszip.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/pdfmake.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/vfs_fonts.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.html5.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.print.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.colVis.min.js"></script>
+    <!-- Export plugin -->
+    <script type="text/javascript" src="~/lib/hhurz/libs/FileSaver/FileSaver.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/js-xlsx/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.min.js"></script>
+    @*<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.15.4/extensions/print/bootstrap-table-print.js"></script>*@
+
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+        window.onload = function () {
+             document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+              };
+        </script>
+    }
+<script>
+     function GetSalStatementDetails() {
+         var SelectedPayMonth = 1;
+        event.preventDefault();
+            var form_data = new FormData();
+         form_data.append('PayMonth', SelectedPayMonth);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetSalStatementFromSP", "SalaryStatement")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    document.getElementById("successBody").innerHTML = "Salary Statement Exported.";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+
+    }
+</script>
+
+    <script>
+
+        $(document).ready(function () {
+            $("#liAttendance").addClass("active");
+            $("#liAttandancePolicy").addClass("active");
+            document.getElementById("liAttandancePolicy").style.backgroundColor = "#3c8dbc45";
+        });
+        function AddSalaryvalidateData(event) {
+            var IsAnyEmpty = false;
+            var alertMsg = "";
+
+            if (document.getElementById("txtEmployeeNumber").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = "Employee Number <br />";
+            }
+
+            if (document.getElementById("txtEmployeeName").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = "Employee Name <br />";
+            }
+
+            if (document.getElementById("ddlEmployeeType").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Employee Type <br />";
+            }
+
+            if (document.getElementById("ddlGender").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Gender <br />";
+            }
+
+            if (document.getElementById("dtDOJ").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "DOJ <br />";
+            }
+
+            if (document.getElementById("ddlDOB").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "DOB <br />";
+            }
+
+            if (document.getElementById("dtLastPayrollProceesedDate").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Last Payroll Proceesed Date <br />";
+            }
+
+            if (document.getElementById("txtLocation").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Location <br />";
+            }
+
+            if (IsAnyEmpty) {
+
+                event.preventDefault();
+
+                document.getElementById("btnAlert").click();
+
+                $('#alertBody').html('<p>' + alertMsg + '<br /> can not be empty </p>');
+                debugger;
+
+                IsAnyEmpty = true;
+            }
+
+            return IsAnyEmpty;
+
+            function successAlertClose(event) {
+                document.getElementById("modal-success").style.display = "none";
+            }
+        }
+        function Clear() {
+
+            document.getElementById("txtEmployeeNumber").value = null;
+            document.getElementById("txtEmployeeName").value = null;
+
+            document.getElementById("txtPayrollMonth").value = null;
+            document.getElementById("dtEffectiveDateFrom").value = null;
+            document.getElementById("txtAmount").value = null;
+
+            document.getElementById("txtRemarks").value = null;
+
+        }
+
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#liEmployee").addClass("active");
+            $("#liEmployeeList").addClass("active");
+            document.getElementById("liEmployeeList").style.backgroundColor = "#3c8dbc45";
+
+            //// Setup - add a text input to each footer cell
+            //$('#tblPolicyList tfoot th').each(function (i) {
+            //    var title = $('#tblPolicyList thead th').eq($(this).index()).text();
+            //    $(this).html('<input type="text" placeholder="Search ' + title + '" data-index="' + i + '" />');
+            //});
+
+
+            // DataTable
+            @* scrollY: "300px",*@
+            var table = $('#tblArrearsList').DataTable({
+                "scrollX": true,
+                "scrollY": true,
+                "scrollCollapse": true,
+                "paging": true,
+                "fixedColumns": true,
+                "fixedHeader": true,
+                "bLengthChange": true,
+                "Filter": true,
+                "Info": true,
+                "pagingType": "full_numbers",
+                "pageLength": 10,
+                "pageList": "[10, 25, 50, 100, 200, All]",
+                "dom": 'Bfrtip',
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-copy"></i>'
+                    },
+                    {
+                        extend: 'excel',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-excel-o"></i>'
+                    },
+                    {
+                        extend: 'pdf',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-pdf-o"></i>'
+                    },
+                    {
+                        extend: 'csv',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-csv-o"></i>'
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-print"></i>'
+                    }
+                ],
+            });
+
+
+            // Filter event handler
+            $(table.table().container()).on('keyup', 'tfoot input', function () {
+                table
+                    .column($(this).data('index'))
+                    .search(this.value)
+                    .draw();
+            });
+        });
+
+        @*$(function () {
+            $('#tblEmpList').DataTable();
+        })*@
+
+
+        $("#btnExport").click(function (e) {
+            //alert("excel");
+            //window.open('data:application/vnd.ms-excel,' + $('#divJoinerslist').dataTable.html());
+            $('#tblArrearsList').tableExport({ type: 'excel'});
+            @*$('#tblEmpList').tableExport({ type: 'csv' });*@
+            @*$('tblEmpList').tableExport({
+                type: 'excel',
+                mso: {
+                    fileFormat: 'excel',
+                    worksheetName: ['Table 1', 'Table 2', 'Table 3']
+                }
+            });*@
+
+            @*$('tblEmpList').tableExport({
+                type: 'excel',
+                mso: {
+                    fileFormat: 'xmlss',
+                    worksheetName: ['Table 1', 'Table 2', 'Table 3']
+                }
+            });*@
+            e.preventDefault();
+        });
+
+        $("#btnpDF").click(function (e) {
+            //PDF
+            $('#tblArrearsList').tableExport({
+                type: 'pdf',
+                jspdf: {
+                    orientation: 'l',
+                    format: 'a4',
+                    margins: { left: 10, right: 10, top: 20, bottom: 20 },
+                    autotable: {
+                        styles: {
+                            fillColor: 'inherit',
+                            textColor: 'inherit'
+                        },
+                        tableWidth: 'auto'
+                    }
+                }
+            });
+            e.preventDefault();
+        });
+
+        $("#btnPrint").click(function (e) {
+            //Print
+            var table = document.getElementById('tblArrearsList');
+            table.button('.buttons-print').trigger();
+            //var win = window.open('', '', 'height=700,width=700');
+            //window.document.write(tab.outerHTML);
+            //window.document.print();
+            //window.print();
+            //window.document.close();
+
+            //window.print();
+
+            //e.preventDefault();
+        });
+
+    </script>
+
+}

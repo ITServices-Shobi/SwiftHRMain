@@ -1,0 +1,833 @@
+﻿@model SwiftHR.Utility.LeaveSettings
+
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Leave Settings";
+}
+
+<!-- DataTables -->
+<link rel="stylesheet" href="~/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+
+<section class="content-header">
+    <h1>
+        Leaves Settings
+    </h1>
+
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="box box-default">
+        <div class="box-body">
+            <form asp-controller="Leaves" asp-action="LeavesSettings" method="POST">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="nav-tabs-custom">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a id="anchr1" href="#BasicInfo" data-toggle="tab">Leave Scheme Setup</a></li>
+                                <li><a id="anchr2" href="#EmploymentSelections" data-toggle="tab">Leave Type Category Setup </a></li>
+                                <li><a id="anchr3" href="#LeavesType" data-toggle="tab">Leave Types Setup</a></li>
+                                <li><a id="anchr4" href="#PaymentMode" data-toggle="tab">Leave Policy Setup</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="tab-content">
+
+                            <div class="active tab-pane" id="BasicInfo" style="border: 1px solid #0000001c;">
+                                <div class="row">
+                                    <button type="button" disabled id="btnNewScheme" class="btn btn-primary btn-xs" style="float: right; margin-right: 2%;" onclick="NewData(1);"><i id="iNewScheme" class="fa fa-save"> New Scheme</i></button>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtSchemeName">Scheme Name<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtSchemeName" name="SchemeName" class="form-control" placeholder="Scheme Name" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtSchemeDescription">Scheme Description</label>
+                                                <input type="text" id="txtSchemeDescription" name="SchemeDescription" class="form-control" placeholder="Scheme Description" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="dtSchemeAppliedFrom">Scheme Active From <span style="color:#FF0000;">*</span></label>
+                                                <input class="form-control" name="SchemeAppliedFrom" type="date" id="dtSchemeAppliedFrom">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="dtSchemeAppliedTill">Scheme Active Till <span style="color:#FF0000;">*</span></label>
+                                                <input class="form-control" name="SchemeAppliedTill" type="date" id="dtSchemeAppliedTill">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-body" style="border: 1px solid #0000001c;">
+                                            <div class="form-group">
+                                                <table id="tblLeaveSchemesList" data-toggle="table" data-sort-name="Status" data-sort-order="desc" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" data-page-length='5' style="width:100%">
+                                                    <thead class="bg-primary">
+                                                        <tr>
+                                                            <th> Leave Scheme</th>
+                                                            <th> Scheme Description </th>
+                                                            <th> Applied From </th>
+                                                            <th> Applied Till </th>
+                                                            <th> Current Status </th>
+                                                            <th> Updated On </th>
+                                                            <th hidden hidden-print> Scheme Updated On </th>
+                                                            <th> Created By </th>
+                                                            <th> Action </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @if (Model.leaveTypeSchemeSettings != null && Model.leaveTypeSchemeSettings.Count() > 0)
+                                                        {
+                                                            @foreach (var leave in Model.leaveTypeSchemeSettings)
+                                                            {
+                                                                <tr>
+                                                                    <td>@leave.LeaveTypeSchemeName</td>
+                                                                    <td>@leave.LeaveTypeSchemeDescription</td>
+                                                                    <td>@leave.SchemeAppliedFrom</td>
+                                                                    <td>@leave.SchemeAppliedTill</td>
+                                                                    <td style="width: 12%;">
+                                                                        @if (leave.IsActive == true)
+                                                                        {
+                                                                            <small class="label  bg-aqua-gradient"><i class="fa fa-gears"></i> Active</small>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <small class="label  bg-aqua-gradient"><i class="fa fa-gears"></i> In Active</small>
+                                                                        }
+                                                                    </td>
+                                                                    <td>@leave.CreatedDate</td>
+                                                                    <td hidden>
+                                                                        @System.Convert.ToDateTime(leave.CreatedDate).ToString("yyyy-MM-dd")
+                                                                    </td>
+
+                                                                    <td style="width: 18%;">
+                                                                        @if (Model.userDetails.Where(x => x.UserId == @leave.CreatedBy).ToList().SingleOrDefault() != null)
+                                                                        {
+                                                                            <img src="../UploadImages/@Model.userDetails.Where(x => x.UserId == @leave.CreatedBy).ToList().SingleOrDefault().ProfilePicturePath" alt="Emp Image" style="width:10% !important; border-radius: 50%;">
+                                                                            <span style="margin-left:5%;">
+                                                                                <strong> @Model.userDetails.Where(x => x.UserId == @leave.CreatedBy).ToList().SingleOrDefault().FirstName @Model.userDetails.Where(x => x.UserId == @leave.CreatedBy).ToList().SingleOrDefault().LastName </strong>
+                                                                            </span>
+                                                                        }
+                                                                    </td>
+                                                                    <td style="width: 20%;">
+                                                                        @if (leave.IsActive == true)
+                                                                        {
+                                                                            <button href="" type="button" id="_@leave.LeaveTypeSchemeId" class="btn btn-linkedin pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="ModifySchemesData(@leave.LeaveTypeSchemeId,'@leave.LeaveTypeSchemeName','@leave.LeaveTypeSchemeDescription','@System.Convert.ToDateTime(leave.SchemeAppliedFrom).ToString("yyyy-MM-dd")','@System.Convert.ToDateTime(leave.SchemeAppliedTill).ToString("yyyy-MM-dd")','edit');"><i id="C___@leave.LeaveTypeSchemeId" class="fa fa-pencil-square-o"></i> Edit Scheme </button>
+                                                                            <button href="" type="button" id="_@leave.LeaveTypeSchemeId" class="btn btn-warning pull-right btn-xs" style="float: left; margin-right: 4%;" onclick="ModifySchemesData(@leave.LeaveTypeSchemeId,@leave.LeaveTypeSchemeName,@leave.LeaveTypeSchemeDescription,@leave.SchemeAppliedFrom,@leave.SchemeAppliedTill);"><i id="C___@leave.LeaveTypeSchemeId" class="fa fa-ban"></i> Disable Scheme </button>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <button disabled href="" type="button" id="_@leave.LeaveTypeSchemeId" class="btn btn-warning pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="UpdateScheme(@leave.LeaveTypeSchemeId);"><i id="C___@leave.LeaveTypeSchemeId" class="fa fa-ban"></i> Scheme Disabled </button>
+                                                                        }
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box-footer">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input name="IsSelfOnboarding" type="checkbox" id="chkIsSelfOnboarding">  Allow Employee Self Onboarding
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input id="empSchemeIdValForEditing" type="hidden" value="" />
+                                        <button type="button" id="btnNext1" class="btn btn-warning" style="float: right; margin-right: 2%" onclick="NextClick(event, '2')">Next <i class="fa fa-arrow-circle-right"></i></button>
+                                        <button type="submit" id="btnSave" class="btn btn-primary" style="float: right; margin-right: 2%;" onclick="validateSchemeData(event);"><i id="iSave" class="fa fa-save"> Save Scheme</i></button>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="EmploymentSelections" style="border: 1px solid #0000001c;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtFName">Leave Category<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtLeavecategory" name="Leave Category" class="form-control" placeholder="Scheme Name" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtMName">Category Description</label>
+                                                <input type="text" id="txtCategoryDescription" name="CategoryDescription" class="form-control" placeholder="Scheme Description" onkeydown="preventNumberInput(event)" onkeyup="preventNumberInput(event)">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-body" style="border: 1px solid #0000001c;">
+                                            <div class="form-group">
+                                                <table id="tblLeaveCategoryList" data-toggle="table" data-sort-name="Status" data-sort-order="desc" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" data-page-length='5' style="width:100%">
+                                                    <thead class="bg-primary">
+                                                        <tr>
+                                                            <th> Leave Category</th>
+                                                            <th> Category Description </th>
+                                                            <th> Current Status </th>
+                                                            <th> Updated On </th>
+                                                            <th hidden hidden-print> Category Updated On </th>
+                                                            <th> Created By </th>
+                                                            <th> Action </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @if (Model.leaveTypeCategorySettings != null && Model.leaveTypeCategorySettings.Count() > 0)
+                                                        {
+                                                            @foreach (var cat in Model.leaveTypeCategorySettings)
+                                                            {
+                                                                <tr>
+                                                                    <td>@cat.LeaveTypeCategoryName</td>
+                                                                    <td>@cat.LeaveTypeCategoryDesc</td>
+                                                                    <td style="width: 12%;">
+                                                                        @if (cat.IsActive == true)
+                                                                        {
+                                                                            <small class="label  bg-aqua-gradient"><i class="fa fa-gears"></i> Active</small>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <small class="label  bg-aqua-gradient"><i class="fa fa-gears"></i> In Active</small>
+                                                                        }
+                                                                    </td>
+                                                                    <td>@cat.CreatedDate</td>
+                                                                    <td hidden>
+                                                                        @System.Convert.ToDateTime(cat.CreatedDate).ToString("yyyy-MM-dd")
+                                                                    </td>
+
+                                                                    <td style="width: 18%;">
+                                                                        @if (Model.userDetails.Where(x => x.UserId == @cat.CreatedBy).ToList().SingleOrDefault() != null)
+                                                                        {
+                                                                            <img src="../UploadImages/@Model.userDetails.Where(x => x.UserId == @cat.CreatedBy).ToList().SingleOrDefault().ProfilePicturePath" alt="Emp Image" style="width:10% !important; border-radius: 50%;">
+                                                                            <span style="margin-left:5%;">
+                                                                                <strong> @Model.userDetails.Where(x => x.UserId == @cat.CreatedBy).ToList().SingleOrDefault().FirstName @Model.userDetails.Where(x => x.UserId == @cat.CreatedBy).ToList().SingleOrDefault().LastName </strong>
+                                                                            </span>
+                                                                        }
+                                                                    </td>
+                                                                    <td style="width: 20%;">
+                                                                        @if (cat.IsActive == true)
+                                                                        {
+                                                                            <button href="" type="button" id="_@cat.LeaveTypeCategoryId" class="btn btn-linkedin pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="ModifySchemesData(@cat.LeaveTypeCategoryId);"><i id="C___@cat.LeaveTypeCategoryId" class="fa fa-pencil-square-o"></i> Edit Category </button>
+                                                                            <button href="" type="button" id="_@cat.LeaveTypeCategoryId" class="btn btn-warning pull-right btn-xs" style="float: left; margin-right: 4%;" onclick="ModifySchemesData(@cat.LeaveTypeCategoryId);"><i id="C___@cat.LeaveTypeCategoryId" class="fa fa-ban"></i> Disable Category </button>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <button disabled href="" type="button" id="_@cat.LeaveTypeCategoryId" class="btn btn-warning pull-left btn-xs" style="float: left; margin-right: 4%;" onclick="UpdateScheme(@cat.LeaveTypeCategoryId);"><i id="C___@cat.LeaveTypeCategoryId" class="fa fa-ban"></i> Category Disabled </button>
+                                                                        }
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box-footer">
+                                    <button type="submit" id="btnSaveCategory" class="btn btn-primary" style="float: right; margin-right: 2%;" onclick="validateSchemeData(event);"><i id="iSaveCategory" class="fa fa-save"> Save Category</i></button>
+                                </div>
+                                <div class="row" >
+                                    <div class="col-md-6">
+                                        <div class="box-body" style="border: 1px solid #0000001c;">
+                                            <div class="form-group">
+                                                <label for="ddlEmployeeStatus">Leave Category</label>
+                                                <select class="form-control select2 bg-primary" id="ddlEmployeeStatus" name="EmployeeStatus" asp-for="@Model.leaveTypeCategorySettings" asp-items="@(new SelectList(Model.leaveTypeCategorySettings, "LeaveTypeCategoryId", "LeaveTypeCategoryName"))">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box-body" style="border: 1px solid #0000001c;">
+                                            <div class="form-group">
+                                                <div>Leave Types</div>
+                                                <select id="categorySelection" class="form-control select2" asp-for="@Model.leaveTypeSettings" asp-items="@(new SelectList(Model.leaveTypeSettings, "LeaveTypeId", "LeaveTypeName"))"
+                                                        multiple="multiple">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+                                <div class="box-footer">
+                                    <button type="button" id="btnNext2" class="btn btn-warning" style="float: right; margin-right: 4%" onclick="NextClick(event, '3')">Next <i class="fa fa-arrow-circle-right"></i></button>
+                                    <button type="submit" id="btnSaveCategoryMapping" class="btn btn-primary" style="float: right; margin-right: 2%;" onclick="validateSchemeData(event);"><i id="iSaveCategoryMapping" class="fa fa-save"> Save Category Mapping</i></button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="LeavesType" style="border: 1px solid #0000001c;">
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <div class="checkbox" style="text-align:center;">
+                                                    <label>
+                                                        <input name="EnablePF" type="checkbox" id="chkEnablePF" onchange="chkEnablePFChange(this)"> Enable PF
+                                                    </label>
+                                                </div>
+                                                <div id="divPF">
+
+                                                    <label for="txtPfnumber"> PF Number </label>
+                                                    <input type="text" class="form-control" id="txtPfnumber" name="Pfnumber" placeholder="PF Number" onkeypress='return restrictAlphabets(event)' disabled>
+
+                                                    <label for="txtUANNumber"> UAN Number </label>
+                                                    <input type="text" class="form-control" id="txtUANNumber" name="Uannumber" placeholder="UAN Number" onkeypress='return restrictAlphabets(event)' disabled>
+
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="checkbox" style="text-align: center; margin-left: 1.5%;">
+                                                    <label>
+                                                        <input name="IncludeLwf" type="checkbox" id="chkEnableLWF"> Enable LWF
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <div class="checkbox" style="text-align:center;">
+                                                    <label>
+                                                        <input type="checkbox" id="chkEnableESI" name="IncludeEsi" onchange="chkEnableESIChange(this)"> Enable ESI
+                                                    </label>
+                                                </div>
+
+                                                <div id="divESI">
+                                                    <label for="txtESINumber">  ESI Number </label>
+                                                    <input type="text" id="txtESINumber" name="Esinumber" class="form-control" placeholder="ESI Number" onkeypress='return restrictAlphabets(event)' disabled>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <button type="button" id="btnNext3" class="btn btn-warning" style="float: right; margin-right: 4%" onclick="NextClick(event, '4')">Next </button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="PaymentMode" style="border: 1px solid #0000001c;">
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="ddlPaymentMode"> Payment Mode</label>
+                                                <select class="form-control select2" id="ddlPaymentMode" name="PaymentMethod">
+                                                    <option value="0">Choose..</option>
+
+
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <button type="submit" id="btnSaveAll" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="validateData(event);"> Save All </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div style="display:none;">
+                <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning2">
+                </button>
+                <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+                </button>
+            </div>
+
+
+            <div class="alert alert-warning fade" id="modal-warning">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4>
+                    <i class="icon fa fa-warning"></i> Alert!
+                </h4>
+
+                <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+                </div>
+
+                <div class="alert-footer">
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+
+
+            <div class="modal modal-warning fade" id="modal-warning2">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title"><i class="icon fa fa-warning"></i> Alert!</h4>
+                        </div>
+                        <div id="alertBody2" class="modal-body">
+                            <p>One fine body&hellip;</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                        </div>
+                    </div>
+                    @*/.modal-content*@
+                </div>
+                @*/.modal-dialog*@
+            </div>
+            <!-- /.modal -->
+
+            <div class="alertS alert-success" id="modal-success" style="display:none;">
+                <button type="button" class="close" aria-hidden="true" onclick="successAlertClose()">&times;</button>
+                <h4><i class="icon fa fa-check"></i> Success </h4>
+
+                <p id="successBody"></p>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+        window.onload = function () {
+                document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                document.getElementById("modal-success").style.display = "block";
+              };
+    </script>
+}
+
+
+@section Scripts {
+    <!-- DataTables -->
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <!-- Export -->
+    <script src="~/bower_components/datatables.net-export/dataTables.buttons.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/jszip.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/pdfmake.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/vfs_fonts.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.html5.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.print.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.colVis.min.js"></script>
+    <!-- Dual List box -->
+    <link href="~/bower_components/dbl-listview/css/bootstrap-duallistbox.css" rel="stylesheet" />
+    <script src="~/bower_components/dbl-listview/js/jquery.bootstrap-duallistbox.js"></script>
+
+    <script>
+        function GridSetup(name) {
+            var table = $('#' + name).DataTable({
+                "pagingType": "full_numbers",
+                "pageLength": 5,
+                "order": [[7, "desc"]],
+                "dom": 'Bfrtip',
+                "buttons": [
+                    {
+                        extend: 'pdf',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-file-pdf-o"></i>'
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-default btn-circle pull-right hidden-print',
+                        text: '<i class="fa fa-print"></i>'
+                    }
+                ],
+            });
+            table.draw();
+
+        };
+
+        $(document).ready(function () {
+            $("#liLeave").addClass("active");
+            $("#liLeavesSettings").addClass("active");
+            document.getElementById("liLeavesSettings").style.backgroundColor = "#3c8dbc45";
+            GridSetup('tblLeaveSchemesList');
+            //GridSetup('tblLeaveCategoryList');
+
+            @*$('#tblLeaveCategoryList').DataTable({
+                "scrollY": "200px",
+                "width":"100%",
+                "scrollCollapse": true,
+                "paging": true
+            });*@
+
+
+             $('#tblLeaveCategoryList').DataTable({
+                "width": "100%",
+                "scrollCollapse": true,
+                "paging": true
+            });
+            
+
+            $('#categorySelection').bootstrapDualListbox({});
+        });
+
+        function chkEnablePFChange(chkEnablePFChange) {
+            if (chkEnablePFChange.checked) {
+                document.getElementById("txtPfnumber").disabled = false;
+                document.getElementById("txtUANNumber").disabled = false;
+            }
+            else {
+                document.getElementById("txtPfnumber").disabled = true;
+                document.getElementById("txtUANNumber").disabled = true;
+            }
+
+        }
+
+        function chkEnableESIChange(chkEnableESIChange) {
+            if (chkEnableESIChange.checked)
+                document.getElementById("txtESINumber").disabled = false;
+            else
+                document.getElementById("txtESINumber").disabled = true;
+        }
+
+        function EmployeeNumberCheck(txtemployeeNumber) {
+
+            var employeeNumber = txtemployeeNumber.value;
+
+             $.ajax({
+                type: "GET",
+                url: "@Url.Action("EmployeeNumberExists", "Employee")",
+                data: { empNumber: employeeNumber},
+                dataType: "JSON",
+                 success: function (response) {
+                     if (response == "True") {
+                         txtemployeeNumber.value = "";
+                         alert("Employee number already exists.")
+                     }
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+        }
+
+        $('#chkEnableLWF').click(function () {
+            $('#chkEnableLWF').val($(this).is(':checked'));
+        });
+
+        $('#chkEnableESI').click(function () {
+            $('#chkEnableESI').val($(this).is(':checked'));
+        });
+
+        $('#chkIsSelfOnboarding').click(function () {
+            $('#chkIsSelfOnboarding').val($(this).is(':checked'));
+        });
+
+        function NextClick(event, nextSection) {
+            switch (nextSection) {
+                case "1": document.getElementById("anchr1").click(); break;
+                case "2": if (validateData(event)) { return false; } else { document.getElementById("anchr2").click(); } break;
+                case "3": document.getElementById("anchr3").click(); break;
+                case "4": document.getElementById("anchr4").click(); break;
+                case "5": document.getElementById("anchr5").click(); break;
+            }
+        }
+
+        function validateSchemeData(event) {
+            var IsAnyEmpty = false;
+            var alertMsg = "";
+
+            if (document.getElementById("txtSchemeName").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = "Scheme Name <br />";
+            }
+            if (document.getElementById("dtSchemeAppliedFrom").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Date of Application of Scheme <br />";
+            }
+            if (document.getElementById("dtSchemeAppliedTill").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Date of Ending Of Scheme <br />";
+            }
+            if (IsAnyEmpty) {
+                event.preventDefault();
+                document.getElementById("btnAlert").click();
+
+                $('#alertBody2').html(
+
+                    '<p>' + alertMsg + '<br /> Cannot be empty !</p>'
+
+                );
+                IsAnyEmpty = true;
+            }
+            return IsAnyEmpty;
+        }
+
+        //Save Schemes
+        function AddUpdateSchemesData(empId, leaveId, leaveType, fromDate, toDate, leaveReason) {
+            //alert(leaveId);
+            document.body.style.cursor = 'progress';
+            //Form data
+            var form_data = new FormData();
+            form_data.append('empId', empId);
+            form_data.append('leaveId', leaveId);
+            form_data.append('leaveType', leaveType);
+            form_data.append('fromDate', fromDate);
+            form_data.append('toDate', toDate);
+            form_data.append('leaveReason', leaveReason);
+            //alert("Add Leave" + empId);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("AddUpdateLeaves", "Leaves")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    //alert(leaveStatus);
+                    var usrMsgData = JSON.parse(response);
+                    //alert(usrMsgData[0]);
+                    if (usrMsgData != null && usrMsgData != undefined) {
+                        if (usrMsgData[1] == "1") {
+                            document.getElementById("errorBody").innerHTML = usrMsgData[0];
+                            document.getElementById("modal-error").style.display = "block";
+                        }
+                        else {
+                            document.getElementById("leave-successBody").innerHTML = usrMsgData[0];
+                            document.getElementById("leave-modal-success").style.display = "block";
+                        }
+
+                        setTimeout(successAlertClose, 5000);
+                        //alert("saved data");
+                        document.body.style.cursor = 'default';
+                        $("#iSave").removeClass("fa-pulse fa-spin");
+                        document.getElementById("empLeaveIdValForEditing").value = "";
+                        document.getElementById("dtLeaveFrom").value = "";
+                        document.getElementById("dtLeaveTo").value = "";
+                        document.getElementById("ddlLeaveType").value = "";
+                        document.getElementById("leaveReason").value = "";
+                        document.getElementById("iSave").innerHTML = ' Apply For Leaves';
+
+                    }
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+        }
+        function ModifySchemesData(schemeId, schemeName, schemeDesc, schemeFrom, schemeTo, mode) {
+            //$('.nav-tabs a[href="#ApplyLeaves"]').tab('show');
+            //alert(document.getElementById("dtLeaveFrom").value);
+            if (mode == 'edit') {
+                document.getElementById("txtSchemeName").value = schemeName;
+                document.getElementById("txtSchemeDescription").value = schemeDesc;
+                document.getElementById("dtSchemeAppliedFrom").value = schemeFrom;
+                document.getElementById("dtSchemeAppliedTill").value = schemeTo;
+                document.getElementById("iSave").innerHTML = ' Modify Scheme';
+                document.getElementById("empSchemeIdValForEditing").value = schemeId;
+                $("#btnNewScheme").attr("disabled", false);
+                
+                $('#txtSchemeName').focus();
+            }
+            if (mode == 'disable') {
+            }
+
+        }
+
+        function NewData(index) {
+            if (index == 1) {
+                document.getElementById("txtSchemeName").value = null;
+                document.getElementById("txtSchemeDescription").value = null;
+                document.getElementById("dtSchemeAppliedFrom").value = null;
+                document.getElementById("dtSchemeAppliedTill").value = null;
+                document.getElementById("iSave").innerHTML = ' Save Scheme';
+                document.getElementById("empSchemeIdValForEditing").value = null;
+                $('#txtSchemeName').focus();
+            }
+        }
+
+
+        function validateData(event) {
+            var IsAnyEmpty = false;
+            var alertMsg = "";
+
+            if (document.getElementById("txtEmpNo").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = "Employee Number <br />";
+            }
+            if (document.getElementById("txtFName").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "First Name <br />";
+            }
+            if (document.getElementById("txtLName").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Last Name <br />";
+            }
+            if (document.getElementById("txtMobileNo").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Mobile Number <br />";
+            }
+            if (document.getElementById("txtEmail").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Email <br />";
+            }
+            if (document.getElementById("dtDateOfJoining").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Date of Joining <br />";
+            }
+
+            if (IsAnyEmpty) {
+
+                event.preventDefault();
+
+                document.getElementById("btnAlert").click();
+
+                $('#alertBody').html(
+
+                    '<p>' + alertMsg +  '<br /> can not be empty </p>'
+
+                );
+
+                IsAnyEmpty = true;
+            }
+
+
+            return IsAnyEmpty;
+        }
+
+        function ValidateMobileNo(txtMobileNo) {
+            var mobileNo = txtMobileNo.value;
+
+            if (mobileNo.length < 10) {
+                txtMobileNo.value = "";
+                alert("Please enter valid mobile number.");
+            }
+        }
+
+        function preventNumberInput(e) {
+            var keyCode = (e.keyCode ? e.keyCode : e.which);
+            if (keyCode > 47 && keyCode < 58 || keyCode > 95 && keyCode < 107) {
+                e.preventDefault();
+            }
+        }
+
+        function restrictAlphabets(e) {
+            var x = e.which || e.keycode;
+            if ((x >= 48 && x <= 57))
+                return true;
+            else
+                return false;
+        }
+
+        function ValidateEmail(txtEmail) {
+            var emailId = txtEmail.value;
+            var expr = /^([\w-\.]+)@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+            if (!expr.test(emailId)) {
+                txtEmail.value = "";
+                alert("Please enter valid email.");
+            }
+        }
+
+        function successAlertClose() {
+            document.getElementById("modal-success").style.display = "none";
+        }
+
+    </script>
+}

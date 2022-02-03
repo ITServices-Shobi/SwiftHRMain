@@ -14,6 +14,7 @@ namespace SwiftHR.Utility
         private static TimeZoneInfo IST_TIMEZONE = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
 
         public List<EmpLOPDetails> LOPDetailsList { get; set; }
+        public List<LookUpDetailsM> LoanTypeList { get; set; }
         public EmpLOPDetailsU()
         {
 

@@ -1,0 +1,1457 @@
+﻿
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Add Tax Details";
+}
+
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+
+<section class="content-header">
+    <h1>
+        Add Tax Details
+    </h1>
+
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="box box-default">
+        <div class="box-body">
+            <form asp-controller="Employee" asp-action="AddEmployeeDetails" method="POST">
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="box-body">
+                                    <div class="form-group">
+                                        <label for="txtFName">Employee Number<span style="color:#FF0000;">*</span></label>
+                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="txtFName">Employee Name<span style="color:#FF0000;">*</span></label>
+                                        <select class="form-control select2" id="ddlEmployeeNoSelection" name="EmployeeNoSelection">
+                                            <option value=""></option>
+                                            <option value=""></option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="txtFName">Tax Regime Type<span style="color:#FF0000;">*</span></label>
+                                        <select class="form-control select2" id="ddlEmployeeNoSelection" name="EmployeeNoSelection">
+                                            <option value="">Old</option>
+                                            <option value="">New</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="txtFName">Gender<span style="color:#FF0000;">*</span></label>
+                                        <select class="form-control select2" id="ddlEmployeeNoSelection" name="EmployeeNoSelection">
+                                            <option value="">Male</option>
+                                            <option value="">Female</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="txtFName">Total Annual Salary<span style="color:#FF0000;">*</span></label>
+                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="box-body">
+                                    <div class="form-group">
+                                        <label for="txtFName">DOJ<span style="color:#FF0000;">*</span></label>
+                                        <input class="form-control" name="ConfirmationDate" type="date" id="dtConfirmationDate">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="txtFName">DOB<span style="color:#FF0000;">*</span></label>
+                                        <input class="form-control" name="ConfirmationDate" type="date" id="dtConfirmationDate">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="txtFName">Income Tax Proceesed Date<span style="color:#FF0000;">*</span></label>
+                                        <input class="form-control" name="ConfirmationDate" type="date" id="dtConfirmationDate">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="txtFName">Location<span style="color:#FF0000;">*</span></label>
+                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="nav-tabs-custom">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a id="anchr1" href="#BasicInfo" data-toggle="tab">Month Wise Tax Components</a></li>
+                                <li><a id="anchr2" href="#EmploymentSelections" data-toggle="tab">Previous Employer Income Details</a></li>
+                                <li><a id="anchr3" href="#PF_ESI_LWF" data-toggle="tab">Exemption Components</a></li>
+                                <li><a id="anchr2" href="#Perqusite" data-toggle="tab">Perqusite</a></li>
+                                <li><a id="anchr2" href="#Deductions" data-toggle="tab">Deductions</a></li>
+                                <li><a id="anchr2" href="#OtherIncome" data-toggle="tab">Other Income</a></li>
+                                <li><a id="anchr2" href="#HousePropertyIncome" data-toggle="tab">House Property Income</a></li>
+                                <li><a id="anchr2" href="#Regime" data-toggle="tab">Regime</a></li>
+                                <li><a id="anchr2" href="#TaxResult" data-toggle="tab">Tax Result</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="tab-content">
+
+                            <div class="active tab-pane" id="BasicInfo" style="border: 1px solid #0000001c;">
+                                <div class="row">
+
+                                    <div class="col-md-12">
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divEmpllist">
+                                                <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="bg-primary"> Component </th>
+                                                            <th class="bg-primary"> Total </th>
+                                                            <th class="bg-primary"> Apr </th>
+                                                            <th class="bg-primary"> May </th>
+                                                            <th class="bg-primary"> Jun </th>
+                                                            <th class="bg-primary"> Jul </th>
+                                                            <th class="bg-primary"> Aug </th>
+                                                            <th class="bg-primary"> Sep </th>
+                                                            <th class="bg-primary"> Oct </th>
+                                                            <th class="bg-primary"> Nov </th>
+                                                            <th class="bg-primary"> Dec </th>
+                                                            <th class="bg-primary"> Jan </th>
+                                                            <th class="bg-primary"> Feb </th>
+                                                            <th class="bg-primary"> Mar </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @*@if (Model != null && Model.Count() > 0)
+                                    {
+                                        @foreach (var contact in Model)
+                                        {*@
+                                                        <tr>
+                                                            <td> BASIC </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> HRA </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> BONUS </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> SPECIAL ALLOWANCE </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> INCENTIVE </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> PF </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> PROOF TAX </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                            <td> Rs. 0.00 </td>
+                                                        </tr>
+                                                        @*}
+                                    }*@
+
+                                                    </tbody>
+                                                    <tfoot class="hidden-print">
+                                                        <tr>
+                                                            <th> Component </th>
+                                                            <th> Rs. 0.00 </th>
+                                                            <th> Rs. 0.00 </th>
+                                                            <th> Rs. 0.00 </th>
+                                                            <th> Rs. 0.00 </th>
+                                                            <th> Rs. 0.00 </th>
+                                                            <th> Rs. 0.00 </th>
+                                                            <th> Rs. 0.00 </th>
+                                                            <th> Rs. 0.00 </th>
+                                                            <th> Rs. 0.00 </th>
+                                                            <th> Rs. 0.00 </th>
+                                                            <th> Rs. 0.00 </th>
+                                                            <th> Rs. 0.00 </th>
+                                                            <th> Rs. 0.00 </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button type="button" id="btnNext1" class="btn btn-warning" style="float: right; margin-right: 8%" onclick="NextClick(event, '2')">Next </button>
+                                        <button type="submit" id="btnSave" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="validateData(event);">Save</button>
+                                        <div style="display:none;">
+                                            <button id="btnSaveOnly" type="submit" class="btn btn-primary" style="float: right; margin-right: 4%;">Save</button>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="tab-pane" id="EmploymentSelections" style="border: 1px solid #0000001c;">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divEmpllist">
+                                                <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="bg-primary"> Month </th>
+                                                            <th class="bg-primary"> Income After Exemption </th>
+                                                            <th class="bg-primary"> PF </th>
+                                                            <th class="bg-primary"> Prof Tax </th>
+                                                            <th class="bg-primary"> Total Tax </th>
+                                                            <th class="bg-primary"> Income Tax </th>
+                                                            <th class="bg-primary"> Surcharge </th>
+                                                            <th class="bg-primary"> Cess </th>
+                                                            <th class="bg-primary"> LTA Exemption </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @*@if (Model != null && Model.Count() > 0)
+                                    {
+                                        @foreach (var contact in Model)
+                                        {*@
+                                                        <tr>
+                                                            <td><select class="form-control select2" id="ddlEmployeeNoSelection" name="EmployeeNoSelection">
+                                                                    <option value="Manual Entry"></option>
+                                                                </select>
+                                                            </td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        @*}
+                                    }*@
+
+                                                    </tbody>
+                                                    <tfoot class="hidden-print">
+                                                        <tr>
+                                                            <th> Month </th>
+                                                            <th> Income After Exemption </th>
+                                                            <th> PF </th>
+                                                            <th> Prof Tax </th>
+                                                            <th> Total Tax </th>
+                                                            <th> Income Tax </th>
+                                                            <th> Surcharge </th>
+                                                            <th> Cess </th>
+                                                            <th> LTA Exemption </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <button type="button" id="btnNext2" class="btn btn-warning" style="float: right; margin-right: 4%" onclick="NextClick(event, '3')">Next </button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="PF_ESI_LWF" style="border: 1px solid #0000001c;">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divEmpllist">
+                                                <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="bg-primary"> Component </th>
+                                                            <th class="bg-primary"> Total </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @*@if (Model != null && Model.Count() > 0)
+                                    {
+                                        @foreach (var contact in Model)
+                                        {*@
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Education Exemption</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Gratuity  Exemption</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        @*}
+                                    }*@
+
+                                                    </tbody>
+                                                    <tfoot class="hidden-print">
+                                                        <tr>
+                                                            <th> Component </th>
+                                                            <th> Total </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Total rent paid PA<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Total HRA<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Override HRA Exemption, <span style="color:#FF0000;">*</span></label>
+                                                        <input type="checkbox" id="txtFName" name="FirstName">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Total rent paid(Prorated)<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Excess Rent<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="txtFName">HRA Exemption<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divEmpllist">
+                                                <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="bg-primary"> Month </th>
+                                                            <th class="bg-primary"> Rent </th>
+                                                            <th class="bg-primary"> HRA Percent </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @*@if (Model != null && Model.Count() > 0)
+                                    {
+                                        @foreach (var contact in Model)
+                                        {*@
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">April</td>
+                                                            <td>Rs. 0.00</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">May</td>
+                                                            <td>Rs. 0.00</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">June</td>
+                                                            <td>Rs. 0.00</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">July</td>
+                                                            <td>Rs. 0.00</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">August</td>
+                                                            <td>Rs. 0.00</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">September</td>
+                                                            <td>Rs. 0.00</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">October</td>
+                                                            <td>Rs. 0.00</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">November</td>
+                                                            <td>Rs. 0.00</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">December</td>
+                                                            <td>Rs. 0.00</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">January</td>
+                                                            <td>Rs. 0.00</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">February</td>
+                                                            <td>Rs. 0.00</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">March</td>
+                                                            <td>Rs. 0.00</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        @*}
+                                    }*@
+
+                                                    </tbody>
+                                                    <tfoot class="hidden-print">
+                                                        <tr>
+                                                            <th> Month </th>
+                                                            <th> Rent </th>
+                                                            <th> HRA Percent </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <button type="button" id="btnNext3" class="btn btn-warning" style="float: right; margin-right: 4%" onclick="NextClick(event, '4')">Next </button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="Perqusite" style="border: 1px solid #0000001c;">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divEmpllist">
+                                                <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="bg-primary"> Component </th>
+                                                            <th class="bg-primary"> Total </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @*@if (Model != null && Model.Count() > 0)
+                                    {
+                                        @foreach (var contact in Model)
+                                        {*@
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Vehicle Perquisite</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Assets in Residence Perquisite</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">House Perquisite</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Loan Perquisite</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Employer PF Perquisite</td>
+                                                            <td>Rs. 0.00</td>
+                                                        </tr>
+                                                        @*}
+                                    }*@
+
+                                                    </tbody>
+                                                    <tfoot class="hidden-print">
+                                                        <tr>
+                                                            <th> Component </th>
+                                                            <th> Total </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Total Perquisite<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)" value="RS. 0.00" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <button type="button" id="btnNext3" class="btn btn-warning" style="float: right; margin-right: 4%" onclick="NextClick(event, '4')">Next </button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="Deductions" style="border: 1px solid #0000001c;">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Section<span style="color:#FF0000;">*</span></label>
+                                                        <select class="form-control select2" id="ddlEmployeeNoSelection" name="EmployeeNoSelection">
+                                                            <option value="">80C and Other</option>
+                                                            <option value="">80D</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Total Tax Deductions<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)" value="RS. 0.00" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Total Proof Tax<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)" value="RS. 0.00" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divEmpllist">
+                                                <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="bg-primary"> Narration Type </th>
+                                                            <th class="bg-primary"> Section </th>
+                                                            <th class="bg-primary"> Max Limit </th>
+                                                            <th class="bg-primary"> Gross Amt </th>
+                                                            <th class="bg-primary"> Quilifying Amt </th>
+                                                            <th class="bg-primary"> Deductible Amt </th>
+                                                            <th class="bg-primary"> Proof Avaliable </th>
+                                                            <th class="bg-primary"> Remark </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @*@if (Model != null && Model.Count() > 0)
+                                    {
+                                        @foreach (var contact in Model)
+                                        {*@
+                                                        <tr>
+                                                            <td>
+                                                                <select class="form-control select2" id="ddlEmployeeNoSelection" name="EmployeeNoSelection">
+                                                                    <option value="Manual Entry"></option>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                                <select class="form-control select2" id="ddlEmployeeNoSelection" name="EmployeeNoSelection">
+                                                                    <option value="Manual Entry"></option>
+                                                                </select>
+                                                            </td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        @*}
+                                    }*@
+
+                                                    </tbody>
+                                                    <tfoot class="hidden-print">
+                                                        <tr>
+                                                            <th> Narration Type </th>
+                                                            <th> Section </th>
+                                                            <th> Max Limit </th>
+                                                            <th> Gross Amt </th>
+                                                            <th> Quilifying Amt </th>
+                                                            <th> Deductible Amt </th>
+                                                            <th> Proof Avaliable </th>
+                                                            <th> Remark </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <button type="button" id="btnNext3" class="btn btn-warning" style="float: right; margin-right: 4%" onclick="NextClick(event, '4')">Next </button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="OtherIncome" style="border: 1px solid #0000001c;">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divEmpllist">
+                                                <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="bg-primary"> Other Income Type </th>
+                                                            <th class="bg-primary"> Max Limit </th>
+                                                            <th class="bg-primary"> Amount </th>
+                                                            <th class="bg-primary"> Remark </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @*@if (Model != null && Model.Count() > 0)
+                                    {
+                                        @foreach (var contact in Model)
+                                        {*@
+                                                        <tr>
+                                                            <td>
+                                                                <select class="form-control select2" id="ddlEmployeeNoSelection" name="EmployeeNoSelection">
+                                                                    <option value="Manual Entry"></option>
+                                                                </select>
+                                                            </td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        @*}
+                                    }*@
+
+                                                    </tbody>
+                                                    <tfoot class="hidden-print">
+                                                        <tr>
+                                                            <th> Other Income Type </th>
+                                                            <th> Max Limit </th>
+                                                            <th> Amount </th>
+                                                            <th> Remark </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divEmpllist">
+                                                <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="bg-primary"> Short Term Income Type </th>
+                                                            <th class="bg-primary"> Amount </th>
+                                                            <th class="bg-primary"> Remark </th>
+                                                            <th class="bg-primary"> Tax Rate </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @*@if (Model != null && Model.Count() > 0)
+                                    {
+                                        @foreach (var contact in Model)
+                                        {*@
+                                                        <tr>
+                                                            <td>
+                                                                <select class="form-control select2" id="ddlEmployeeNoSelection" name="EmployeeNoSelection">
+                                                                    <option value="Manual Entry"></option>
+                                                                </select>
+                                                            </td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        @*}
+                                    }*@
+
+                                                    </tbody>
+                                                    <tfoot class="hidden-print">
+                                                        <tr>
+                                                            <th> Short Term Income Type </th>
+                                                            <th> Amount </th>
+                                                            <th> Remark </th>
+                                                            <th> Tax Rate </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <button type="button" id="btnNext3" class="btn btn-warning" style="float: right; margin-right: 4%" onclick="NextClick(event, '4')">Next </button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="HousePropertyIncome" style="border: 1px solid #0000001c;">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divEmpllist">
+                                                <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="bg-primary"> House Property Income Particulars </th>
+                                                            <th class="bg-primary"> Amount </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @*@if (Model != null && Model.Count() > 0)
+                                    {
+                                        @foreach (var contact in Model)
+                                        {*@
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Interest on Housing Loan ( Self Occupied)</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Total Income/Loss From Let Out Property</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">
+                                                                Total Exemption
+                                                                If (a + b) is less than -200000 then -200000 will be exempted else c will be exempted.
+                                                            </td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        @*}
+                                    }*@
+
+                                                    </tbody>
+                                                    <tfoot class="hidden-print">
+                                                        <tr>
+                                                            <th> Particulars </th>
+                                                            <th> Amount </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divEmpllist">
+                                                <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="bg-primary"> Income from self-occupied property Particulars </th>
+                                                            <th class="bg-primary"> Eligible Amount </th>
+                                                            <th class="bg-primary"> Amount </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @*@if (Model != null && Model.Count() > 0)
+                                    {
+                                        @foreach (var contact in Model)
+                                        {*@
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Interest on Housing Loan ( Self Occupied)</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        @*}
+                                    }*@
+
+                                                    </tbody>
+                                                    <tfoot class="hidden-print">
+                                                        <tr>
+                                                            <th> Short Term Income Type </th>
+                                                            <th> Amount </th>
+                                                            <th> Remark </th>
+                                                            <th> Tax Rate </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Lender's Name<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Lender's PAN<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divEmpllist">
+                                                <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="bg-primary"> Income from Let-out Property Particulars </th>
+                                                            <th class="bg-primary"> Amount </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @*@if (Model != null && Model.Count() > 0)
+                                    {
+                                        @foreach (var contact in Model)
+                                        {*@
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Annual Letable Value/Rent Received or Receivable</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Less: Municipal Taxes Paid During the Year</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Less:Unrealized Rent</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Net Annual Value (1-(2+3))</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Less: Deductions from Net Annual Value</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Standard Deduction at 30% of Net Annual Value</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Interest on Housing Loan</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">
+                                                                <div class="form-group">
+                                                                    <label for="txtFName">Lender's Name<span style="color:#FF0000;">*</span></label>
+                                                                    <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <label for="txtFName">Lender's PAN<span style="color:#FF0000;">*</span></label>
+                                                                    <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)">
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Income/Loss from Let Out Property</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        @*}
+                                    }*@
+
+                                                    </tbody>
+                                                    <tfoot class="hidden-print">
+                                                        <tr>
+                                                            <th> Particulars </th>
+                                                            <th> Amount </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+
+                                            <button type="button" id="btnNext3" class="btn btn-primary" style="float: right; margin-right: 4%" onclick="NextClick(event, '4')">Add More Let-out Property </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <button type="button" id="btnNext3" class="btn btn-warning" style="float: right; margin-right: 4%" onclick="NextClick(event, '4')">Next </button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="Regime" style="border: 1px solid #0000001c;">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Regime Type<span style="color:#FF0000;">*</span></label>
+                                                        <select class="form-control select2" id="ddlEmployeeNoSelection" name="EmployeeNoSelection">
+                                                            <option value="">Old</option>
+                                                            <option value="">New</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <button type="button" id="btnNext3" class="btn btn-warning" style="float: right; margin-right: 4%" onclick="NextClick(event, '4')">Next </button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="TaxResult" style="border: 1px solid #0000001c;">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Total Income<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)" value="RS. 0.00" readonly>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Income Tax<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)" value="RS. 0.00" readonly>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Total Tax<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)" value="RS. 0.00" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="box-body">
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Srcharge<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)" value="RS. 0.00" readonly>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="txtFName">Cess<span style="color:#FF0000;">*</span></label>
+                                                        <input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)" value="RS. 0.00" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-body">
+                                            <div class="table-responsive" id="divEmpllist">
+                                                <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="bg-primary"> Paid Till Date </th>
+                                                            <th class="bg-primary"> Income Tax </th>
+                                                            <th class="bg-primary"> Surcharge </th>
+                                                            <th class="bg-primary"> Edu. Cess </th>
+                                                            <th class="bg-primary"> Total </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @*@if (Model != null && Model.Count() > 0)
+        {
+            @foreach (var contact in Model)
+            {*@
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Deduction Through Payroll</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Direct TDS</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Previous Employment</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Total</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Annual Tax Balance</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 20%; word-wrap:break-word;">Monthly Tax to be Paid</td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                            <td><input type="text" id="txtMobileNo" name="ContactNumber" class="form-control" maxlength="10" min="10" placeholder="" onkeypress='return restrictAlphabets(event)' onchange="ValidateMobileNo(this)"></td>
+                                                        </tr>
+                                                        @*}
+        }*@
+
+                                                    </tbody>
+                                                    <tfoot class="hidden-print">
+                                                        <tr>
+                                                            <th> Paid Till Date </th>
+                                                            <th> Income Tax </th>
+                                                            <th> Surcharge </th>
+                                                            <th> Edu. Cess </th>
+                                                            <th> Total </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <button type="button" id="btnNext3" class="btn btn-warning" style="float: right; margin-right: 4%" onclick="NextClick(event, '4')">Verify </button>
+                                    <button type="button" id="btnNext3" class="btn btn-success" style="float: right; margin-right: 4%" onclick="NextClick(event, '4')">Save </button>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div style="display:none;">
+                <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+                </button>
+                <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+                </button>
+            </div>
+
+
+            <div class="alert alert-warning fade" id="modal-warning">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4>
+                    <i class="icon fa fa-warning"></i> Alert!
+                </h4>
+
+                <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+                </div>
+
+                <div class="alert-footer">
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+
+
+            <div class="modal modal-warning fade" id="modal-warning2">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">Alert!</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>One fine body&hellip;</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                        </div>
+                    </div>
+                    @*/.modal-content*@
+                </div>
+                @*/.modal-dialog*@
+            </div>
+            <!-- /.modal -->
+
+            <div class="alertS alert-success" id="modal-success" style="display:none;">
+                <button type="button" class="close" aria-hidden="true" onclick="successAlertClose()">&times;</button>
+                <h4><i class="icon fa fa-check"></i> Success </h4>
+
+                <p id="successBody"></p>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+        window.onload = function () {
+                document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+                document.getElementById("modal-success").style.display = "block";
+              };
+    </script>
+}
+
+
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+            $("#liEmployee").addClass("active");
+            $("#liAddEmployee").addClass("active");
+            document.getElementById("liAddEmployee").style.backgroundColor = "#3c8dbc45";
+        });
+
+        function chkEnablePFChange(chkEnablePFChange) {
+            if (chkEnablePFChange.checked) {
+                document.getElementById("txtPfnumber").disabled = false;
+                document.getElementById("txtUANNumber").disabled = false;
+            }
+            else {
+                document.getElementById("txtPfnumber").disabled = true;
+                document.getElementById("txtUANNumber").disabled = true;
+            }
+
+        }
+
+        function chkEnableESIChange(chkEnableESIChange) {
+            if (chkEnableESIChange.checked)
+                document.getElementById("txtESINumber").disabled = false;
+            else
+                document.getElementById("txtESINumber").disabled = true;
+        }
+
+        function EmployeeNumberCheck(txtemployeeNumber) {
+
+            var employeeNumber = txtemployeeNumber.value;
+
+             $.ajax({
+                type: "GET",
+                url: "@Url.Action("EmployeeNumberExists", "Employee")",
+                data: { empNumber: employeeNumber},
+                dataType: "JSON",
+                 success: function (response) {
+                     if (response == "True") {
+                         txtemployeeNumber.value = "";
+                         alert("Employee number already exists.")
+                     }
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+        }
+
+        $('#chkEnableLWF').click(function () {
+            $('#chkEnableLWF').val($(this).is(':checked'));
+        });
+
+        $('#chkEnableESI').click(function () {
+            $('#chkEnableESI').val($(this).is(':checked'));
+        });
+
+        $('#chkIsSelfOnboarding').click(function () {
+            $('#chkIsSelfOnboarding').val($(this).is(':checked'));
+        });
+
+        function NextClick(event, nextSection) {
+            switch (nextSection) {
+                case "1": document.getElementById("anchr1").click(); break;
+                case "2": if (validateData(event)) { return false; } else { document.getElementById("anchr2").click(); } break;
+                case "3": document.getElementById("anchr3").click(); break;
+                case "4": document.getElementById("anchr4").click(); break;
+                case "5": document.getElementById("anchr5").click(); break;
+            }
+        }
+
+        function validateData(event) {
+            var IsAnyEmpty = false;
+
+
+            var alertMsg = "";
+
+            if (document.getElementById("txtEmpNo").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = "Employee Number <br />";
+            }
+            if (document.getElementById("txtFName").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "First Name <br />";
+            }
+            if (document.getElementById("txtLName").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Last Name <br />";
+            }
+            if (document.getElementById("txtMobileNo").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Mobile Number <br />";
+            }
+            if (document.getElementById("txtEmail").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Email <br />";
+            }
+            if (document.getElementById("dtDateOfJoining").value == "") {
+                IsAnyEmpty = true;
+                alertMsg = alertMsg + "Date of Joining <br />";
+            }
+
+            if (IsAnyEmpty) {
+
+                event.preventDefault();
+
+                document.getElementById("btnAlert").click();
+
+                $('#alertBody').html(
+
+                    '<p>' + alertMsg +  '<br /> can not be empty </p>'
+
+                );
+
+                IsAnyEmpty = true;
+            }
+
+
+            return IsAnyEmpty;
+        }
+
+        function ValidateMobileNo(txtMobileNo) {
+            var mobileNo = txtMobileNo.value;
+
+            if (mobileNo.length < 10) {
+                txtMobileNo.value = "";
+                alert("Please enter valid mobile number.");
+            }
+        }
+
+        function preventNumberInput(e) {
+            var keyCode = (e.keyCode ? e.keyCode : e.which);
+            if (keyCode > 47 && keyCode < 58 || keyCode > 95 && keyCode < 107) {
+                e.preventDefault();
+            }
+        }
+
+        function restrictAlphabets(e) {
+            var x = e.which || e.keycode;
+            if ((x >= 48 && x <= 57))
+                return true;
+            else
+                return false;
+        }
+
+        function ValidateEmail(txtEmail) {
+            var emailId = txtEmail.value;
+            var expr = /^([\w-\.]+)@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+            if (!expr.test(emailId)) {
+                txtEmail.value = "";
+                alert("Please enter valid email.");
+            }
+        }
+
+        function successAlertClose() {
+            document.getElementById("modal-success").style.display = "none";
+        }
+
+    </script>
+}

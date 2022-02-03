@@ -134,7 +134,6 @@ namespace SwiftHR.Utility
                 Message = string.Format("Record Update {0}.\\n Date: {1}", TimeSheet.Day, TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, IST_TIMEZONE).ToString("dd-MM-yyyy"));
             //}
             return Message;
-
         }
 
 

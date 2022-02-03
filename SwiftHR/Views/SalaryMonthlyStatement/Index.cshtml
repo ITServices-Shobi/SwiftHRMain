@@ -1,0 +1,271 @@
+﻿@model SwiftHR.Models.USpSalaryMonthlyStatement
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Process Salary";
+    int i;
+    IEnumerable<SwiftHR.Models.USpSalaryMonthlyStatement> A = new List<SwiftHR.Models.USpSalaryMonthlyStatement>();
+
+}
+
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+
+<script src="../../plugins/datepicker/bootstrap-datepicker.js"></script>
+
+<link rel="stylesheet" href="~/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+@section Scripts {
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/FileSaver/FileSaver.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/js-xlsx/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var dt = new Date();
+            var year = dt.getFullYear();
+            var month = ("0" + (dt.getMonth() + 1)).slice(-2);
+            $("#bdaymonth").val(year + '-' + month);
+            CountOfMonth = new Date(year, month, 0).getDate();
+            date = dt.getDate();
+
+            $('#checkall').change(function () {
+                $('.cb-element').prop('checked', this.checked);
+            });
+            //GetHolidays();
+            $('.cb-element').change(function () {
+                if ($('.cb-element:checked').length == $('.cb-element').length) {
+                    $('#checkall').prop('checked', true);
+                }
+                else {
+                    $('#checkall').prop('checked', false);
+                }
+            });
+        });
+    </script>
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+            window.onload = function () {
+             document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+              };
+        </script>
+    }
+}
+<section class="content-header">
+    <h1>
+        Process Salary
+    </h1>
+</section>
+<section class="content">
+    <div class="alertS alert-success" id="modal-success" style="display:none;">
+        <button type="button" class="close" aria-hidden="true" onclick="successAlertClose(event)">&times;</button>
+        <h4><i class="icon fa fa-check"></i> Success </h4>
+        <p id="successBody"></p>
+    </div>
+    <div class="box box-default">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="PolicyMasterId" style="border: 1px solid #0000001c;">
+                            <form asp-controller="SalaryMonthlyStatement" asp-action="" method="POST">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <a href="https://www.shobigroup.com" class="logo" style="border-right: 0px !important;">
+                                                    <img src="~/dist/img/shobi_logo.png" alt="homepage" class="logo-lg" style="width:75%;" />
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="bdaymonth">Month And Year: </label>
+                                                <i class="fa fa-chevron-circle-left fa-lg allowed" onclick="setpreviousDate();" title="Previous Date" style="margin-right: 10px"></i>
+                                                <input type="month" id="bdaymonth" name="bdaymonth" onchange="GetEmployeeData();">
+                                                <i class="fa fa-chevron-circle-right fa-lg allowed" onclick="MonthNext();" title="Next Date" style="margin-right: 10px"></i>
+                                            </div>
+                                            <div class="form-group">
+                                                <button type="submit" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="ProcessData()">Process</button>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:none;">
+        <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+        </button>
+        <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+        </button>
+    </div>
+
+    <div class="alert alert-warning fade" id="modal-warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4>
+            <i class="icon fa fa-warning"></i> Alert!
+        </h4>
+
+        <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+        </div>
+
+        <div class="alert-footer">
+            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+        </div>
+    </div>
+
+    <div class="modal modal-warning fade" id="modal-warning2">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Alert!</h4>
+                </div>
+                <div class="modal-body">
+                    <p>One fine body&hellip;</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+            @*/.modal-content*@
+        </div>
+        @*/.modal-dialog*@
+    </div>
+</section>
+<script>
+
+    function setpreviousDate() {
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate);
+        var endDate = new Date(dt.setMonth(dt.getMonth() - 1));
+        var year = endDate.getFullYear();
+        var month = ("0" + (endDate.getMonth() + 1)).slice(-2);
+        $("#bdaymonth").val(year + '-' + month);
+        CountOfMonth = new Date(year, month, 0).getDate();
+    }
+
+    function MonthNext() {
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate);
+
+        var endDate = new Date(dt.setMonth(dt.getMonth() + 1));
+        var year = endDate.getFullYear();
+        var month = ("0" + (endDate.getMonth() + 1)).slice(-2);
+        $("#bdaymonth").val(year + '-' + month);
+        CountOfMonth = new Date(year, month, 0).getDate();
+    }
+</script>
+<script>
+    function ProcessData() {
+        event.preventDefault();
+
+        var Month = $('#bdaymonth').val();
+        var dt = new Date(Month + "-");
+
+        var objToday = dt,
+        months = new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'),
+        curMonthNo = objToday.getMonth(),
+        curYear = objToday.getFullYear()
+
+        alert(curMonthNo);
+        var form_data = new FormData();
+        form_data.append('curMonthNo', curMonthNo);
+        form_data.append('curYear', curYear);
+
+        $.ajax({
+                type: "POST",
+                url: "@Url.Action("EmployeesSalaryProcess", "SalaryMonthlyStatement")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                  document.getElementById("successBody").innerHTML = "Process Success";
+                  document.getElementById("modal-success").style.display = "block";
+                  setTimeout(successAlertClose, 5000);
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+
+        }
+    function successAlertClose(event) {
+        document.getElementById("modal-success").style.display = "none";
+    }
+</script>

@@ -16,6 +16,8 @@ namespace SwiftHR.Models
         public string LOPDays { get; set; }
         public string TotalWorkingDays { get; set; }
         public string PayoutMonth { get; set; }
+        public int PayoutMonthInNo { get; set; }
+        public int PayoutYR { get; set; }
         public int VersionNumber { get; set; }
         public decimal Basic { get; set; }
         public decimal HRA { get; set; }
@@ -34,5 +36,6 @@ namespace SwiftHR.Models
         public decimal TotalDeduction { get; set; }
         public decimal NetPay { get; set; }
         public bool? IsActive { get; set; }
+        public string MailSendStatus { get; set; }
     }
 }

@@ -161,9 +161,9 @@ namespace SwiftHR.Controllers
                     EmployeeContributionESICAmt = (MonthlyGrossPay / 100) * EmployeeESIPer;
                     EmployerContributionESICAmt = (MonthlyGrossPay / 100) * EmployerESIPer;
                 }
-                MonthlyNetPayAmt = (MonthlyGrossPay) - (ProfTaxAmt + EmployeeContributionPFAmt + EmployerContributionPFAmt + EmployeeContributionESICAmt + EmployerContributionESICAmt);
+                MonthlyNetPayAmt = (MonthlyGrossPay) - (ProfTaxAmt + EmployeeContributionPFAmt + EmployeeContributionESICAmt);
                 AnnualGrossSalaryAmt = MonthlyGrossPay * 12;
-                AnnualGrossCTCAmt = MonthlyNetPayAmt * 12;
+                AnnualGrossCTCAmt = (MonthlyGrossPay * 12)+(EmployerContributionPFAmt * 12)+(EmployerContributionESICAmt*12);
             }
             var result = new { Basic = BasicAmt, HRA = HRAAmt, Bonus = BonusAmt, OtherAllowance = OtherAllowanceAmt, ProfTax = ProfTaxAmt, EmployeeContributionPF = EmployeeContributionPFAmt,
                 EmployerContributionPF = EmployerContributionPFAmt, EmployeeContributionESIC = EmployeeContributionESICAmt, EmployerContributionESIC = EmployerContributionESICAmt, 

@@ -23,6 +23,7 @@ namespace SwiftHR.Models
         public string Status { get; set; }
         public DateTime EffectiveStartDate { get; set; }
         public DateTime EffectiveEndDate { get; set; }
+        public int VersionNumber { get; set; }
         public bool? IsActive { get; set; }
         public string CreatedDate { get; set; }
         public int? CreatedBy { get; set; }

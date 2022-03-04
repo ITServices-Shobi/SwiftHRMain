@@ -287,17 +287,17 @@
                                         <td onclick="EnableRow(this);" data-rowId=@i data-isSubmited=@DbisSubmitData>@i</td>
                                         <td>
                                             <input type="hidden" id="HiddenRecordId_@i" value="@DbRecordId">
-                                            <input type="time" id='txtIn_@i' style="color:orangered" name="In" class="form-control" placeholder="IN" value="@DbEmpIN" disabled>
+                                            <input type="time" id='txtIn_@i' style="color:orangered" name="In" class="form-control" placeholder="IN" value="@DbEmpIN" >
                                         </td>
                                         <td>
-                                            <input type="time" id="txtOut_@i" name="In" style="color:orangered" data-rowId=@i value="@DbEmpOut" onblur="calculateTotalTime('@i');" class="form-control" placeholder="Out" disabled>
+                                            <input type="time" id="txtOut_@i" name="In" style="color:orangered" data-rowId=@i value="@DbEmpOut" onblur="calculateTotalTime('@i');" class="form-control" placeholder="Out" >
                                         </td>
                                         <td>
                                             <input type="time" id="txtTotal_@i" name="In" style="color:orangered" value="@DbEmpTotal" class="form-control" placeholder="Total" disabled>
 
                                         </td>
                                         <td>
-                                            <input type="time" id="txtBreak_@i" name="In" style="color:orangered" data-rowId=@i class="form-control" onblur="calculateBreakTime('@i');" value="@DbEmpBreak" placeholder="Break" disabled>
+                                            <input type="time" id="txtBreak_@i" name="In" style="color:orangered" data-rowId=@i class="form-control" onblur="calculateBreakTime('@i');" value="@DbEmpBreak" placeholder="Break" >
 
                                         </td>
                                         <td>
@@ -310,7 +310,7 @@
                                         </td>
                                         <td>
                                             @*@Html.DropDownList("txtPrsence_@i",new SelectList(ViewBag.PresenceList, "Value", "Text"), new { @class = "form-control select2"})*@
-                                            <select class="form-control" id="txtPrsence_@i" name="txtPrsence" disabled>
+                                            <select class="form-control" id="txtPrsence_@i" name="txtPrsence" >
                                                 @if (@DbPresence == "")
                                                 {
                                                     <option value="" selected>Please Select</option>
@@ -513,14 +513,14 @@
 
                                      + '<td><input type="checkbox" data-id="chk_' + i +'" class="cb-element chkchild" /></td>'
                                      + '<td onclick="EnableRow(this);" data-rowId="' + i + '" data-isSubmited="'+ DbisSubmitData + '">'+i+'</td>'
-                                     + '<td><input type="hidden" id="HiddenRecordId_' + i + '"value="' + DbRecordId + '" disabled><input type="time" id="txtIn_' + i + '" style="color:orangered" name="In" class="form-control" placeholder="IN" value="' + DbEmpIN + '" disabled></td>'
-                                     + '<td><input type="time" id="txtOut_' + i + '" name="In" style="color:orangered" value="' + DbEmpOut + '" onblur="calculateTotalTime(' + i + ');" class="form-control" placeholder="Out" disabled></td>'
+                                     + '<td><input type="hidden" id="HiddenRecordId_' + i + '"value="' + DbRecordId + '" disabled><input type="time" id="txtIn_' + i + '" style="color:orangered" name="In" class="form-control" placeholder="IN" value="' + DbEmpIN + '" ></td>'
+                                     + '<td><input type="time" id="txtOut_' + i + '" name="In" style="color:orangered" value="' + DbEmpOut + '" onblur="calculateTotalTime(' + i + ');" class="form-control" placeholder="Out" ></td>'
                                      + '<td><input type="time" id="txtTotal_' + i + '" name="In" style="color:orangered" value="' + DbEmpTotal + '" class="form-control" placeholder="Total" disabled></td>'
-                                     + '<td><input type="time" id="txtBreak_' + i + '" name="In" style="color:orangered" class="form-control" onblur="calculateBreakTime(' + i + ');" value="' + DbEmpBreak + '" placeholder="Break" disabled></td>'
+                                     + '<td><input type="time" id="txtBreak_' + i + '" name="In" style="color:orangered" class="form-control" onblur="calculateBreakTime(' + i + ');" value="' + DbEmpBreak + '" placeholder="Break" ></td>'
                                      + '<td><input type="time" id="txtNet_' + i + '" name="In" style="color:orangered" class="form-control" value="' + DbEmpNet + '" placeholder="Net" disabled></td>'
                                      + '<td><input type="text" id="txtDayName_' + i + '" name="DayName" style="color:orangered" class="form-control" value="' + DbDayName + '" placeholder="Day Name" disabled></td>'
                                      @*+ '<td>@Html.Raw(Ajax.javaScriptStringEncode(Html.DropDownList("txtPrsence_@i",new SelectList(ViewBag.PresenceList, "Value", "Text"), new { @class = "form-control select2"}).ToHtmlString()))</td>'*@
-                                      + '<td> <select class="form-control" id="txtPrsence_' + i + '" name="txtPrsence" disabled>'
+                                      + '<td> <select class="form-control" id="txtPrsence_' + i + '" name="txtPrsence" >'
                                         +'<option value="">Please Select</option>'
                                         +'<option value="h">H(Holiday,Weekend)</option>'
                                         +'<option value="v">V(Leave,Vacation)</option>'

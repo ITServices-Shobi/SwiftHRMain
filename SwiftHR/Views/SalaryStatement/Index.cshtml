@@ -116,7 +116,7 @@
                                             <div class="col-md-12">
                                                 <div class="box-body">
                                                     <div class="table-responsive" id="divEmpllist">
-                                                        <table id="tblEmpList" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                                                        <table id="tblSalStatmentListId" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
                                                             <thead>
                                                                 <tr>
                                                                     <th class="bg-primary"> Employee No </th>
@@ -412,7 +412,7 @@
          form_data.append('PayMonth', SelectedPayMonth);
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("GetSalStatementFromSP", "SalaryStatement")",
+                url: "@Url.Action("Export", "SalaryStatement")",
                 processData: false,
                 contentType: false,
                 async: false,
@@ -530,7 +530,7 @@
 
             // DataTable
             @* scrollY: "300px",*@
-            var table = $('#tblArrearsList').DataTable({
+            var table = $('#tblSalStatmentListId').DataTable({
                 "scrollX": true,
                 "scrollY": true,
                 "scrollCollapse": true,
@@ -591,7 +591,7 @@
         $("#btnExport").click(function (e) {
             //alert("excel");
             //window.open('data:application/vnd.ms-excel,' + $('#divJoinerslist').dataTable.html());
-            $('#tblArrearsList').tableExport({ type: 'excel'});
+            $('#tblPolicyList').tableExport({ type: 'excel'});
             @*$('#tblEmpList').tableExport({ type: 'csv' });*@
             @*$('tblEmpList').tableExport({
                 type: 'excel',
@@ -613,7 +613,7 @@
 
         $("#btnpDF").click(function (e) {
             //PDF
-            $('#tblArrearsList').tableExport({
+            $('#tblSalStatmentListId').tableExport({
                 type: 'pdf',
                 jspdf: {
                     orientation: 'l',
@@ -633,7 +633,7 @@
 
         $("#btnPrint").click(function (e) {
             //Print
-            var table = document.getElementById('tblArrearsList');
+            var table = document.getElementById('tblSalStatmentListId');
             table.button('.buttons-print').trigger();
             //var win = window.open('', '', 'height=700,width=700');
             //window.document.write(tab.outerHTML);

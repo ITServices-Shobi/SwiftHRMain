@@ -53,6 +53,7 @@ namespace SwiftHR.Models
         public virtual DbSet<EmpArrearDetails> EmpArrearDetails { get; set; }
         public virtual DbSet<EmpPFESICDetails> EmpPFESICDetails { get; set; }
         public virtual DbSet<SalaryHeader> SalaryHeaders { get; set; }
+        public virtual DbSet<SalaryMonthlyStatement> SalaryMonthlyStatements { get; set; }
         public virtual DbSet<SalaryDetails> SalaryDetails { get; set; }
         public virtual DbSet<EmpAddress> EmpAddress { get; set; }
         public virtual DbSet<CurrancyMaster> CurrancyMasters { get; set; }
@@ -272,6 +273,10 @@ namespace SwiftHR.Models
                     .HasMaxLength(250)
                     .IsUnicode(false);
 
+                entity.Property(e => e.VersionNumber)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.CreatedDate)
                     .HasMaxLength(250)
                     .IsUnicode(false);
@@ -291,6 +296,19 @@ namespace SwiftHR.Models
                 entity.Property(e => e.UpdatedBy)
                     .HasMaxLength(250)
                     .IsUnicode(false);
+
+            });
+
+
+            modelBuilder.Entity<SalaryMonthlyStatement>(entity =>
+            {
+                entity.ToTable("SalaryMonthlyStatement");
+
+
+                entity.Property(e => e.MailSendStatus)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
 
             });
 
@@ -553,6 +571,10 @@ namespace SwiftHR.Models
                 entity.Property(e => e.EmployeeNumber)
                     .HasMaxLength(250)
                     .IsUnicode(false);
+
+                entity.Property(e => e.ComponentsType)
+                  .HasMaxLength(250)
+                  .IsUnicode(false);
 
                 entity.Property(e => e.EarningsTypeFromLookUp)
                    .HasMaxLength(250)

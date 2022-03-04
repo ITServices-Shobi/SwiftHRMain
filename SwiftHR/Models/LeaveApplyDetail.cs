@@ -9,7 +9,7 @@ namespace SwiftHR.Models
     {
         public int EmpLeaveId { get; set; }
         public int? EmployeeId { get; set; }
-        public string LeaveType { get; set; }
+        public int LeaveType { get; set; }
         public string LeaveReason { get; set; }
         public string LeaveFromDate { get; set; }
         public string LeaveToDate { get; set; }

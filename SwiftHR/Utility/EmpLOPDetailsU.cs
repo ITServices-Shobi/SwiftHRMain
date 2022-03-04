@@ -30,7 +30,8 @@ namespace SwiftHR.Utility
                 EmpLOPDetails UpdateLOP = new EmpLOPDetails();
 
 
-                int EmployeeID, LOPMonth;
+                int EmployeeID, LOPMonth,LOPId;
+                int.TryParse(collection["ID"], out LOPId);
                 int.TryParse(collection["EmployeeID"], out EmployeeID);
                 int.TryParse(collection["LOPMonth"], out LOPMonth);
                 
@@ -41,16 +42,16 @@ namespace SwiftHR.Utility
                 LOPList.LOPMonth = LOPMonth;
                 LOPList.TotalLOPDays = collection["TotalLOPDays"];
                 LOPList.Remarks = collection["Remarks"];
-                LOPList.IsActive = false;
+                LOPList.IsActive = true;
                 //LOPList.CreatedDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, IST_TIMEZONE).ToString("dd-MM-yyyy");
                 //LOPList.CreatedBy = 1;
 
                 var RecordExists = (from a in _context.EmpLOPDetails
-                                    where a.EmployeeNumber == LOPList.EmployeeNumber.Trim() & a.IsActive == false
+                                    where a.EmployeeNumber == LOPList.EmployeeNumber.Trim() & a.IsActive == true
                                     select a.EmployeeNumber).SingleOrDefault();
 
 
-                if (LOPList.ID == 0)
+                if (LOPId == 0)
                 {
                     if (LOPList.EmployeeNumber != RecordExists)
                     {
@@ -72,27 +73,24 @@ namespace SwiftHR.Utility
                     using (SHR_SHOBIGROUP_DBContext entities = new SHR_SHOBIGROUP_DBContext())
                     {
                         UpdateLOP = (from a in _context.EmpLOPDetails
-                                     where a.ID == LOPList.ID && a.IsActive == false
+                                     where a.ID == LOPList.ID && a.IsActive == true
                                      select a).SingleOrDefault();
+                        LOPList.EmployeeID = EmployeeID;
+                        LOPList.EmployeeNumber = collection["EmployeeNumber"];
+                        LOPList.EmployeeName = collection["EmployeeName"];
+                        LOPList.LOPMonth = LOPMonth;
+                        LOPList.TotalLOPDays = collection["TotalLOPDays"];
+                        LOPList.Remarks = collection["Remarks"];
+                        LOPList.IsActive = true;
 
-                        UpdateLOP.EmployeeNumber = collection["EmployeeNumber"];
-                        UpdateLOP.EmployeeName = collection["EmployeeName"];
-                        UpdateLOP.LOPMonth = LOPMonth;
-                        UpdateLOP.TotalLOPDays = collection["TotalLOPDays"];
-                        UpdateLOP.Remarks = collection["Remarks"];
-                        UpdateLOP.IsActive = false;
-
-                        entities.EmpLOPDetails.Update(UpdateLOP);
+                        entities.EmpLOPDetails.Update(LOPList);
                         entities.SaveChanges();
-                        id = UpdateLOP.ID;
+                        id = LOPList.ID;
                     }
-                    Message = string.Format("Record Update {0}.\\n Date: {1}", UpdateLOP.EmployeeNumber, TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, IST_TIMEZONE).ToString("dd-MM-yyyy"));
-
+                    Message = string.Format("Record Update {0}.\\n Date: {1}", LOPList.EmployeeNumber, TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, IST_TIMEZONE).ToString("dd-MM-yyyy"));
                 }
-
             }
             return Message;
-
         }
 
         public string DeleteLOPRecord(int EMPLOPID)
@@ -106,7 +104,7 @@ namespace SwiftHR.Utility
 
                 EmpLOPDetails LOPDetails = new EmpLOPDetails();
                 LOPDetails = Record;
-                LOPDetails.IsActive = true;
+                LOPDetails.IsActive = false;
                 using (SHR_SHOBIGROUP_DBContext entities = new SHR_SHOBIGROUP_DBContext())
                 {
                     entities.EmpLOPDetails.Update(LOPDetails);

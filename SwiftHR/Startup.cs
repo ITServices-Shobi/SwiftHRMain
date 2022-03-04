@@ -24,6 +24,7 @@ namespace SwiftHR
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc();
             services.AddControllersWithViews();
             //services.AddDbContext<SHR_SHOBIGROUP_DBContext>(item => item.UseSqlServer(Configuration.GetConnectionString("SHR_Client_DBConnection")));
 

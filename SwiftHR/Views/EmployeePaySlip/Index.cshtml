@@ -1,0 +1,500 @@
+﻿@model SwiftHR.Models.SpGetEmployeePaySlipViewModel
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Process Salary";
+    int i;
+    IEnumerable<SwiftHR.Models.SpGetEmployeePaySlipViewModel> A = new List<SwiftHR.Models.SpGetEmployeePaySlipViewModel>();
+
+}
+
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+
+<link rel="stylesheet" href="~/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="~/css/site.css" />
+
+<script src="../../plugins/datepicker/bootstrap-datepicker.js"></script>
+
+<link rel="stylesheet" href="~/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+@section Scripts {
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/dataTables.buttons.min.js"></script>
+    @*<script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"></script>*@
+
+    <script src="~/bower_components/datatables.net-export/jszip.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/pdfmake.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/vfs_fonts.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.html5.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.print.min.js"></script>
+    <script src="~/bower_components/datatables.net-export/buttons.colVis.min.js"></script>
+    <!-- Export plugin -->
+    <script type="text/javascript" src="~/lib/hhurz/libs/FileSaver/FileSaver.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/js-xlsx/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.min.js"></script>
+    @*<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.15.4/extensions/print/bootstrap-table-print.js"></script>*@
+
+    <script>
+        $(document).ready(function () {
+            var dt = new Date();
+            var year = dt.getFullYear();
+            var month = ("0" + (dt.getMonth() + 1)).slice(-2);
+            $("#bdaymonth").val(year + '-' + month);
+            CountOfMonth = new Date(year, month, 0).getDate();
+            date = dt.getDate();
+
+            $('#checkall').change(function () {
+                $('.cb-element').prop('checked', this.checked);
+            });
+            //GetHolidays();
+            $('.cb-element').change(function () {
+                if ($('.cb-element:checked').length == $('.cb-element').length) {
+                    $('#checkall').prop('checked', true);
+                }
+                else {
+                    $('#checkall').prop('checked', false);
+                }
+            });
+        });
+    </script>
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+            window.onload = function () {
+             document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+              };
+        </script>
+    }
+
+    @*-----------------Search Record -----------------*@
+
+
+    <script>
+    function GetEmpDetails() {
+        event.preventDefault();
+            $('#tblEmplist > tbody').empty();
+            //$("#tdEmpId").html('');
+            var EmployeeNoAndCode = $("#txtEmpCodeName").val();
+            var form_data = new FormData();
+            form_data.append('EmpNo', EmployeeNoAndCode);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SearchEmpNameDetails", "EmpReimbursementApproved")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+                success: function (response) {
+                    // emplist = response;
+                    debugger;
+                    if (response.length > 0) {
+                        var data = response[0];
+                        AddEmployeeTableBody(response.length, response);
+                    }
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+
+    }
+    function AddEmployeeTableBody(EmployeeDetailslen, EmployeeDetails) {
+        debugger;
+        $('#tblEmplist > tbody').empty();
+
+        for (i = 0; i < EmployeeDetailslen; i++) {
+
+            var data = '<tr onclick="SetEmployeeName(' + i + ')">'
+
+                + '<td style="color:blue;"><input  type="hidden" id="HiddenEmpId_' + i + '"value="' + EmployeeDetails[i].employeeId + '" disabled><input type="text" style="color:blue;cursor:pointer" id="txtEmpNumber_' + i + '" class="form-control" value="' + EmployeeDetails[i].employeeNumber + '"  disabled></td>'
+                + '<td><input type="text" id="txtEmpName_' + i + '"  class="form-control" value="' + EmployeeDetails[i].firstName + ' ' + EmployeeDetails[i].lastName + '" disabled></td></tr>'
+
+            $('#tblEmplist').append(data);
+
+        }
+
+    }
+    function SetEmployeeName(index) {
+        var EmpName = $('#txtEmpName_' + index).val();
+        var EmpNo = $('#txtEmpNumber_' + index).val();
+        var EmpId = $('#HiddenEmpId_' + index).val();
+
+        $('#txtEmployeeName').val(EmpName);
+        $('#txtEmployeeCode').val(EmpNo);
+        $('#txtEmployeeId').val(EmpId);
+        $('#modelWindow').modal('hide');
+    }
+
+
+    selectedItems = [];
+    $(document).on("change", ".chkchild", function (item) {
+        var id = "";
+        id = $(this).attr("data-id");
+
+        if (this.checked) { // check select status
+
+            selectedItems.push(id);
+
+        } else {
+            selectedItems.pop(id);
+        }
+
+    });
+    </script>
+
+    <div class="modal fade" id="modelWindow" role="dialog">
+        <div class="modal-dialog modal-sm vertical-align-center">
+            <div class="modal-content">
+
+                <div class="box-body">
+                    <div class="table-responsive" id="tblEmplist">
+
+                        <table id="tblEmplist" data-tableexport-display="none" data-page-list="[10, 25, 50, 100, 200, All]" class="table table-bordered table-striped dt-responsive nowrap table-hover table-condensed" style="width:100%">
+                            @if (ViewBag.EmpList != null)
+                            {
+                                IEnumerable<SwiftHR.Models.Employee> d = new List<SwiftHR.Models.Employee>();
+                                d = ViewBag.EmpList;
+                                <thead>
+                                    <tr>
+                                        <th class="bg-primary"> Employee No</th>
+                                        <th class="bg-primary"> Employee</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var Adata in d)
+                                    {
+                                        <tr id="@Adata.EmployeeId">
+                                            <td id="tdEmpId">
+                                                @Html.Hidden("EmpId", Adata.EmployeeId)
+                                                @Html.Display("EmpNumber", Adata.EmployeeNumber)
+                                            </td>
+                                            <td>
+                                                @Html.Display("EmpName", Adata.FirstName)
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            }
+                        </table>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#btn').click(function () {
+            $('#modelWindow').modal('show');
+        });
+    </script>
+
+    @*-----------------------END -------------------------*@
+
+}
+<section class="content-header">
+    <h1>
+        Employye Pay Slip
+    </h1>
+</section>
+<section class="content">
+    <div class="alertS alert-success" id="modal-success" style="display:none;">
+        <button type="button" class="close" aria-hidden="true" onclick="successAlertClose(event)">&times;</button>
+        <h4><i class="icon fa fa-check"></i> Success </h4>
+        <p id="successBody"></p>
+    </div>
+
+
+    <div class="box box-default">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="" style="border: 1px solid #0000001c;">
+                            <form asp-controller="EmployeePaySlip" asp-action="" method="POST">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <a href="https://www.shobigroup.com" class="logo" style="border-right: 0px !important;">
+                                                    <img src="~/dist/img/shobi_logo.png" alt="homepage" class="logo-lg" style="width:75%;" />
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtEmpCodeName">
+                                                    Employee Code/Name<span style="color:#FF0000;">*</span>
+                                                </label>
+                                                <input type="hidden" id="ReimbId" name="Id">
+                                                <input type="hidden" id="txtEmployeeId" name="EmployeeID">
+                                                <input type="text" id="txtEmpCodeName" name="EmpCodeName" class="form-control" placeholder="Employee Code">
+                                                <button title="Search" id="btn" type="submit" class="btn btn-primary" style="float: right; margin-right: -11%; margin-top: -12%; cursor:  pointer;" onclick="GetEmpDetails()">:</button>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="bdaymonth">Month And Year: </label>
+                                                <br /><br />
+                                                <i class="fa fa-chevron-circle-left fa-lg allowed" onclick="setpreviousDate();" title="Previous Date" style="margin-right: 10px"></i>
+                                                <input type="month" id="bdaymonth" name="bdaymonth" onchange="GetEmployeeData();">
+                                                <i class="fa fa-chevron-circle-right fa-lg allowed" onclick="MonthNext();" title="Next Date" style="margin-right: 10px"></i>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="txtEmployeeName">Employee Name<span style="color:#FF0000;">*</span></label>
+                                                <input type="text" id="txtEmployeeName" name="EmployeeName" class="form-control" readonly="" placeholder="Employee Name">
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="box-body">
+                                                <div class="form-group">
+                                                    <br /><br />
+                                                    <button type="submit" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="ProcessData()">View Salary</button>
+                                                </div>
+                                            </div>
+                                            <!-- /.box-body -->
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="MonthDetailsId" class="table table-bordered table-striped dt-responsive nowrap table-hover" style="width:100%">
+                        <thead>
+                            <tr>
+                                @*<th colspan="2" class="bg-primary">Earning</th>
+                                <th colspan="2" class="bg-primary">Deduction</th>*@
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+        </div>
+    </div>
+
+    <div style="display:none;">
+        <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+        </button>
+        <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+        </button>
+    </div>
+
+    <div class="alert alert-warning fade" id="modal-warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4>
+            <i class="icon fa fa-warning"></i> Alert!
+        </h4>
+
+        <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+        </div>
+
+        <div class="alert-footer">
+            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+        </div>
+    </div>
+
+    <div class="modal modal-warning fade" id="modal-warning2">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Alert!</h4>
+                </div>
+                <div class="modal-body">
+                    <p>One fine body&hellip;</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+            @*/.modal-content*@
+        </div>
+        @*/.modal-dialog*@
+    </div>
+</section>
+<script>
+
+    function setpreviousDate() {
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate);
+        var endDate = new Date(dt.setMonth(dt.getMonth() - 1));
+        var year = endDate.getFullYear();
+        var month = ("0" + (endDate.getMonth() + 1)).slice(-2);
+        $("#bdaymonth").val(year + '-' + month);
+        CountOfMonth = new Date(year, month, 0).getDate();
+    }
+
+    function MonthNext() {
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate);
+
+        var endDate = new Date(dt.setMonth(dt.getMonth() + 1));
+        var year = endDate.getFullYear();
+        var month = ("0" + (endDate.getMonth() + 1)).slice(-2);
+        $("#bdaymonth").val(year + '-' + month);
+        CountOfMonth = new Date(year, month, 0).getDate();
+    }
+</script>
+<script>
+
+    function ProcessData(i) {
+        event.preventDefault();
+
+        var Month = $('#bdaymonth').val();
+        var EmPID = $('#txtEmployeeId').val();
+        var dt = new Date(Month + "-");
+
+        var objToday = dt,
+        months = new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'),
+        curMonthNo = objToday.getMonth(),
+        curYear = objToday.getFullYear()
+
+        alert(curMonthNo);
+        var form_data = new FormData();
+        form_data.append('curMonthNo', curMonthNo);
+        form_data.append('curYear', curYear);
+        form_data.append('EmPID', EmPID);
+
+        $.ajax({
+                type: "POST",
+                url: "@Url.Action("GenerateEmployeesPaySlip", "EmployeePaySlip")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+            success: function (Result) {
+                var data = Result.result[0];
+                AddSalaryHeaderTableBody(Result.result.length, Result.result);
+
+                  document.getElementById("successBody").innerHTML = "Salary Generated Success";
+                  document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+
+
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+
+    }
+
+    function AddSalaryHeaderTableBody(SalaryHeaderlen, EmployeeDetails) {
+        debugger;
+        $('#MonthDetailsId > tbody').empty();
+      
+        for (i = 0; i < SalaryHeaderlen; i++) {
+
+            var data = '<tr id="trChildRow_' + i + '">'
+                + '<td style="line-height:0.4235676">' + EmployeeDetails[i].empDetails + '</td>'
+                + '<td style="line-height:0.4235676">' + EmployeeDetails[i].empDetailsVale + '</td>'
+                + '<td style="line-height:0.4235676">' + EmployeeDetails[i].empDetails1 + '</td>'
+                + '<td style="line-height:0.4235676">' + EmployeeDetails[i].empDetailsVale1+ '</td></tr > '
+
+                + '<tr id="trDetailsRow_' + i + '" hidden><td></td><td colspan="6"><table id="EmpDetailsId_' + i + '" class="table table-bordered etable"><thead><tr></tr ></thead > <tbody></tbody></table></td></tr>'
+            $('#MonthDetailsId').append(data);
+
+        }
+
+    }
+
+    function successAlertClose(event) {
+        document.getElementById("modal-success").style.display = "none";
+    }
+</script>
+

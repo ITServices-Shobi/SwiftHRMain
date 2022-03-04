@@ -11,7 +11,7 @@ namespace SwiftHR.Models
         public int EmployeeId { get; set; }
         public int EmployeeNumber { get; set; }
         public string EmployeeName { get; set; }
-
+        public string ComponentsType { get; set; }
         public int EarningsTypeFromLookUp { get; set; }
         public DateTime Date { get; set; }
         public DateTime PaymentEffectedDate { get; set; }

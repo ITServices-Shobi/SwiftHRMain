@@ -386,7 +386,7 @@
                             <li id="liAttendancePolicySetup" class="liItems"><a href="pages/forms/advanced.html"><i class="fa fa-circle-o"></i> Attendance Policy Setup</a></li>
                             <li id="liAttendanceScheme" class="liItems"><a href="pages/forms/editors.html"><i class="fa fa-circle-o"></i> Attendance Scheme</a></li>
                             @*<li id="liTimeSheet" class="liItems"><a href="pages/forms/editors.html"><i class="fa fa-circle-o"></i> Time Sheet </a></li>
-        <li id="liShifts" class="liItems"><a href=""><i class="fa fa-circle-o"></i> Shifts</a></li>*@
+                                <li id="liShifts" class="liItems"><a href=""><i class="fa fa-circle-o"></i> Shifts</a></li>*@
                         </ul>
                     </li>
                     <li id="liPayroll" class="treeview liItems">
@@ -717,6 +717,30 @@
         <div class="control-sidebar-bg"></div>
 
     </div>
+
+
+    <div style="display:none;">
+        <button type="button" id="btnBusy" class="btn btn-success" data-toggle="modal" data-target="#modal-busy" data-backdrop="static" data-keyboard="false">
+        </button>
+    </div>
+
+    <div class="modal" id="modal-busy">
+        <div class="modal-dialog modal-dialog-centered" style="width: 100% !important; height: 100% !important;">
+            <div class="modal-content" style="background-color: transparent !important; border: 0px !important; width: 100% !important; height: 100% !important;">
+                <div id="alertBodyBusy" class="modal-body">
+                    <center>
+                        <div class="loader-logo" style="background-color: transparent !important;"><img src="~/dist/img/swiftHRPrgressbar-transparent.png" alt=""></div>
+                        <div class="fa-9x">
+                            <i id="iSpinner" class="fa fa-spinner fa-pulse fa-spin " style="font-size:60px;color:red"></i>
+                        </div>
+                        <div class="loading-text" style="font-weight: 600; font-size:20px; color: #337ab7;">
+                            Page is Loading...
+                        </div>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- ./wrapper -->
     <!-- jQuery 3 -->
     <script src="~/bower_components/jquery/dist/jquery.min.js"></script>
@@ -887,6 +911,8 @@
         </div>
         <!-- /.modal-content -->
     </div>
+
+
     <!-- /.modal-dialog -->
     </div>
 </body>

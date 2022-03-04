@@ -40,10 +40,13 @@ namespace SwiftHR.Controllers
 
             List<EmpLOPDetails> LOPDetailsList = new List<EmpLOPDetails>();
 
-            LOPDetailsList = _context.EmpLOPDetails.Where(x => x.IsActive == false).ToList();
+            LOPDetailsList = _context.EmpLOPDetails.Where(x => x.IsActive == true).ToList();
             ViewBag.LOPList = LOPDetailsList;
 
-            return View("Index",EmpLOPDetailsMaster);
+            EmpLOPDetailsU empLOPMasters = new EmpLOPDetailsU();
+            empLOPMasters = GetMonthName();
+
+            return View("Index", empLOPMasters);
         }
 
         [HttpPost]
@@ -54,12 +57,12 @@ namespace SwiftHR.Controllers
             try
             {
                 EmpLOPDetailsU LOPMaster = new EmpLOPDetailsU();
-                
+                LOPMaster = GetMonthName();
                 ViewBag.Message = LOPMaster.AddEmpLOPDetails(collection);
 
                 List<EmpLOPDetails> LOPList = new List<EmpLOPDetails>();
 
-                LOPList = _context.EmpLOPDetails.Where(x => x.IsActive == false).ToList();
+                LOPList = _context.EmpLOPDetails.Where(x => x.IsActive == true).ToList();
                 ViewBag.LOPList = LOPList;
 
                 return View("Index", LOPMaster);
@@ -117,6 +120,18 @@ namespace SwiftHR.Controllers
             //ViewBag.Message = result;
 
             //return View("AddPolicy", policyMaster);
+        }
+
+        private EmpLOPDetailsU GetMonthName()
+        {
+            EmpLOPDetailsU empLopDetails = new EmpLOPDetailsU();
+
+            List<LookUpDetailsM> LoanTypeList = new List<LookUpDetailsM>();
+            LoanTypeList = _context.LookUpDetailsM.Where(e => e.LookUpId == Convert.ToInt32("5")).ToList();
+
+            empLopDetails.LoanTypeList = LoanTypeList;
+            
+            return empLopDetails;
         }
 
     }

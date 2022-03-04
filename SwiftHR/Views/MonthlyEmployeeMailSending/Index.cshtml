@@ -1,0 +1,513 @@
+﻿@model SwiftHR.Utility.SalaryMonthlyStatementU
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Send Pay Slip";
+}
+
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alertS {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+        outline: 0;
+    }
+
+    .alert-warning {
+        border-color: #e08e0b;
+        width: 40%;
+        margin-left: 30%;
+        height: 50%;
+        margin-top: 5%;
+    }
+
+    .alert-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .alert-success {
+        border-color: #008d4c;
+        width: 50%;
+        margin-left: 30%;
+        height: 20%;
+        margin-top: 5%;
+    }
+</style>
+
+<script src="../../plugins/datepicker/bootstrap-datepicker.js"></script>
+<link rel="stylesheet" href="~/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+
+
+<section class="content-header">
+    <h1>
+        Send Mail
+    </h1>
+
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="box box-default">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="SalaryID" style="border: 1px solid #0000001c;">
+                            <form asp-controller="MonthlyEmployeeMailSending" asp-action="" method="POST">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <a href="https://www.shobigroup.com" class="logo" style="border-right: 0px !important;">
+                                                    <img src="~/dist/img/shobi_logo.png" alt="homepage" class="logo-lg" style="width:75%;" />
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <label for="bdaymonth">Month And Year: </label>
+                                                <i class="fa fa-chevron-circle-left fa-lg allowed" onclick="setpreviousDate();" title="Previous Date" style="margin-right: 10px"></i>
+                                                <input type="month" id="bdaymonth" name="bdaymonth" onchange="GetEmployeeData();">
+                                                <i class="fa fa-chevron-circle-right fa-lg allowed" onclick="MonthNext();" title="Next Date" style="margin-right: 10px"></i>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+                                <table id="PaySlipSendMailtblId" class="table table-bordered etable">
+                                    <thead>
+                                        <tr>
+                                            <th class="bg-primary">
+                                                <input type="checkbox" name="all" id="checkall" /> All
+                                            </th>
+                                            <th class="bg-primary"> Employee</th>
+                                            <th class="bg-primary"> Day In Month</th>
+                                            <th class="bg-primary">Total Woring Days</th>
+                                            <th class="bg-primary">Month</th>
+                                            <th class="bg-primary">Net Pay</th>
+                                            <th class="bg-primary">View PaySlip</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody></tbody>
+
+                                </table>
+
+                                <div class="box-footer">
+                                    <div class="col-md-12">
+                                        <button type="submit" class="btn btn-primary" style="float: right; margin-right: 4%;" onclick="GetProcessSalaryList()">Search</button>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <button type="submit" class="btn btn-primary" id="btnsendMail" style="float: right; margin-right: 4%;" onclick="GenerateMultiplePdf()">Send Mail</button>
+                                    </div>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:none;">
+                <button type="button" id="btnAlert" class="btn btn-info" data-toggle="modal" data-target="#modal-warning">
+                </button>
+                <button type="button" id="btnSuccess" class="btn btn-success" data-toggle="modal" data-target="#modal-success">
+                </button>
+            </div>
+
+
+            <div class="alert alert-warning fade" id="modal-warning">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4>
+                    <i class="icon fa fa-warning"></i> Alert!
+                </h4>
+
+                <div id="alertBody" style="margin-top: 6%; margin-left: 10%;">
+                </div>
+
+                <div class="alert-footer">
+                    <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+
+
+            <div class="modal modal-warning fade" id="modal-warning2">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">Alert!</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>One fine body&hellip;</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-outline" data-dismiss="modal">Ok</button>
+                        </div>
+                    </div>
+                    @*/.modal-content*@
+                </div>
+                @*/.modal-dialog*@
+            </div>
+            <!-- /.modal -->
+
+            <div class="alertS alert-success" id="modal-success" style="display:none;">
+                <button type="button" class="close" aria-hidden="true" onclick="successAlertClose()">&times;</button>
+                <h4><i class="icon fa fa-check"></i> Success </h4>
+
+                <p id="successBody"></p>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+<script>
+
+    function setpreviousDate() {
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate);
+        var endDate = new Date(dt.setMonth(dt.getMonth() - 1));
+        var year = endDate.getFullYear();
+        var month = ("0" + (endDate.getMonth() + 1)).slice(-2);
+        $("#bdaymonth").val(year + '-' + month);
+        CountOfMonth = new Date(year, month, 0).getDate();
+    }
+
+    function MonthNext() {
+        var todaysdate = $('#bdaymonth').val();
+        var dt = new Date(todaysdate);
+
+        var endDate = new Date(dt.setMonth(dt.getMonth() + 1));
+        var year = endDate.getFullYear();
+        var month = ("0" + (endDate.getMonth() + 1)).slice(-2);
+        $("#bdaymonth").val(year + '-' + month);
+        CountOfMonth = new Date(year, month, 0).getDate();
+    }
+</script>
+<script>
+    function GetProcessSalaryList() {
+        document.getElementById("btnBusy").click();
+        /*return;*/
+        event.preventDefault();
+
+        var Month = $('#bdaymonth').val();
+        var dt = new Date(Month + "-");
+
+        var objToday = dt,
+        months = new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'),
+        curMonthNo = objToday.getMonth(),
+        curYear = objToday.getFullYear()
+
+        var form_data = new FormData();
+        form_data.append('curMonthNo', curMonthNo);
+        form_data.append('curYear', curYear);
+
+        $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetEmployeeProcessSalary", "MonthlyEmployeeMailSending")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+            success: function (response) {
+
+                //alert($(this).parent().);
+                debugger;
+                var resData = response.result;
+                if (resData.length > 0) {
+                    //PaySlipDataTableBody(resData);
+                    busyAlertClose();
+                    var data = response[0];
+                    PaySlipDataTableBody(resData.length, resData);
+
+                }
+                else {
+                    busyAlertClose();
+                    // alert('End time should be after start time.');
+                    document.getElementById("successBody").innerHTML = "No Record .";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+                }
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+
+
+    }
+
+    function PaySlipDataTableBody(PaySlipDataDetailslen, PaySlipData) {
+        debugger;
+
+        $('#PaySlipSendMailtblId > tbody').empty();
+
+        for (i = 0; i < PaySlipDataDetailslen; i++) {
+
+            var data = '<tr id="trChildRow_' + i + '">'
+                + '<td style="line-height:0.4235676"><input type="checkbox" data-id="' + PaySlipData[i].employeeId + '"  class="cb-element chkchild" /></td>'
+
+                /*+ '<td style="line-height:0.4235676"> <input type = "text" class="form-control" value = "' + PaySlipData[i].employeeName +'" ></td>'*/
+
+                + '<td style="line-height:0.4235676"><input type="hidden" id="EmpHiddenId_'+i+'" value="' + PaySlipData[i].employeeId + '"/>' + PaySlipData[i].employeeName + '</td>'
+                + '<td style="line-height:0.4235676">' + PaySlipData[i].daysInMonth + '</td>'
+                + '<td style="line-height:0.4235676">' + PaySlipData[i].totalWorkingDays + '</td>'
+                + '<td style="line-height:0.4235676">' + PaySlipData[i].month + '</td>'
+                + '<td style="line-height:0.4235676">' + PaySlipData[i].netPay + '</td>'
+                + '<td><a type = "button" href = "" id = "btnViewpdf_' + i + '" class="btn btn-success pull-left btn-xs" style = "float: left; margin-right: 4%;" onclick = "ViewPaySlipPdf(' + i + ');"> <i id="" class="fa fa-eye"></i></a ></td ></tr > '
+                + '</tr>'
+
+            $('#PaySlipSendMailtblId').append(data);
+
+        }
+
+        GridSetup('PaySlipSendMailtblId');
+    }
+
+    function ViewPaySlipPdf(i) {
+        event.preventDefault();
+
+        var Month = $('#bdaymonth').val();
+        var dt = new Date(Month + "-");
+
+        var objToday = dt,
+        months = new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'),
+        curMonthNo = objToday.getMonth(),
+        curYear = objToday.getFullYear()
+
+
+        var EmPID = $('#EmpHiddenId_'+i).val();
+
+
+        var form_data = new FormData();
+        form_data.append('curMonthNo', curMonthNo);
+        form_data.append('curYear', curYear);
+        form_data.append('EmPID', EmPID);
+
+        
+        var url = '@Url.Action("OpenSalarySlipPdf", "MonthlyEmployeeMailSending")?EmPID=' + EmPID + '&curMonthNo=' + curMonthNo + '&curYear=' + curYear;
+        //window.location.href = url;
+        window.open(url, '_blank');
+        @*$.ajax({
+                type: "POST",
+                url: "@Url.Action("OpenSalarySlipPdf", "MonthlyEmployeeMailSending")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+            success: function (response) {
+
+
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });*@
+
+    }
+
+    function GenerateMultiplePdf() {
+        event.preventDefault();
+
+        var Month = $('#bdaymonth').val();
+        var dt = new Date(Month + "-");
+
+        var objToday = dt,
+        months = new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'),
+        curMonthNo = objToday.getMonth(),
+        curYear = objToday.getFullYear()
+
+        var EmPID = "";
+
+
+        var form_data = new FormData();
+        form_data.append('curMonthNo', curMonthNo);
+        form_data.append('curYear', curYear);
+
+        for (var i = 0; i < selectedItems.length; i++) {
+            EmPID = EmPID + "," + selectedItems[i];
+
+        }
+        form_data.append('EmPID', EmPID);
+        $.ajax({
+                type: "POST",
+                url: "@Url.Action("SendSalarySlipToEmployees", "MonthlyEmployeeMailSending")",
+                processData: false,
+                contentType: false,
+                async: false,
+                cache: false,
+                data: form_data,
+            success: function (response) {
+                if (response.result == "success") {
+                    document.getElementById("successBody").innerHTML = "Mail sent sucessfully!!";
+                    document.getElementById("modal-success").style.display = "block";
+                    setTimeout(successAlertClose, 5000);
+                }
+                else {
+                    alert(response.result);
+                }
+                },
+                error: function (req, status, error) {
+                    //console.log(msg);
+                }
+            });
+
+    }
+
+    function successAlertClose(event) {
+        document.getElementById("modal-success").style.display = "none";
+    }
+</script>
+<script>
+    function GridSetup(name) {
+        var table = $('#' + name).DataTable({
+            "pagingType": "full_numbers",
+            "pageLength": 5,
+            "order": [[8, "desc"]],
+            "dom": 'Bfrtip',
+            "buttons": [
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-default btn-circle pull-right hidden-print',
+                    text: '<i class="fa fa-file-pdf-o"></i>'
+                },
+                {
+                    extend: 'print',
+                    className: 'btn btn-default btn-circle pull-right hidden-print',
+                    text: '<i class="fa fa-print"></i>'
+                }
+            ],
+        });
+        table.draw();
+
+    };
+</script>
+
+
+
+@section Scripts {
+
+    <script src="~/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="~/lib/hhurz/libs/FileSaver/FileSaver.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/js-xlsx/xlsx.core.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.js"></script>
+    <script type="text/javascript" src="~/lib/hhurz/tableExport.min.js"></script>
+
+
+
+
+    <script>
+        selectedItems = [];
+        $(document).on("change", ".chkchild", function (item) {
+            var id = "";
+            id = $(this).attr("data-id");
+
+            if (this.checked) { // check select status
+
+                selectedItems.push(id);
+
+            } else {
+                selectedItems.pop(id);
+            }
+
+            //if (selectedItems.length > 1) {
+            //    $('#btnsendMail').removeAttr('disabled');
+            //}
+            //else {
+            //    $('#btnsendMail').attr('disabled', 'disabled');
+            //}
+        });
+
+    </script>
+
+
+
+
+    <script>
+        $(document).ready(function () {
+            var dt = new Date();
+            var year = dt.getFullYear();
+            var month = ("0" + (dt.getMonth() + 1)).slice(-2);
+            $("#bdaymonth").val(year + '-' + month);
+            CountOfMonth = new Date(year, month, 0).getDate();
+            date = dt.getDate();
+
+            $('#checkall').change(function () {
+                $('.cb-element').prop('checked', this.checked);
+            });
+            //GetHolidays();
+            $('.cb-element').change(function () {
+                if ($('.cb-element:checked').length == $('.cb-element').length) {
+                    $('#checkall').prop('checked', true);
+                }
+                else {
+                    $('#checkall').prop('checked', false);
+                }
+            });
+
+        });
+
+
+    </script>
+    @if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+            window.onload = function () {
+             document.getElementById("successBody").innerHTML = "@ViewBag.Message";
+            document.getElementById("modal-success").style.display = "block";
+            setTimeout(successAlertClose, 5000);
+              };
+        </script>
+    }
+<script>
+
+    function busyAlertClose(event) {
+        $('#modal-busy').modal('hide');
+    }
+
+</script>
+    
+}

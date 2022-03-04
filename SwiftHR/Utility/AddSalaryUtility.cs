@@ -31,12 +31,13 @@ namespace SwiftHR.Utility
 
             if (!string.IsNullOrEmpty(collection["EmployeeNumber"].ToString()))
             {
-                int EmployeeID;
+                int EmployeeID, VersionNumber;
                 int SalaryID, EmployeeType, Gender, PayoutMonth;
                 Boolean PFAvailability;
                 DateTime DOB, DOJ, LastPayrollProceesedDate, EffectiveStartDate, EffectiveEndDate;
                 int.TryParse(collection["ID"], out SalaryID);
                 int.TryParse(collection["EmployeeID"], out EmployeeID);
+                int.TryParse(collection["VersionNumber"], out VersionNumber);
                 int.TryParse(collection["EmployeeType"], out EmployeeType);
                 int.TryParse(collection["Gender"], out Gender);
                 int.TryParse(collection["PayoutMonth"], out PayoutMonth);
@@ -73,6 +74,7 @@ namespace SwiftHR.Utility
                 SalaryHeaderList.EmployeeNumber = collection["EmployeeNumber"];
                 SalaryHeaderList.EmployeeName = collection["EmployeeName"];
                 SalaryHeaderList.EmployeeID = EmployeeID;
+                SalaryHeaderList.VersionNumber = VersionNumber + 1;
                 SalaryHeaderList.EmployeeType = EmployeeType;
                 SalaryHeaderList.Gender = Gender;
                 SalaryHeaderList.PFAvailability = PFAvailability;

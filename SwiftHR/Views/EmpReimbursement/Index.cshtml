@@ -111,6 +111,20 @@
                                     <div class="col-md-4">
                                         <div class="box-body">
                                             <div class="form-group">
+                                                <label for="txtComponentsType">Components Type<span style="color:#FF0000;">*</span></label>
+                                                <select class="form-control select2" id="txtComponentsType" name="ComponentsType">
+                                                    <option value="0">Choose..</option>
+                                                    <option value="Earnings">Earnings Components</option>
+                                                    <option value="Deduction">Deduction Components</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="box-body">
+                                            <div class="form-group">
                                                 <label for="EarningType">Earnings Components<span style="color:#FF0000;">*</span></label>
                                                 <select class="form-control select2" id="txtEarningType" name="EarningType">
                                                     <option value="0">Choose..</option>
@@ -344,10 +358,18 @@
                 IsAnyEmpty = true;
                 alertMsg = "Employee Number <br />";
             }
+            
+            if (document.getElementById("txtComponentsType").value == "" || document.getElementById("txtComponentsType").value == 0) {
+                IsAnyEmpty = true;
+                alertMsg = "Components  Type <br />";
+            }
+
             if (document.getElementById("txtEarningType").value == "" || document.getElementById("txtEarningType").value == 0) {
                 IsAnyEmpty = true;
                 alertMsg = "Earning Type <br />";
             }
+
+
 
             
             if (document.getElementById("dtDate").value == "") {

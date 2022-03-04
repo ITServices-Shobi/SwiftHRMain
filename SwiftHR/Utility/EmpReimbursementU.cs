@@ -68,10 +68,12 @@ namespace SwiftHR.Utility
                         ReimbursementList.EmployeeId = EmployeeID;
                         ReimbursementList.EmployeeNumber = EmpNO;
                         ReimbursementList.EmployeeName = collection["EmployeeName"];
+                        ReimbursementList.ComponentsType = collection["ComponentsType"];
                         ReimbursementList.EarningsTypeFromLookUp = EarningType;
                         ReimbursementList.Date = Date;
                         ReimbursementList.Amount = Amt;
                         ReimbursementList.Remarks = collection["Remarks"];
+                        
                         ReimbursementList.IsActive = true;
                         ReimbursementList.PaymentEffectedDate = PaymentEffectedDate;
                         ReimbursementList.Status = "Apply";
@@ -100,6 +102,7 @@ namespace SwiftHR.Utility
 
                         UpdateEmpReimbursement.EmployeeId = EmployeeID;
                         UpdateEmpReimbursement.EmployeeNumber = EmpNO;
+
                         UpdateEmpReimbursement.EmployeeName = collection["EmployeeName"];
                         UpdateEmpReimbursement.Date = Date;
                         UpdateEmpReimbursement.Amount = Amt;

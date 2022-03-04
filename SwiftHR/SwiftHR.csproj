@@ -2,6 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<UserSecretsId>bc870c2b-d44f-4de4-8af0-5c7b470b5373</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -9,6 +10,10 @@
 	  <Content Remove="Views\Leaves\**" />
 	  <EmbeddedResource Remove="Views\Leaves\**" />
 	  <None Remove="Views\Leaves\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="wwwroot\PaySlip\PaySlipReport.rdlc" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -38,6 +43,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Include="Views\EmpLOPDetails\Index.cshtml" />
 		<None Include="wwwroot\bower_components\bootstrap-colorpicker\dist\js\bootstrap-colorpicker.min.js" />
 		<None Include="wwwroot\bower_components\bootstrap-datepicker\dist\js\bootstrap-datepicker.min.js" />
 		<None Include="wwwroot\bower_components\bootstrap-daterangepicker\daterangepicker.js" />
@@ -118,8 +124,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AspNetCore.Reporting" Version="2.1.0" />
 		<PackageReference Include="EntityFramework" Version="6.4.4" />
 		<PackageReference Include="EPPlus" Version="5.5.3" />
+		<PackageReference Include="ExcelLibrary" Version="1.2011.7.31" />
+		<PackageReference Include="Fingers10.ExcelExport" Version="3.0.1" />
 		<PackageReference Include="MailKit" Version="2.10.1" />
 		<PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
@@ -135,7 +144,29 @@
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
 		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
 		<PackageReference Include="Nexmo.Csharp.Client" Version="2.3.1" />
+		<PackageReference Include="System.CodeDom" Version="6.0.0" />
 		<PackageReference Include="Vonage" Version="5.9.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="SHR_SHOBIGROUP_DBDataSet.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>SHR_SHOBIGROUP_DBDataSet.xsd</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="wwwroot\PaySlip\PaySlipReport.rdlc">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="SHR_SHOBIGROUP_DBDataSet.xsd">
+	    <Generator>MSDataSetGenerator</Generator>
+	    <LastGenOutput>SHR_SHOBIGROUP_DBDataSet.Designer.cs</LastGenOutput>
+	  </None>
 	</ItemGroup>
 
 </Project>

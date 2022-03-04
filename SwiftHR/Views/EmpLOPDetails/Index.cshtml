@@ -88,7 +88,7 @@
                                         <div class="box-body">
                                             <div class="form-group">
                                                 <label for="txtEmployeeNumber">Employee Code<span style="color:#FF0000;">*</span></label>
-                                                <input type="hidden" id="ID" name="ID">
+                                                <input type="hidden" id="LOPID" name="ID">
                                                 <input type="hidden" id="txtEmployeeId" name="EmployeeID">
                                                 <input type="text" id="txtEmployeeNumber" name="EmployeeNumber" class="form-control" placeholder="Employee Code" onchange="GetEmpDetails()">
                                             </div>
@@ -300,7 +300,8 @@
                     //alert($(this).parent().);
                     debugger;
 
-                    $("#Id").val(response[0].id);
+                    $("#LOPID").val(response[0].id);
+                    $("#txtEmployeeId").val(response[0].employeeID);
                     $("#txtEmployeeNumber").val(response[0].employeeNumber);
                     $("#txtEmployeeName").val(response[0].employeeName);
                     $("#txtLOPMonth").val(response[0].lOPMonth);

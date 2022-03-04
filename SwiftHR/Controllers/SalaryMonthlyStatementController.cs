@@ -35,6 +35,8 @@ namespace SwiftHR.Controllers
             return View();
         }
 
+      //  [HttpGet("GetFixHolidays")]
+
         [HttpPost]
         public ActionResult EmployeesSalaryProcess(int curMonthNo, int curYear)
         {
@@ -42,8 +44,122 @@ namespace SwiftHR.Controllers
             try
             {
 
+                bool saturday, sunday;
+                bool.TryParse(_configuration["WeekOfHolidays:saturday"], out saturday);
+                bool.TryParse(_configuration["WeekOfHolidays:sunday"], out sunday);
+
+                DateTime today = DateTime.Today;
+                DateTime endOfMonth = new DateTime(curYear, curMonthNo, DateTime.DaysInMonth(curYear, curMonthNo));
+                int day = endOfMonth.Day;
+
+                DateTime now = DateTime.Now;
+                int WeekHolidaycount;
+                WeekHolidaycount = 0;
+                for (int i = 0; i < day; ++i)
+                {
+                    DateTime d = new DateTime(curYear, curMonthNo, i + 1);
+
+                    
+
+                    if (saturday == true)
+                    {
+                        if (d.DayOfWeek == DayOfWeek.Saturday)
+                        {
+
+                            WeekHolidaycount = WeekHolidaycount + 1;
+                        }
+                    }
+                    if (sunday == true)
+                    {
+                        if (d.DayOfWeek == DayOfWeek.Sunday)
+                        {
+                            WeekHolidaycount = WeekHolidaycount + 1;
+                        }
+                    }
+                }
 
 
+                List<string> fixHolidays = _configuration.GetSection("FixedHolidays")?.GetChildren()?.Select(x => x.Path.Substring(x.Path.IndexOf(":") + 1))?.ToList();
+
+                List<List<String>> holidayMatrix = new List<List<String>>();
+
+                int FixHolidaycounter = 0;
+
+                foreach (var fxholidays in fixHolidays)
+                {
+                    string[] holi = fxholidays.Split("/");
+                    string holidayString = curYear + "-" + holi[1] + "-" + holi[0];
+                    DateTime holidaydt = new DateTime(curYear, Convert.ToInt32(holi[1]), Convert.ToInt32(holi[0]));
+                    string holidayday = holidaydt.DayOfWeek.ToString();
+
+                    if (saturday == true && sunday == true )
+                    {
+                        if (holidayday.ToLower() != "saturday" && holidayday.ToLower() != "sunday")
+                        {
+                            if (holi[1] == curMonthNo.ToString("D2"))
+                            {
+                                holidayMatrix.Add(new List<String>());
+
+                                holidayMatrix[FixHolidaycounter].Add(fxholidays + "/" + curYear);
+
+                                holidayMatrix[FixHolidaycounter].Add(_configuration["FixedHolidays:" + fxholidays]);
+
+                                FixHolidaycounter++;
+                            }
+                        }
+
+                    }
+                    else if (saturday == true && sunday == false)
+                    {
+                        if (holidayday.ToLower() != "saturday")
+                        {
+                            if (holi[1] == curMonthNo.ToString("D2"))
+                            {
+                                holidayMatrix.Add(new List<String>());
+
+                                holidayMatrix[FixHolidaycounter].Add(fxholidays + "/" + curYear);
+
+                                holidayMatrix[FixHolidaycounter].Add(_configuration["FixedHolidays:" + fxholidays]);
+
+                                FixHolidaycounter++;
+                            }
+                        }
+
+                    }
+                    else if (saturday == false && sunday == true)
+                    {
+                        if (holidayday.ToLower() != "sunday")
+                        {
+                            if (holi[1] == curMonthNo.ToString("D2"))
+                            {
+                                holidayMatrix.Add(new List<String>());
+
+                                holidayMatrix[FixHolidaycounter].Add(fxholidays + "/" + curYear);
+
+                                holidayMatrix[FixHolidaycounter].Add(_configuration["FixedHolidays:" + fxholidays]);
+
+                                FixHolidaycounter++;
+                            }
+                        }
+
+                    }
+                    else 
+                    {                      
+                            if (holi[1] == curMonthNo.ToString("D2"))
+                            {
+                                holidayMatrix.Add(new List<String>());
+
+                                holidayMatrix[FixHolidaycounter].Add(fxholidays + "/" + curYear);
+
+                                holidayMatrix[FixHolidaycounter].Add(_configuration["FixedHolidays:" + fxholidays]);
+
+                                FixHolidaycounter++;
+                            }                       
+
+                    }
+                }
+
+                var TotalHolidays = FixHolidaycounter + WeekHolidaycount;
 
                 SalaryMonthlyStatementU SalProcessDataMaster = new SalaryMonthlyStatementU();
                 DataTable response = new DataTable();
@@ -57,7 +173,7 @@ namespace SwiftHR.Controllers
                 try
                 {
                     string connstring = ConfigurationManager.AppSetting.GetConnectionString("SHR_Client_DBConnection");
-                    response = SalProcessDataMaster.ProcessData(Convert.ToInt32(curMonthNo), Convert.ToInt32(curYear), connstring).Tables[0];
+                    response = SalProcessDataMaster.ProcessData(Convert.ToInt32(curMonthNo), Convert.ToInt32(curYear), Convert.ToInt32(TotalHolidays), connstring).Tables[0];
 
                     ReimbursementList = (from DataRow dr in response.Rows
                                          select new USpSalaryMonthlyStatement()
